@@ -20,6 +20,8 @@ elif [ "$1" = "inspectdb" ]; then
     ./flag_tool -i | less
 elif [ "$1" = "flag" ]; then
     ./flag_tool "$@"
+elif [ "$1" = "flagcompile" ]; then
+    gcc flag_tool.c -lsqlite3 -o flag_tool	
 else
   echo "I do not know this command..."
 fi
