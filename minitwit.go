@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -20,13 +22,51 @@ func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 	templates.ExecuteTemplate(writer, "example.html", nil)
 }
 
-// TODO: ConnectDb()
+func read_sql_schema() string {
+	schema, err := os.ReadFile("schema.sql")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(schema)
+}
 
-// TODO: InitDb()
+func connect_db() *sql.DB {
+	db, err := sql.Open("sqlite3", "/tmp/minitwit.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
+
+func init_db() {
+	db := connect_db()
+	defer db.Close()
+	sqlStmt := read_sql_schema()
+
+	_, err := db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func query_db() {
+
+}
+
+// TODO this function should probably return a string
+func get_user_id(username string) sql.Result {
+	db := connect_db()
+
+	sqlStmt := fmt.Sprintf("select user_id from user where username = %s", username)
+
+	var id, err = db.Exec(sqlStmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return id
+}
 
 // TODO: QueryDb()
-
-// TODO: GetUser_id(username)
 
 // TODO: FormatDatetime(timestamp)
 
