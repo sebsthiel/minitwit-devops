@@ -103,9 +103,9 @@ func get_user_id(username string) sql.Result {
 
 // TODO: BeforeRequest()
 
-// TODO: Timeline()
+// TODO: Timeline()  done
 
-// TODO: UserTimeline(username)
+// TODO: UserTimeline(username) done
 
 // TODO: FollowUser(username)
 
@@ -113,11 +113,11 @@ func get_user_id(username string) sql.Result {
 
 // TODO: AddMessage()
 
-// TODO: Login()
+// TODO: Login() done 
 
-// TODO: Logout()
+// TODO: Logout() done
 
-// TODO: Register()
+// TODO: Register() done 
 
 func main() {
 	fmt.Println("Starting server")
@@ -128,8 +128,41 @@ func main() {
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
 
-	router.HandleFunc("/", ExampleFunction).Methods(("GET"))
-	// TODO: add routes here
+	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Public timeline (placeholder)\n"))
+	}).Methods("GET")
+
+	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+    		w.WriteHeader(http.StatusOK)
+    		w.Write([]byte("Login page (placeholder)\n"))
+	}).Methods("GET")
+
+	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Logout (placeholder)\n"))
+	}).Methods("GET")
+
+	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Register (placeholder)\n"))
+	}).Methods("GET")
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Timeline (placeholder)\n"))
+	}).Methods("GET")
+
+	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		username := vars["username"]
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
+	}).Methods("GET")
+
+
+
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
