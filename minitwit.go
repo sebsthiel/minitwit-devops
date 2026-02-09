@@ -14,12 +14,41 @@ import (
 const PORT = "5000"
 
 // Data Structs: TODO
+type Data struct {
+	User         *User
+	Error        string
+	FormUsername string
+	Flashes      []string
+}
 
-var templates = template.Must(template.ParseGlob("templates/*.html"))
+type User struct {
+	Username string
+}
+
+var funcMap = template.FuncMap{
+	"url": func(urlName string) string {
+		return routes[urlName]
+	},
+}
+
+var templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
+
+var routes = map[string]string{
+	"timeline": "/",
+	"login":    "/login",
+	// TODO: extend with all name -> api route
+}
 
 func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 
-	templates.ExecuteTemplate(writer, "example.html", nil)
+	data := Data{
+		User:         &User{Username: "Test"}, //TODO REMOVE
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+	}
+	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
+	templates.ExecuteTemplate(writer, "example.html", data)
 }
 
 func read_sql_schema() string {
