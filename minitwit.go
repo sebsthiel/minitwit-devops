@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"text/template"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -98,6 +99,12 @@ func get_user_id(username string) sql.Result {
 // TODO: QueryDb()
 
 // TODO: FormatDatetime(timestamp)
+func FormatDatetime(timestamp int64) string { //return format string
+    t := time.Unix(timestamp, 0)
+	t = t.UTC()
+    result := t.Format("2006-01-02 @ 15:04")
+	return result
+}
 
 // TODO: GravatarUrl(email, size=80)
 
@@ -160,7 +167,6 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
 	}).Methods("GET")
-
 
 
 
