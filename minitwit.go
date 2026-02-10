@@ -61,7 +61,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", "./python_implementation/minitwit.db")
+	db, err := sql.Open("sqlite3", "/tmp/minitwit.db")
 	if err != nil {
 		log.Fatal(err)
 	}
