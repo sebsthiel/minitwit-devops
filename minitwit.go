@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const PORT = "5000"
@@ -82,17 +83,24 @@ func query_db() {
 
 }
 
-// TODO this function should probably return a string
-func get_user_id(username string) sql.Result {
+func get_user_id(username string) string {
 	db := connect_db()
 
-	sqlStmt := fmt.Sprintf("select user_id from user where username = %s", username)
+	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
 
-	var id, err = db.Exec(sqlStmt)
+	// Query for a single row
+	var res = db.QueryRow(sqlStmt)
+
+	// Var to hold result of scan
+	var user_id string
+
+	// The Scan function copies the row entries (Just one entry in this case) to its argument (a pointer)
+	var err = res.Scan(&user_id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return id
+
+	return user_id
 }
 
 // TODO: QueryDb()
@@ -113,13 +121,14 @@ func get_user_id(username string) sql.Result {
 
 // TODO: AddMessage()
 
-// TODO: Login() done 
+// TODO: Login() done
 
 // TODO: Logout() done
 
-// TODO: Register() done 
+// TODO: Register() done
 
 func main() {
+
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -134,8 +143,8 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-    		w.WriteHeader(http.StatusOK)
-    		w.Write([]byte("Login page (placeholder)\n"))
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Login page (placeholder)\n"))
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
@@ -160,9 +169,6 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
 	}).Methods("GET")
-
-
-
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
