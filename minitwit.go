@@ -1,11 +1,14 @@
 package main
 
 import (
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -107,7 +110,13 @@ func get_user_id(username string) string {
 
 // TODO: FormatDatetime(timestamp)
 
-// TODO: GravatarUrl(email, size=80)
+func gravatar_url(email string, size int) string {
+	trimmed := strings.ToLower(strings.TrimSpace(email))
+	hash := md5.Sum([]byte(trimmed))
+	hashString := hex.EncodeToString(hash[:])
+
+	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
+}
 
 // TODO: BeforeRequest()
 
