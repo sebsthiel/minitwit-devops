@@ -1,30 +1,37 @@
+{{define "layout"}}
 <!doctype html>
-<title>{{ block "title" . }}Welcome{{ end }} | MiniTwit</title>
-<link rel=stylesheet type=text/css href="/static/style.css">
-<div class=page>
+<title>{{block "title" .}}Welcome{{end}} | MiniTwit</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css">
+
+<div class="page">
   <h1>MiniTwit</h1>
-  <div class=navigation>
-  {{ if .User }}
-    <a href='{{ url "timeline" }}'>my timeline</a> |
-    <a href='{{ url "public_timeline" }}'>public timeline</a> |
-    <a href='{{ url "logout" }}'>sign out [{{ .User.Username }}]</a>
-  {{ else }}
-    <a href='{{ url "public_timeline" }}'>public timeline</a> |
-    <a href='{{ url "register" }}'>sign up</a> |
-    <a href='{{ url "login" }}'>sign in</a>
-  {{ end }}
+
+  <div class="navigation">
+  {{if .User}}
+    <a href='{{url "timeline"}}'>my timeline</a> |
+    <a href='{{url "public_timeline"}}'>public timeline</a> |
+    <a href='{{url "logout"}}'>sign out [{{.User.Username}}]</a>
+  {{else}}
+    <a href='{{url "public_timeline"}}'>public timeline</a> |
+    <a href='{{url "register"}}'>sign up</a> |
+    <a href='{{url "login"}}'>sign in</a>
+  {{end}}
   </div>
-    {{ if .Flashes }}
-      <ul class=flashes>
-      {{range .Flashes }}
-        <li>{{ . }}
-      {{ end }}
-      </ul>
-    {{ end }}
-  <div class=body>
-  {{ block "body" .}}{{ end }}
+
+  {{if .Flashes}}
+    <ul class="flashes">
+    {{range .Flashes}}
+      <li>{{.}}</li>
+    {{end}}
+    </ul>
+  {{end}}
+
+  <div class="body">
+    {{block "body" .}}{{end}}
   </div>
-  <div class=footer>
+
+  <div class="footer">
     MiniTwit &mdash; A Flask Application
   </div>
 </div>
+{{end}}

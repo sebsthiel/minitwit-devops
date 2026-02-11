@@ -18,6 +18,18 @@ const DATABASE = "/tmp/minitwit.db"
 
 var database *sql.DB
 
+var baseTpl = template.Must(
+	template.New("base").Funcs(funcMap).ParseFiles("templates/layout.html"),
+)
+
+var loginTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/login.html"),
+)
+
+var registerTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
+)
+
 // Data Structs: TODO
 type Data struct {
 	User         *User
@@ -36,24 +48,10 @@ var funcMap = template.FuncMap{
 	},
 }
 
-var templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
-
 var routes = map[string]string{
 	"timeline": "/",
 	"login":    "/login",
 	// TODO: extend with all name -> api route
-}
-
-func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
-
-	data := Data{
-		User:         &User{Username: "Test"}, //TODO REMOVE
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
-	templates.ExecuteTemplate(writer, "example.html", data)
 }
 
 func read_sql_schema() string {
@@ -195,7 +193,7 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		templates.ExecuteTemplate(w, "login.html", nil)
+		loginTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
@@ -204,8 +202,7 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Register (placeholder)\n"))
+		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
