@@ -36,8 +36,9 @@ var funcMap = template.FuncMap{
 var templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 
 var routes = map[string]string{
-	"timeline": "/",
-	"login":    "/login",
+	"timeline":        "/",
+	"login":           "/login",
+	"public_timeline": "/timeline",
 	// TODO: extend with all name -> api route
 }
 
@@ -57,6 +58,48 @@ func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 	}
 	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
 	templates.ExecuteTemplate(writer, "example.html", data)
+}
+
+func Login(writer http.ResponseWriter, request *http.Request) {
+
+	data := Data{
+		User:         &User{Username: "Test"}, //TODO REMOVE
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+	}
+
+	// if user is already loggen in then redirect to timeline
+
+	// get db
+	var db = connect_db()
+
+	// must be called to populate the form
+	request.ParseForm()
+
+	var username = request.Form.Get("username")
+
+	fmt.Print("Username: ")
+	fmt.Print(username)
+	// check if username is in db
+	var usernameStmt = fmt.Sprintf("select * from user where username = %s", request.Form.Get("FormUsername"))
+	var user = db.QueryRow(usernameStmt)
+
+	if user == nil {
+		log.Fatal("user is nil")
+	}
+
+	// check if password matches
+
+	session, _ := store.Get(request, "cookie-name")
+	// Authentication goes here
+	// ...
+
+	// Set user as authenticated
+	session.Values["authenticated"] = true
+	session.Save(request, writer)
+
+	templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
 }
 
 func read_sql_schema() string {
@@ -145,25 +188,6 @@ func add_message() {
 
 // TODO: Login() done
 
-func login(w http.ResponseWriter, r *http.Request) {
-	// if user is already loggen in then redirect to timeline
-
-	// get db
-	// var db = connect_db()
-
-	// check if username is in db
-
-	// check if password matches
-
-	session, _ := store.Get(r, "cookie-name")
-	// Authentication goes here
-	// ...
-
-	// Set user as authenticated
-	session.Values["authenticated"] = true
-	session.Save(r, w)
-}
-
 // TODO: Logout() done
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -194,7 +218,7 @@ func main() {
 			w.Write([]byte("Public timeline (placeholder)\n"))
 		}).Methods("GET")
 	*/
-	router.HandleFunc("/login", login)
+	router.HandleFunc("/login", Login)
 
 	/*
 		router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
