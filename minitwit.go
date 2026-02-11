@@ -29,6 +29,10 @@ var loginTpl = template.Must(
 var registerTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
 )
+var timelineTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
+)
+
 
 // Data Structs: TODO
 type Data struct {
@@ -188,9 +192,9 @@ func main() {
 			http.FileServer(http.Dir("./static"))))
 
 	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Public timeline (placeholder)\n"))
+		timelineTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
+
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		loginTpl.ExecuteTemplate(w, "layout", nil)
@@ -206,9 +210,9 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Timeline (placeholder)\n"))
+		http.Redirect(w, r, "/public", http.StatusFound)
 	}).Methods("GET")
+
 
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
