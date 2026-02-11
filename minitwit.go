@@ -39,6 +39,7 @@ var routes = map[string]string{
 	"timeline":        "/",
 	"login":           "/login",
 	"public_timeline": "/timeline",
+	"logout":          "/logout",
 	// TODO: extend with all name -> api route
 }
 
@@ -61,6 +62,7 @@ func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 }
 
 func Login(writer http.ResponseWriter, request *http.Request) {
+	session, _ := store.Get(request, "cookie-name")
 
 	data := Data{
 		User:         &User{Username: "Test"}, //TODO REMOVE
@@ -70,34 +72,38 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// if user is already loggen in then redirect to timeline
+	if session.Values["authenticated"] == true {
+		// Redirect
+	}
 
 	// get db
-	var db = connect_db()
+	db := connect_db()
 
 	// must be called to populate the form
 	request.ParseForm()
 
-	var username = request.Form.Get("username")
+	var pw string
 
-	fmt.Print("Username: ")
-	fmt.Print(username)
 	// check if username is in db
-	var usernameStmt = fmt.Sprintf("select * from user where username = %s", request.Form.Get("FormUsername"))
-	var user = db.QueryRow(usernameStmt)
+	var usernameStmt = fmt.Sprintf("select pw_hash from user where username = '%s'", request.Form.Get("username"))
+	db.QueryRow(usernameStmt).Scan(&pw)
 
-	if user == nil {
-		log.Fatal("user is nil")
+	//fmt.Print(request.Form.Get("username"))
+	// if user in not in db, or pw is incorrect set error message, else login
+	if pw == "" {
+		fmt.Print("ski")
+		data.Error = "Invalid username"
+	} else if pw != request.Form.Get("password") {
+		data.Error = "Invalid password"
+	} else {
+		// Set user as authenticated
+		fmt.Print("logged in")
+		session.Values["authenticated"] = true
+		session.Save(request, writer)
 	}
 
-	// check if password matches
-
-	session, _ := store.Get(request, "cookie-name")
 	// Authentication goes here
 	// ...
-
-	// Set user as authenticated
-	session.Values["authenticated"] = true
-	session.Save(request, writer)
 
 	templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
 }
@@ -111,7 +117,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", "/tmp/minitwit.db")
+	db, err := sql.Open("sqlite3", "test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -190,10 +196,11 @@ func add_message() {
 
 // TODO: Logout() done
 
-func logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "cookie-name")
 
+	fmt.Print("logged out")
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	session.Save(r, w)
@@ -226,10 +233,7 @@ func main() {
 			w.Write([]byte("Login page (placeholder)\n"))
 		}).Methods("GET")*/
 
-	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Logout (placeholder)\n"))
-	}).Methods("GET")
+	router.HandleFunc("/logout", Logout)
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
