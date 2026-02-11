@@ -11,6 +11,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // configuration
@@ -138,17 +139,24 @@ func query_db_one(query string, args any) (map[string]any, error) {
 	return results[0], nil
 }
 
-// TODO this function should probably return a string
-func get_user_id(username string) sql.Result {
+func get_user_id(username string) string {
 	db := connect_db()
 
-	sqlStmt := fmt.Sprintf("select user_id from user where username = %s", username)
+	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
 
-	var id, err = db.Exec(sqlStmt)
+	// Query for a single row
+	var res = db.QueryRow(sqlStmt)
+
+	// Var to hold result of scan
+	var user_id string
+
+	// The Scan function copies the row entries (Just one entry in this case) to its argument (a pointer)
+	var err = res.Scan(&user_id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return id
+
+	return user_id
 }
 
 // TODO: FormatDatetime(timestamp)
@@ -189,7 +197,8 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		templates.ExecuteTemplate(w, "login.html", nil)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Login page (placeholder)\n"))
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
