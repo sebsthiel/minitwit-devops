@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -39,6 +40,12 @@ var routes = map[string]string{
 	"login":    "/login",
 	// TODO: extend with all name -> api route
 }
+
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
 
 func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 
@@ -121,9 +128,52 @@ func get_user_id(username string) string {
 
 // TODO: AddMessage()
 
+func add_message() {
+	// check if user is logged in
+
+	/*
+		// get db
+		var db = connect_db()
+
+		// make insert stmt
+		var stmt = fmt.Sprintf("insert into message (%s, %s, pub_date, flagged)", (session['user_id'], request.form['text'], int(time.time())))
+
+		// if logged in insert message into db
+		db.Exec(stmt)
+	*/
+}
+
 // TODO: Login() done
 
+func login(w http.ResponseWriter, r *http.Request) {
+	// if user is already loggen in then redirect to timeline
+
+	// get db
+	// var db = connect_db()
+
+	// check if username is in db
+
+	// check if password matches
+
+	session, _ := store.Get(r, "cookie-name")
+	// Authentication goes here
+	// ...
+
+	// Set user as authenticated
+	session.Values["authenticated"] = true
+	session.Save(r, w)
+}
+
 // TODO: Logout() done
+
+func logout(w http.ResponseWriter, r *http.Request) {
+
+	session, _ := store.Get(r, "cookie-name")
+
+	// Revoke users authentication
+	session.Values["authenticated"] = false
+	session.Save(r, w)
+}
 
 // TODO: Register() done
 
@@ -137,15 +187,20 @@ func main() {
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
 
-	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Public timeline (placeholder)\n"))
-	}).Methods("GET")
+	router.HandleFunc("/public", ExampleFunction)
+	/*
+		router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Public timeline (placeholder)\n"))
+		}).Methods("GET")
+	*/
+	router.HandleFunc("/login", login)
 
-	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Login page (placeholder)\n"))
-	}).Methods("GET")
+	/*
+		router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Login page (placeholder)\n"))
+		}).Methods("GET")*/
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
