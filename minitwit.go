@@ -12,7 +12,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const PORT = "5000"
+// configuration
+const PORT = "5001"
+const DATABASE = "/tmp/minitwit.db"
+
+var database *sql.DB
 
 // Data Structs: TODO
 type Data struct {
@@ -61,7 +65,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", "/tmp/minitwit.db")
+	db, err := sql.Open("sqlite3", DATABASE)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,8 +83,58 @@ func init_db() {
 	}
 }
 
-func query_db() {
+// Queries the database and returns a list of dictionaries.
+// USE query_db_one if you only want one result
+func query_db(query string, args any) ([]map[string]any, error) {
+	rows, err := database.Query(query, args)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
+	cols, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+	// results is a slice of rows...
+	var results []map[string]any
+
+	for rows.Next() {
+		values := make([]any, len(cols))
+		valuePtrs := make([]any, len(cols))
+
+		for i := range cols {
+			valuePtrs[i] = &values[i]
+		}
+
+		// put data into pointers
+		err := rows.Scan(valuePtrs...)
+
+		if err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]any)
+		for i, col := range cols {
+			rowMap[col] = values[i]
+		}
+
+		results = append(results, rowMap)
+	}
+	return results, nil
+}
+
+func query_db_one(query string, args any) (map[string]any, error) {
+	results, err := query_db(query, args)
+	if err != nil {
+		return nil, nil
+	}
+
+	if len(results) == 0 {
+		return nil, nil
+	}
+
+	return results[0], nil
 }
 
 func get_user_id(username string) string {
@@ -102,8 +156,6 @@ func get_user_id(username string) string {
 
 	return user_id
 }
-
-// TODO: QueryDb()
 
 // TODO: FormatDatetime(timestamp)
 
@@ -128,7 +180,7 @@ func get_user_id(username string) string {
 // TODO: Register() done
 
 func main() {
-
+	database = connect_db()
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -143,8 +195,7 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Login page (placeholder)\n"))
+		templates.ExecuteTemplate(w, "login.html", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
