@@ -95,9 +95,8 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		data.Error = "Invalid username"
 	} else if pw != request.Form.Get("password") {
 		data.Error = "Invalid password"
-	} else {
-		// Set user as authenticated
-		fmt.Print("logged in")
+	} else { // Set user as authenticated
+		fmt.Print("logged in") // TODO remove once convinced
 		session.Values["authenticated"] = true
 		session.Save(request, writer)
 	}
@@ -177,8 +176,13 @@ func get_user_id(username string) string {
 
 // TODO: AddMessage()
 
-func add_message() {
+func add_message(writer http.ResponseWriter, request *http.Request) {
+	session, _ := store.Get(request, "cookie-name")
+
 	// check if user is logged in
+	if session.Values["authenticated"] == false {
+		//http.Redirect()
+	}
 
 	/*
 		// get db
@@ -200,7 +204,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "cookie-name")
 
-	fmt.Print("logged out")
+	fmt.Print("logged out") // TODO remove once convinced
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	session.Save(r, w)
