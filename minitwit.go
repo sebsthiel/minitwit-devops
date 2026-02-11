@@ -195,8 +195,7 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Login page (placeholder)\n"))
+		templates.ExecuteTemplate(w, "login.html", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
