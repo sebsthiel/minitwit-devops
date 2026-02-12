@@ -32,6 +32,9 @@ var registerTpl = template.Must(
 var timelineTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
 )
+var userTimelineTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/user_timeline.html"),
+)
 
 
 // Data Structs: TODO
@@ -259,12 +262,33 @@ router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
 
 
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		username := vars["username"]
+	vars := mux.Vars(r)
+	username := vars["username"]
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
-	}).Methods("GET")
+	msgs, err := query_db(`
+		SELECT message.message_id, message.text, message.pub_date, user.username
+		FROM message
+		JOIN user ON user.user_id = message.author_id
+		WHERE user.username = ?
+		ORDER BY message.pub_date DESC
+		LIMIT 30;
+	`, username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := Data{
+		FormUsername: username,
+		Messages:     msgs,
+	}
+
+	if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}).Methods("GET")
+
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
