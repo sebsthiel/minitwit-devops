@@ -15,7 +15,7 @@ import (
 // configuration
 const PORT = "5001"
 const DATABASE = "/tmp/minitwit.db"
-
+const PER_PAGE = 30
 var database *sql.DB
 
 var baseTpl = template.Must(
@@ -63,7 +63,7 @@ var routes = map[string]string{
 }
 
 func read_sql_schema() string {
-	schema, err := os.ReadFile("python_implementation/schema.sql")
+	schema, err := os.ReadFile("schema.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,8 +91,9 @@ func init_db() {
 
 // Queries the database and returns a list of dictionaries.
 // USE query_db_one if you only want one result
-func query_db(query string, args any) ([]map[string]any, error) {
-	rows, err := database.Query(query, args)
+func query_db(query string, args ...any) ([]map[string]any, error) {
+	rows, err := database.Query(query, args...
+)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +131,8 @@ func query_db(query string, args any) ([]map[string]any, error) {
 	return results, nil
 }
 
-func query_db_one(query string, args any) (map[string]any, error) {
-	results, err := query_db(query, args)
+func query_db_one(query string, args ...any) (map[string]any, error) {
+	results, err := query_db(query, args...)
 	if err != nil {
 		return nil, nil
 	}
@@ -163,27 +164,6 @@ func get_user_id(username string) string {
 	return user_id
 }
 
-// TODO: FormatDatetime(timestamp)
-
-// TODO: GravatarUrl(email, size=80)
-
-// TODO: BeforeRequest()
-
-// TODO: Timeline()  done
-
-// TODO: UserTimeline(username) done
-
-// TODO: FollowUser(username)
-
-// TODO: UnfollowUser(username)
-
-// TODO: AddMessage()
-
-// TODO: Login() done
-
-// TODO: Logout() done
-
-// TODO: Register() done
 
 func ensure_schema(db *sql.DB) {
 	var name string
@@ -225,8 +205,8 @@ router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
 		FROM message
 		JOIN user ON user.user_id = message.author_id
 		ORDER BY message.pub_date DESC
-		LIMIT 30;
-	`, nil)
+		LIMIT ?;
+	`, PER_PAGE)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -252,6 +232,13 @@ router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Logout (placeholder)\n"))
 	}).Methods("GET")
 
+	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}).Methods("GET")
+
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
@@ -271,8 +258,8 @@ router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
 		JOIN user ON user.user_id = message.author_id
 		WHERE user.username = ?
 		ORDER BY message.pub_date DESC
-		LIMIT 30;
-	`, username)
+		LIMIT ?;
+	`, username, PER_PAGE)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
