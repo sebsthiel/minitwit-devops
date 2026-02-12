@@ -1,18 +1,42 @@
 package main
 
 import (
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-const PORT = "5000"
+// configuration
+const PORT = "5001"
+const DATABASE = "/tmp/minitwit.db"
+
+var database *sql.DB
+
+var baseTpl = template.Must(
+	template.New("base").Funcs(funcMap).ParseFiles("templates/layout.html"),
+)
+
+var loginTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/login.html"),
+)
+
+var registerTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
+)
+var timelineTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
+)
+
 
 // Data Structs: TODO
 type Data struct {
@@ -32,24 +56,10 @@ var funcMap = template.FuncMap{
 	},
 }
 
-var templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
-
 var routes = map[string]string{
 	"timeline": "/",
 	"login":    "/login",
 	// TODO: extend with all name -> api route
-}
-
-func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
-
-	data := Data{
-		User:         &User{Username: "Test"}, //TODO REMOVE
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
-	templates.ExecuteTemplate(writer, "example.html", data)
 }
 
 func read_sql_schema() string {
@@ -61,7 +71,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", "/tmp/minitwit.db")
+	db, err := sql.Open("sqlite3", DATABASE)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,24 +89,79 @@ func init_db() {
 	}
 }
 
-func query_db() {
+// Queries the database and returns a list of dictionaries.
+// USE query_db_one if you only want one result
+func query_db(query string, args any) ([]map[string]any, error) {
+	rows, err := database.Query(query, args)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
+	cols, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+	// results is a slice of rows...
+	var results []map[string]any
+
+	for rows.Next() {
+		values := make([]any, len(cols))
+		valuePtrs := make([]any, len(cols))
+
+		for i := range cols {
+			valuePtrs[i] = &values[i]
+		}
+
+		// put data into pointers
+		err := rows.Scan(valuePtrs...)
+
+		if err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]any)
+		for i, col := range cols {
+			rowMap[col] = values[i]
+		}
+
+		results = append(results, rowMap)
+	}
+	return results, nil
 }
 
-// TODO this function should probably return a string
-func get_user_id(username string) sql.Result {
+func query_db_one(query string, args any) (map[string]any, error) {
+	results, err := query_db(query, args)
+	if err != nil {
+		return nil, nil
+	}
+
+	if len(results) == 0 {
+		return nil, nil
+	}
+
+	return results[0], nil
+}
+
+func get_user_id(username string) string {
 	db := connect_db()
 
-	sqlStmt := fmt.Sprintf("select user_id from user where username = %s", username)
+	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
 
-	var id, err = db.Exec(sqlStmt)
+	// Query for a single row
+	var res = db.QueryRow(sqlStmt)
+
+	// Var to hold result of scan
+	var user_id string
+
+	// The Scan function copies the row entries (Just one entry in this case) to its argument (a pointer)
+	var err = res.Scan(&user_id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return id
-}
 
-// TODO: QueryDb()
+	return user_id
+}
 
 // TODO: FormatDatetime(timestamp)
 func FormatDatetime(timestamp int64) string { //return format string
@@ -106,7 +171,13 @@ func FormatDatetime(timestamp int64) string { //return format string
 	return result
 }
 
-// TODO: GravatarUrl(email, size=80)
+func gravatar_url(email string, size int) string {
+	trimmed := strings.ToLower(strings.TrimSpace(email))
+	hash := md5.Sum([]byte(trimmed))
+	hashString := hex.EncodeToString(hash[:])
+
+	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
+}
 
 // TODO: BeforeRequest()
 
@@ -120,13 +191,14 @@ func FormatDatetime(timestamp int64) string { //return format string
 
 // TODO: AddMessage()
 
-// TODO: Login() done 
+// TODO: Login() done
 
 // TODO: Logout() done
 
-// TODO: Register() done 
+// TODO: Register() done
 
 func main() {
+	database = connect_db()
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -136,13 +208,12 @@ func main() {
 			http.FileServer(http.Dir("./static"))))
 
 	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Public timeline (placeholder)\n"))
+		timelineTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
+
 	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-    		w.WriteHeader(http.StatusOK)
-    		w.Write([]byte("Login page (placeholder)\n"))
+		loginTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
@@ -151,14 +222,13 @@ func main() {
 	}).Methods("GET")
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Register (placeholder)\n"))
+		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Timeline (placeholder)\n"))
+		http.Redirect(w, r, "/public", http.StatusFound)
 	}).Methods("GET")
+
 
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
