@@ -186,8 +186,55 @@ func gravatar_url(email string, size int) string {
 // TODO: UserTimeline(username) done
 
 // TODO: FollowUser(username)
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+    if sessionUserID == "" {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+
+    vars := mux.Vars(r)
+    usernameToFollow := vars["username"]
+
+    whomID := get_user_id(usernameToFollow)
+    if whomID == "" {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    _, err := db.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", sessionUserID, whomID)
+    if err != nil {
+        http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
+}
 
 // TODO: UnfollowUser(username)
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+	if sessionUserID == "" {
+    	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    	return
+	}
+    vars := mux.Vars(r)
+    usernameToUnfollow := vars["username"]
+
+    whomID := get_user_id(usernameToUnfollow)
+    if whomID == "" {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    _, err := db.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", sessionUserID, whomID)
+    if err != nil {
+        http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
+}
 
 // TODO: AddMessage()
 
