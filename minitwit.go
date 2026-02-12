@@ -40,6 +40,7 @@ type Data struct {
 	Error        string
 	FormUsername string
 	Flashes      []string
+	Messages     []map[string]any
 }
 
 type User struct {
@@ -59,7 +60,7 @@ var routes = map[string]string{
 }
 
 func read_sql_schema() string {
-	schema, err := os.ReadFile("schema.sql")
+	schema, err := os.ReadFile("python_implementation/schema.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -181,8 +182,30 @@ func get_user_id(username string) string {
 
 // TODO: Register() done
 
+func ensure_schema(db *sql.DB) {
+	var name string
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='message'`).Scan(&name)
+	if err == sql.ErrNoRows {
+		sqlStmt := read_sql_schema()
+		if _, err := db.Exec(sqlStmt); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+
+
+
+
+
 func main() {
 	database = connect_db()
+	ensure_schema(database)
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -190,15 +213,36 @@ func main() {
 	router.PathPrefix("/static/").
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
+	
 
-	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-		timelineTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
+router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
+
+	msgs, err := query_db(`
+		SELECT message.message_id, message.text, message.pub_date, user.username
+		FROM message
+		JOIN user ON user.user_id = message.author_id
+		ORDER BY message.pub_date DESC
+		LIMIT 30;
+	`, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := Data{
+		Messages: msgs,
+	}
+
+	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}).Methods("GET")
 
 
-	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		loginTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
+
+
 
 	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
