@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
@@ -163,6 +164,12 @@ func get_user_id(username string) string {
 }
 
 // TODO: FormatDatetime(timestamp)
+func FormatDatetime(timestamp int64) string { //return format string
+    t := time.Unix(timestamp, 0)
+	t = t.UTC()
+    result := t.Format("2006-01-02 @ 15:04")
+	return result
+}
 
 func gravatar_url(email string, size int) string {
 	trimmed := strings.ToLower(strings.TrimSpace(email))
@@ -230,6 +237,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
 	}).Methods("GET")
+
+
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
