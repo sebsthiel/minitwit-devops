@@ -19,7 +19,7 @@ import (
 
 // configurationf
 const PORT = "5001"
-const DATABASE = "test.db"
+const DATABASE = "python_implementation/minitwit.db"
 const PER_PAGE = 30
 
 var database *sql.DB
@@ -413,7 +413,9 @@ func main() {
 		data := Data{
 			Messages: msgs,
 		}
-		fmt.Printf("%#v\n", msgs[0])
+		if len(msgs) > 0 {
+    			fmt.Printf("%#v\n", msgs[0])
+		}
 
 		if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
