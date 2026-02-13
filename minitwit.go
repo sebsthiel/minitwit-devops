@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -57,9 +58,74 @@ var funcMap = template.FuncMap{
 }
 
 var routes = map[string]string{
-	"timeline": "/",
-	"login":    "/login",
+	"timeline":        "/",
+	"login":           "/login",
+	"public_timeline": "/timeline",
+	"logout":          "/logout",
 	// TODO: extend with all name -> api route
+}
+
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
+
+func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
+
+	data := Data{
+		User:         &User{Username: "Test"}, //TODO REMOVE
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+	}
+	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
+	templates.ExecuteTemplate(writer, "example.html", data)
+}
+
+func Login(writer http.ResponseWriter, request *http.Request) {
+	session, _ := store.Get(request, "cookie-name")
+
+	data := Data{
+		User:         &User{Username: "Test"}, //TODO REMOVE
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+	}
+
+	// TODO
+	// if user is already loggen in then redirect to timeline
+	if session.Values["authenticated"] == true {
+		// Redirect
+	}
+
+	// get db
+	db := connect_db()
+
+	// must be called to populate the form
+	request.ParseForm()
+	var pw string
+
+	// check if username is in db
+	var usernameStmt = fmt.Sprintf("select pw_hash from user where username = '%s'", request.Form.Get("username"))
+	db.QueryRow(usernameStmt).Scan(&pw)
+
+	// if user in not in db, or pw is incorrect set error message, else login
+	if pw == "" {
+		fmt.Print("ski")
+		data.Error = "Invalid username"
+	} else if pw != request.Form.Get("password") {
+		data.Error = "Invalid password"
+	} else { // Set user as authenticated
+		fmt.Print("logged in") // TODO remove once convinced
+		session.Values["authenticated"] = true
+		session.Save(request, writer)
+	}
+
+	// Authentication goes here
+	// ...
+
+	templates.ExecuteTemplate(writer, "login.html", data)
 }
 
 func read_sql_schema() string {
@@ -238,9 +304,35 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 
 // TODO: AddMessage()
 
-// TODO: Login() done
+func add_message(writer http.ResponseWriter, request *http.Request) {
+	session, _ := store.Get(request, "cookie-name")
 
-// TODO: Logout() done
+	// check if user is logged in
+	if session.Values["authenticated"] == false {
+		//http.Redirect()
+	}
+
+	/*
+		// get db
+		var db = connect_db()
+
+		// make insert stmt
+		var stmt = fmt.Sprintf("insert into message (%s, %s, pub_date, flagged)", (session['user_id'], request.form['text'], int(time.time())))
+
+		// if logged in insert message into db
+		db.Exec(stmt)
+	*/
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+
+	session, _ := store.Get(r, "cookie-name")
+
+	fmt.Print("logged out") // TODO remove once convinced
+	// Revoke users authentication
+	session.Values["authenticated"] = false
+	session.Save(r, w)
+}
 
 // TODO: Register() done
 
@@ -254,19 +346,22 @@ func main() {
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
 
-	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-		timelineTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
+	router.HandleFunc("/public", ExampleFunction)
+	/*
+		router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Public timeline (placeholder)\n"))
+		}).Methods("GET")
+	*/
+	router.HandleFunc("/login", Login)
 
+	/*
+		router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Login page (placeholder)\n"))
+		}).Methods("GET")*/
 
-	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		loginTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
-
-	router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Logout (placeholder)\n"))
-	}).Methods("GET")
+	router.HandleFunc("/logout", Logout)
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", nil)
