@@ -1,19 +1,43 @@
 package main
 
 import (
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"text/template"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const PORT = "5000"
+// configuration
+const PORT = "5001"
+const DATABASE = "/tmp/minitwit.db"
+
+var database *sql.DB
+
+var baseTpl = template.Must(
+	template.New("base").Funcs(funcMap).ParseFiles("templates/layout.html"),
+)
+
+var loginTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/login.html"),
+)
+
+var registerTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
+)
+var timelineTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
+)
+
 
 // Data Structs: TODO
 type Data struct {
@@ -32,8 +56,6 @@ var funcMap = template.FuncMap{
 		return routes[urlName]
 	},
 }
-
-var templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 
 var routes = map[string]string{
 	"timeline":        "/",
@@ -115,7 +137,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", "test.db")
+	db, err := sql.Open("sqlite3", DATABASE)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,8 +155,58 @@ func init_db() {
 	}
 }
 
-func query_db() {
+// Queries the database and returns a list of dictionaries.
+// USE query_db_one if you only want one result
+func query_db(query string, args any) ([]map[string]any, error) {
+	rows, err := database.Query(query, args)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
+	cols, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+	// results is a slice of rows...
+	var results []map[string]any
+
+	for rows.Next() {
+		values := make([]any, len(cols))
+		valuePtrs := make([]any, len(cols))
+
+		for i := range cols {
+			valuePtrs[i] = &values[i]
+		}
+
+		// put data into pointers
+		err := rows.Scan(valuePtrs...)
+
+		if err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]any)
+		for i, col := range cols {
+			rowMap[col] = values[i]
+		}
+
+		results = append(results, rowMap)
+	}
+	return results, nil
+}
+
+func query_db_one(query string, args any) (map[string]any, error) {
+	results, err := query_db(query, args)
+	if err != nil {
+		return nil, nil
+	}
+
+	if len(results) == 0 {
+		return nil, nil
+	}
+
+	return results[0], nil
 }
 
 func get_user_id(username string) string {
@@ -157,11 +229,21 @@ func get_user_id(username string) string {
 	return user_id
 }
 
-// TODO: QueryDb()
-
 // TODO: FormatDatetime(timestamp)
+func FormatDatetime(timestamp int64) string { //return format string
+    t := time.Unix(timestamp, 0)
+	t = t.UTC()
+    result := t.Format("2006-01-02 @ 15:04")
+	return result
+}
 
-// TODO: GravatarUrl(email, size=80)
+func gravatar_url(email string, size int) string {
+	trimmed := strings.ToLower(strings.TrimSpace(email))
+	hash := md5.Sum([]byte(trimmed))
+	hashString := hex.EncodeToString(hash[:])
+
+	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
+}
 
 // TODO: BeforeRequest()
 
@@ -170,8 +252,55 @@ func get_user_id(username string) string {
 // TODO: UserTimeline(username) done
 
 // TODO: FollowUser(username)
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+    if sessionUserID == "" {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+
+    vars := mux.Vars(r)
+    usernameToFollow := vars["username"]
+
+    whomID := get_user_id(usernameToFollow)
+    if whomID == "" {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    _, err := db.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", sessionUserID, whomID)
+    if err != nil {
+        http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
+}
 
 // TODO: UnfollowUser(username)
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+	if sessionUserID == "" {
+    	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    	return
+	}
+    vars := mux.Vars(r)
+    usernameToUnfollow := vars["username"]
+
+    whomID := get_user_id(usernameToUnfollow)
+    if whomID == "" {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    _, err := db.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", sessionUserID, whomID)
+    if err != nil {
+        http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
+}
 
 // TODO: AddMessage()
 
@@ -208,7 +337,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 // TODO: Register() done
 
 func main() {
-
+	database = connect_db()
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -235,14 +364,13 @@ func main() {
 	router.HandleFunc("/logout", Logout)
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Register (placeholder)\n"))
+		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Timeline (placeholder)\n"))
+		http.Redirect(w, r, "/public", http.StatusFound)
 	}).Methods("GET")
+
 
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -251,6 +379,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
 	}).Methods("GET")
+
+
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
