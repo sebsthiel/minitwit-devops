@@ -17,7 +17,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// configuration
+// configurationf
 const PORT = "5001"
 const DATABASE = "/tmp/minitwit.db"
 const PER_PAGE = 30
@@ -381,6 +381,7 @@ func main() {
 		data := Data{
 			Messages: msgs,
 		}
+		fmt.Printf("%#v\n", msgs[0])
 
 		if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
