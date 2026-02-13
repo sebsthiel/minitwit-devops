@@ -71,6 +71,7 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		Flashes:      nil,
 	}
 
+	// TODO
 	// if user is already loggen in then redirect to timeline
 	if session.Values["authenticated"] == true {
 		// Redirect
@@ -81,14 +82,12 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 
 	// must be called to populate the form
 	request.ParseForm()
-
 	var pw string
 
 	// check if username is in db
 	var usernameStmt = fmt.Sprintf("select pw_hash from user where username = '%s'", request.Form.Get("username"))
 	db.QueryRow(usernameStmt).Scan(&pw)
 
-	//fmt.Print(request.Form.Get("username"))
 	// if user in not in db, or pw is incorrect set error message, else login
 	if pw == "" {
 		fmt.Print("ski")
@@ -104,7 +103,7 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 	// Authentication goes here
 	// ...
 
-	templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
+	templates.ExecuteTemplate(writer, "login.html", data)
 }
 
 func read_sql_schema() string {
@@ -195,10 +194,6 @@ func add_message(writer http.ResponseWriter, request *http.Request) {
 		db.Exec(stmt)
 	*/
 }
-
-// TODO: Login() done
-
-// TODO: Logout() done
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 
