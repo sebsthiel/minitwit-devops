@@ -20,6 +20,7 @@ import (
 // configuration
 const PORT = "5001"
 const DATABASE = "/tmp/minitwit.db"
+const PER_PAGE = 30
 
 var database *sql.DB
 
@@ -37,7 +38,9 @@ var registerTpl = template.Must(
 var timelineTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
 )
-
+var userTimelineTpl = template.Must(
+	template.Must(baseTpl.Clone()).ParseFiles("templates/user_timeline.html"),
+)
 
 // Data Structs: TODO
 type Data struct {
@@ -45,6 +48,7 @@ type Data struct {
 	Error        string
 	FormUsername string
 	Flashes      []string
+	Messages     []map[string]any
 }
 
 type User struct {
@@ -80,7 +84,7 @@ func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 		Flashes:      nil,
 	}
 	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
-	templates.ExecuteTemplate(writer, "example.html", data)
+	userTimelineTpl.ExecuteTemplate(writer, "example.html", data)
 }
 
 func Login(writer http.ResponseWriter, request *http.Request) {
@@ -125,7 +129,10 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 	// Authentication goes here
 	// ...
 
-	templates.ExecuteTemplate(writer, "login.html", data)
+	if err := loginTpl.ExecuteTemplate(writer, "layout", data); err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func read_sql_schema() string {
@@ -157,8 +164,9 @@ func init_db() {
 
 // Queries the database and returns a list of dictionaries.
 // USE query_db_one if you only want one result
-func query_db(query string, args any) ([]map[string]any, error) {
-	rows, err := database.Query(query, args)
+func query_db(query string, args ...any) ([]map[string]any, error) {
+	rows, err := database.Query(query, args...,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +204,8 @@ func query_db(query string, args any) ([]map[string]any, error) {
 	return results, nil
 }
 
-func query_db_one(query string, args any) (map[string]any, error) {
-	results, err := query_db(query, args)
+func query_db_one(query string, args ...any) (map[string]any, error) {
+	results, err := query_db(query, args...)
 	if err != nil {
 		return nil, nil
 	}
@@ -229,11 +237,26 @@ func get_user_id(username string) string {
 	return user_id
 }
 
+func ensure_schema(db *sql.DB) {
+	var name string
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='message'`).Scan(&name)
+	if err == sql.ErrNoRows {
+		sqlStmt := read_sql_schema()
+		if _, err := db.Exec(sqlStmt); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // TODO: FormatDatetime(timestamp)
 func FormatDatetime(timestamp int64) string { //return format string
-    t := time.Unix(timestamp, 0)
+	t := time.Unix(timestamp, 0)
 	t = t.UTC()
-    result := t.Format("2006-01-02 @ 15:04")
+	result := t.Format("2006-01-02 @ 15:04")
 	return result
 }
 
@@ -245,61 +268,55 @@ func gravatar_url(email string, size int) string {
 	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
 }
 
-// TODO: BeforeRequest()
-
-// TODO: Timeline()  done
-
-// TODO: UserTimeline(username) done
-
 // TODO: FollowUser(username)
 func FollowUser(w http.ResponseWriter, r *http.Request) {
-    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
-    if sessionUserID == "" {
-        http.Error(w, "Unauthorized", http.StatusUnauthorized)
-        return
-    }
+	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+	if sessionUserID == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
-    vars := mux.Vars(r)
-    usernameToFollow := vars["username"]
+	vars := mux.Vars(r)
+	usernameToFollow := vars["username"]
 
-    whomID := get_user_id(usernameToFollow)
-    if whomID == "" {
-        http.Error(w, "User not found", http.StatusNotFound)
-        return
-    }
+	whomID := get_user_id(usernameToFollow)
+	if whomID == "" {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
 
-    _, err := db.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", sessionUserID, whomID)
-    if err != nil {
-        http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	_, err := database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", sessionUserID, whomID)
+	if err != nil {
+		http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
+	http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
 }
 
 // TODO: UnfollowUser(username)
 func UnfollowUser(w http.ResponseWriter, r *http.Request) {
-    sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
 	if sessionUserID == "" {
-    	http.Error(w, "Unauthorized", http.StatusUnauthorized)
-    	return
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
-    vars := mux.Vars(r)
-    usernameToUnfollow := vars["username"]
+	vars := mux.Vars(r)
+	usernameToUnfollow := vars["username"]
 
-    whomID := get_user_id(usernameToUnfollow)
-    if whomID == "" {
-        http.Error(w, "User not found", http.StatusNotFound)
-        return
-    }
+	whomID := get_user_id(usernameToUnfollow)
+	if whomID == "" {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
 
-    _, err := db.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", sessionUserID, whomID)
-    if err != nil {
-        http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	_, err := database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", sessionUserID, whomID)
+	if err != nil {
+		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
+	http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
 // TODO: AddMessage()
@@ -338,6 +355,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	database = connect_db()
+	ensure_schema(database)
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 
@@ -345,6 +363,31 @@ func main() {
 	router.PathPrefix("/static/").
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
+
+	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
+
+		msgs, err := query_db(`
+		SELECT message.message_id, message.text, message.pub_date, user.username
+		FROM message
+		JOIN user ON user.user_id = message.author_id
+		ORDER BY message.pub_date DESC
+		LIMIT ?;
+	`, PER_PAGE)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data := Data{
+			Messages: msgs,
+		}
+
+		if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+	}).Methods("GET")
 
 	router.HandleFunc("/public", ExampleFunction)
 	/*
@@ -363,6 +406,13 @@ func main() {
 
 	router.HandleFunc("/logout", Logout)
 
+	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}).Methods("GET")
+
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
@@ -371,16 +421,33 @@ func main() {
 		http.Redirect(w, r, "/public", http.StatusFound)
 	}).Methods("GET")
 
-
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		username := vars["username"]
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("User timeline for " + username + " (placeholder)\n"))
+		msgs, err := query_db(`
+		SELECT message.message_id, message.text, message.pub_date, user.username
+		FROM message
+		JOIN user ON user.user_id = message.author_id
+		WHERE user.username = ?
+		ORDER BY message.pub_date DESC
+		LIMIT ?;
+	`, username, PER_PAGE)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data := Data{
+			FormUsername: username,
+			Messages:     msgs,
+		}
+
+		if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}).Methods("GET")
-
-
 
 	fmt.Println("Started listining on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))

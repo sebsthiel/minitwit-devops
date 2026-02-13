@@ -1,0 +1,11 @@
+{{define "body"}}
+<h1>Timeline for {{.FormUsername}}</h1>
+
+{{range .Messages}}
+  <div class="message">
+    <p><strong>{{index . "username"}}</strong>: {{index . "text"}}</p>
+  </div>
+{{else}}
+  <p><em>No messages yet.</em></p>
+{{end}}
+{{end}}

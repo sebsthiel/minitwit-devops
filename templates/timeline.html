@@ -1,5 +1,12 @@
-{{define "content"}}
-<h1>Public Timeline</h1>
-<p>Timeline v1 working.</p>
+{{define "body"}}
+  <h1>Public Timeline</h1>
+
+  {{range .Messages}}
+    <div class="message">
+      <p><strong>{{.Username}}</strong>: {{.Text}}</p>
+    </div>
+  {{else}}
+    <p><em>No messages yet.</em></p>
+  {{end}}
 {{end}}
 
