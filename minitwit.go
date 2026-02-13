@@ -19,7 +19,7 @@ import (
 
 // configuration
 const PORT = "5001"
-const DATABASE = "/tmp/minitwit.db"
+const DATABASE = "test.db"
 const PER_PAGE = 30
 
 var database *sql.DB
@@ -87,50 +87,80 @@ func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
 	userTimelineTpl.ExecuteTemplate(writer, "example.html", data)
 }
 
-func Login(writer http.ResponseWriter, request *http.Request) {
-	session, _ := store.Get(request, "cookie-name")
+// authentication middleware
+func RequireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "cookie-name")
+
+		if session.Values["authenticated"] != true {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	// if user is already loggen in then redirect to timeline
+	if session.Values["authenticated"] == true {
+		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
+		return
+	}
 
 	data := Data{
-		User:         &User{Username: "Test"}, //TODO REMOVE
 		Error:        "",
 		FormUsername: "",
 		Flashes:      nil,
 	}
 
-	// TODO
-	// if user is already loggen in then redirect to timeline
-	if session.Values["authenticated"] == true {
-		// Redirect
+	// Get the login page
+	if r.Method == http.MethodGet {
+		if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
 	}
 
-	// get db
-	db := connect_db()
+	// POST login
+	if r.Method == http.MethodPost {
+		r.ParseForm()
 
-	// must be called to populate the form
-	request.ParseForm()
-	var pw string
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
 
-	// check if username is in db
-	var usernameStmt = fmt.Sprintf("select pw_hash from user where username = '%s'", request.Form.Get("username"))
-	db.QueryRow(usernameStmt).Scan(&pw)
+		data.FormUsername = username
 
-	// if user in not in db, or pw is incorrect set error message, else login
-	if pw == "" {
-		fmt.Print("ski")
-		data.Error = "Invalid username"
-	} else if pw != request.Form.Get("password") {
-		data.Error = "Invalid password"
-	} else { // Set user as authenticated
-		fmt.Print("logged in") // TODO remove once convinced
+		// Get DB
+		db := connect_db()
+
+		var pw string
+		query := "SELECT pw_hash FROM user WHERE username = ?"
+		err := db.QueryRow(query, username).Scan(&pw)
+
+		// User not found
+		if err != nil || pw == "" {
+			data.Error = "Invalid username or password"
+			loginTpl.ExecuteTemplate(w, "layout", data)
+			return
+		}
+
+		// Password mismatch (you said not to worry about hashing logic)
+		if pw != password {
+			data.Error = "Invalid username or password"
+			loginTpl.ExecuteTemplate(w, "layout", data)
+			return
+		}
+
+		// Set session values (authenticated)
 		session.Values["authenticated"] = true
-		session.Save(request, writer)
-	}
+		session.Values["username"] = username
+		session.Save(r, w)
 
-	// Authentication goes here
-	// ...
-
-	if err := loginTpl.ExecuteTemplate(writer, "layout", data); err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		// Redirect after login
+		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
 		return
 	}
 }
