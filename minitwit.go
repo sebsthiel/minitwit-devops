@@ -101,6 +101,7 @@ func RequireAuth(next http.Handler) http.Handler {
 	})
 }
 
+// TODO right now the password is matched agains exactly what is in the db, should be hash
 func Login(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
@@ -147,7 +148,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Password mismatch (you said not to worry about hashing logic)
+		// Password mismatch
 		if pw != password {
 			data.Error = "Invalid username or password"
 			loginTpl.ExecuteTemplate(w, "layout", data)
@@ -372,13 +373,14 @@ func add_message(writer http.ResponseWriter, request *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-
 	session, _ := store.Get(r, "cookie-name")
 
-	fmt.Print("logged out") // TODO remove once convinced
-	// Revoke users authentication
-	session.Values["authenticated"] = false
+	// This tells the browser to delete the cookie immediately, effectively destroying the session
+	session.Options.MaxAge = -1
+
 	session.Save(r, w)
+
+	http.Redirect(w, r, "/timeline", http.StatusSeeOther)
 }
 
 // TODO: Register() done
