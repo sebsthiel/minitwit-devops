@@ -1,11 +1,19 @@
 {{define "body"}}
-<h1>Timeline for {{.FormUsername}}</h1>
+  <h2>{{.FormUsername}}'s Timeline</h2>
 
-{{range .Messages}}
-  <div class="message">
-    <p><strong>{{index . "username"}}</strong>: {{index . "text"}}</p>
-  </div>
-{{else}}
-  <p><em>No messages yet.</em></p>
-{{end}}
+  <ul class="messages">
+  {{range .Messages}}
+    <li>
+      <p>
+        <strong>
+          <a href="/user/{{index . "username"}}">{{index . "username"}}</a>
+        </strong>
+        {{index . "text"}}
+        {{with index . "pub_date"}}<small>&mdash; {{.}}</small>{{end}}
+      </p>
+    </li>
+  {{else}}
+    <li><em>There's no message so far.</em></li>
+  {{end}}
+  </ul>
 {{end}}

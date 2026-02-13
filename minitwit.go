@@ -19,7 +19,7 @@ import (
 
 // configurationf
 const PORT = "5001"
-const DATABASE = "test.db"
+const DATABASE = "python_implementation/minitwit.db"
 const PER_PAGE = 30
 
 var database *sql.DB
