@@ -413,7 +413,6 @@ func main() {
 		data := Data{
 			Messages: msgs,
 		}
-		fmt.Printf("%#v\n", msgs[0])
 
 		if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
