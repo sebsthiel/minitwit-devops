@@ -384,23 +384,9 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/timeline", http.StatusSeeOther)
 }
 
-<<<<<<< Updated upstream
 func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
-=======
-func Register(w http.ResponseWriter, r *http.Request) {
-	//var regUserStmt = fmt.Sprintf("select pw_hash from user where username = '%s'", request.Form.Get("username"))
-	regUser, err := query_db("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)", r.Form.Get("newusername"), r.Form.Get("newemail"), r.Form.Get("newpassword"))
-	if err != nil {
-		http.Error(w, "Failed to register user: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("Registered user: %v\n", regUser)
-}
-
-// TODO: Register() done
->>>>>>> Stashed changes
 
 	msgs, err := query_db(`
 		SELECT message.message_id, message.text, message.pub_date, user.username
