@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -17,9 +19,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// configurationf
+// configurations
 const PORT = "5001"
-const DATABASE = "python_implementation/minitwit.db"
+const DATABASE = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *sql.DB
@@ -51,10 +53,6 @@ type Data struct {
 	Messages     []map[string]any
 }
 
-type User struct {
-	Username string
-}
-
 var funcMap = template.FuncMap{
 	"url": func(urlName string) string {
 		return routes[urlName]
@@ -64,7 +62,7 @@ var funcMap = template.FuncMap{
 var routes = map[string]string{
 	"timeline":        "/",
 	"login":           "/login",
-	"public_timeline": "/timeline",
+	"public_timeline": "/",
 	"logout":          "/logout",
 	// TODO: extend with all name -> api route
 }
@@ -75,94 +73,59 @@ var (
 	store = sessions.NewCookieStore(key)
 )
 
-func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
-
-	data := Data{
-		User:         &User{Username: "Test"}, //TODO REMOVE
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
-	userTimelineTpl.ExecuteTemplate(writer, "example.html", data)
-}
-
-// authentication middleware
-func RequireAuth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, _ := store.Get(r, "cookie-name")
-
-		if session.Values["authenticated"] != true {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 // TODO right now the password is matched agains exactly what is in the db, should be hash
 func Login(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
 
-	// if user is already loggen in then redirect to timeline
-	if session.Values["authenticated"] == true {
-		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
-		return
+	// Redirect the user if they are already logged in.
+	_, ok := TryGetUserFromRequest(r)
+	if ok {
+		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
-	data := Data{
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-
-	// Get the login page
+	// On GET request we return the template.
 	if r.Method == http.MethodGet {
-		if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	// POST login
-	if r.Method == http.MethodPost {
-		r.ParseForm()
+	data := Data{
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+		User:         nil,
+	}
 
-		username := r.Form.Get("username")
-		password := r.Form.Get("password")
+	// Get username and password from the template form.
+	username := r.FormValue("username")
+	password := r.FormValue("password")
 
-		data.FormUsername = username
+	userUser := GetUserByUsername(username)
 
-		// Get DB
-		db := connect_db()
+	// Add user to session and redirect
+	if userUser != nil && userUser.pw_hash == password {
 
-		var pw string
-		query := "SELECT pw_hash FROM user WHERE username = ?"
-		err := db.QueryRow(query, username).Scan(&pw)
-
-		// User not found
-		if err != nil || pw == "" {
-			data.Error = "Invalid username or password"
-			loginTpl.ExecuteTemplate(w, "layout", data)
+		session, err := store.Get(r, "session")
+		if err != nil {
+			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
 
-		// Password mismatch
-		if pw != password {
-			data.Error = "Invalid username or password"
-			loginTpl.ExecuteTemplate(w, "layout", data)
+		session.Values["user_id"] = userUser.User_id
+
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, "Could not save session", http.StatusInternalServerError)
 			return
 		}
-
-		// Set session values (authenticated)
-		session.Values["authenticated"] = true
-		session.Values["username"] = username
-		session.Save(r, w)
-
-		// Redirect after login
-		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
+		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
+	}
+	// If the username or password is wrong display error in login page.
+	data.Error = "Wrong username or password"
+	if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -249,23 +212,21 @@ func query_db_one(query string, args ...any) (map[string]any, error) {
 }
 
 func get_user_id(username string) string {
-	db := connect_db()
-
 	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
 
 	// Query for a single row
-	var res = db.QueryRow(sqlStmt)
-
-	// Var to hold result of scan
-	var user_id string
-
-	// The Scan function copies the row entries (Just one entry in this case) to its argument (a pointer)
-	var err = res.Scan(&user_id)
+	var res, err = query_db_one(sqlStmt)
 	if err != nil {
 		log.Fatal(err)
+		return ""
 	}
 
-	return user_id
+	if res == nil {
+		return ""
+	}
+
+	userid := res["user_id"].(int64)
+	return strconv.FormatInt(userid, 10)
 }
 
 func ensure_schema(db *sql.DB) {
@@ -283,7 +244,6 @@ func ensure_schema(db *sql.DB) {
 	}
 }
 
-// TODO: FormatDatetime(timestamp)
 func FormatDatetime(timestamp int64) string { //return format string
 	t := time.Unix(timestamp, 0)
 	t = t.UTC()
@@ -372,92 +332,31 @@ func add_message(writer http.ResponseWriter, request *http.Request) {
 	*/
 }
 
+// Removes user_id from session and redirects to "/"
 func Logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
 
-	// This tells the browser to delete the cookie immediately, effectively destroying the session
-	session.Options.MaxAge = -1
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, "session error", http.StatusInternalServerError)
+		return
+	}
 
-	session.Save(r, w)
+	delete(session.Values, "user_id")
 
-	http.Redirect(w, r, "/timeline", http.StatusSeeOther)
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, "could not save session", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// TODO: Register() done
+func UserTimeline(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
 
-func main() {
-	database = connect_db()
-	ensure_schema(database)
-	fmt.Println("Starting server")
-	router := mux.NewRouter()
-
-	// load stylesheet
-	router.PathPrefix("/static/").
-		Handler(http.StripPrefix("/static/",
-			http.FileServer(http.Dir("./static"))))
-
-	router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-
-		msgs, err := query_db(`
-		SELECT message.message_id, message.text, message.pub_date, user.username
-		FROM message
-		JOIN user ON user.user_id = message.author_id
-		ORDER BY message.pub_date DESC
-		LIMIT ?;
-	`, PER_PAGE)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		data := Data{
-			Messages: msgs,
-		}
-
-		if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-	}).Methods("GET")
-
-	router.HandleFunc("/public", ExampleFunction)
-	/*
-		router.HandleFunc("/public", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("Public timeline (placeholder)\n"))
-		}).Methods("GET")
-	*/
-	router.HandleFunc("/login", Login)
-
-	/*
-		router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("Login page (placeholder)\n"))
-		}).Methods("GET")*/
-
-	router.HandleFunc("/logout", Logout)
-
-	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}).Methods("GET")
-
-	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		registerTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
-
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/public", http.StatusFound)
-	}).Methods("GET")
-
-	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		username := vars["username"]
-
-		msgs, err := query_db(`
+	msgs, err := query_db(`
 		SELECT message.message_id, message.text, message.pub_date, user.username
 		FROM message
 		JOIN user ON user.user_id = message.author_id
@@ -465,20 +364,161 @@ func main() {
 		ORDER BY message.pub_date DESC
 		LIMIT ?;
 	`, username, PER_PAGE)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := Data{
+		FormUsername: username,
+		Messages:     msgs,
+	}
+
+	if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func Timeline(w http.ResponseWriter, r *http.Request) {
+
+	msgs, err := query_db(`
+		SELECT message.message_id, message.text, message.pub_date, user.username
+		FROM message
+		JOIN user ON user.user_id = message.author_id
+		ORDER BY message.pub_date DESC
+		LIMIT ?;
+	`, PER_PAGE)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := Data{
+		Messages: msgs,
+	}
+	user, ok := TryGetUserFromRequest(r)
+
+	if ok {
+		data.User = &user
+	}
+
+	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}
+
+type User struct {
+	User_id  int
+	Username string
+	Email    string
+	pw_hash  string
+}
+
+func loadUserFromDB(uid int) User {
+	sqlStmt := fmt.Sprintf("select * from user where user_id = %d", uid)
+
+	// Query for a single row
+	data, err := query_db_one(sqlStmt)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	user := User{
+		User_id:  int(data["user_id"].(int64)),
+		Username: string(data["username"].(string)),
+		Email:    string(data["email"].(string)),
+		pw_hash:  string(data["pw_hash"].(string)),
+	}
+	return user
+
+}
+
+func GetUserByUsername(username string) *User {
+	// Query database for user
+	data, err := query_db_one("SELECT user_id, username, email, pw_hash FROM user WHERE username = ?", username)
+
+	if err != nil {
+		log.Fatal("Invalid username")
+	}
+
+	if data == nil {
+		return nil
+	}
+
+	//Store user in User struct
+	user := User{
+		User_id:  int(data["user_id"].(int64)),
+		Username: string(data["username"].(string)),
+		Email:    string(data["email"].(string)),
+		pw_hash:  string(data["pw_hash"].(string)),
+	}
+
+	return &user
+}
+
+type contextKey string
+
+const userContextKey = contextKey("user")
+
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		session, _ := store.Get(r, "session")
+
+		if uid, ok := session.Values["user_id"].(int); ok {
+			user := loadUserFromDB(uid)
+
+			ctx := context.WithValue(r.Context(), userContextKey, user)
+			r = r.WithContext(ctx)
 		}
 
-		data := Data{
-			FormUsername: username,
-			Messages:     msgs,
-		}
+		next.ServeHTTP(w, r)
+	})
+}
 
-		if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+func Register(w http.ResponseWriter, r *http.Request) {
+	// If user in session redirect to "/"
+
+}
+
+// Returns User if exists and boolean. Boolean is true if user exists
+func TryGetUserFromRequest(r *http.Request) (User, bool) {
+	user, ok := r.Context().Value(userContextKey).(User)
+	return user, ok
+}
+
+func main() {
+	database = connect_db()
+	ensure_schema(database)
+	fmt.Println("Starting server")
+	router := mux.NewRouter()
+	router.Use(AuthMiddleware)
+
+	// load stylesheet
+	router.PathPrefix("/static/").
+		Handler(http.StripPrefix("/static/",
+			http.FileServer(http.Dir("./static"))))
+
+	// Routing handlers
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/public", http.StatusFound)
+	}).Methods("GET")
+
+	router.HandleFunc("/public", Timeline).Methods("GET")
+
+	router.HandleFunc("/user/{username}", UserTimeline).Methods("GET")
+
+	router.HandleFunc("/login", Login).Methods("GET", "POST")
+
+	router.HandleFunc("/logout", Logout)
+
+	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		registerTpl.ExecuteTemplate(w, "layout", nil)
 	}).Methods("GET")
 
 	fmt.Println("Started listining on:", PORT)
