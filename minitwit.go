@@ -76,7 +76,8 @@ var funcMap = template.FuncMap{
 var routes = map[string]string{
 	"timeline":        "/",
 	"login":           "/login",
-	"public_timeline": "/",
+	"public_timeline": "/public",
+	"register":        "/register",
 	"logout":          "/logout",
 	// TODO: extend with all name -> api route
 }
@@ -519,8 +520,36 @@ func AuthMiddleware(next http.Handler) http.Handler {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	// If user in session redirect to "/"
 
+	if r.Method == http.MethodGet {
+		if err := registerTpl.ExecuteTemplate(w, "layout", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form", http.StatusBadRequest)
+		return
+	}
+	username := r.FormValue("username")
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	if username == "" || password == "" {
+		data := Data{Error: "username and password required", FormUsername: username}
+		registerTpl.ExecuteTemplate(w, "layout", data)
+		return
+	}
+
+	_, err := database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
+		username, email, password)
+	if err != nil {
+		data := Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
+		registerTpl.ExecuteTemplate(w, "layout", data)
+		return
+	}
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 // Returns User if exists and boolean. Boolean is true if user exists
@@ -554,10 +583,8 @@ func main() {
 
 	router.HandleFunc("/logout", Logout)
 
-	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		registerTpl.ExecuteTemplate(w, "layout", nil)
-	}).Methods("GET")
+	router.HandleFunc("/register", Register).Methods("GET", "POST")
 
-	fmt.Println("Started listining on:", PORT)
+	fmt.Println("Started listening on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
 }
