@@ -311,8 +311,8 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddMessage(w http.ResponseWriter, r *http.Request) {
-	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
-	if sessionUserID == "" {
+	_, ok := TryGetUserFromRequest(r)
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
