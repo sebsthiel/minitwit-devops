@@ -337,6 +337,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 // Removes user_id from session and redirects to "/"
@@ -412,11 +413,14 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	profileUserName := profileUserData["username"].(string)
+
+	profileUserId, err := strconv.Atoi(get_user_id(profileUserName))
+
 	// Create ProfileUser
 	profileUser := &User{
-		// You need to add UserID to your User struct first
-		// UserID:   int(profileUserData["user_id"].(int64)),
-		Username: profileUserData["username"].(string),
+		Username: profileUserName,
+		User_id:  profileUserId,
 	}
 
 	data := Data{
@@ -434,11 +438,8 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		data.User = &user
 	}
 
-	profileUserId := get_user_id(data.ProfileUser.Username)
-
 	whom_id_data, err := query_db_one("select whom_id from follower where who_id = ? AND whom_id = ?", user.User_id, profileUserId)
 
-	fmt.Println("whom_id ?", whom_id_data["whom_id"])
 	if whom_id_data["whom_id"] != nil {
 		data.Followed = true
 	}
