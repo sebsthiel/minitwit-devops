@@ -6,12 +6,12 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -275,9 +275,10 @@ func gravatar_url(email string, size int) string {
 
 // TODO: FollowUser(username)
 func FollowUser(w http.ResponseWriter, r *http.Request) {
-	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
-	if sessionUserID == "" {
+	user, ok := TryGetUserFromRequest(r)
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		//http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
 
@@ -290,20 +291,20 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", sessionUserID, whomID)
+	_, err := database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", user.User_id, whomID)
 	if err != nil {
 		http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
 }
 
 // TODO: UnfollowUser(username)
 func UnfollowUser(w http.ResponseWriter, r *http.Request) {
-	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
-	if sessionUserID == "" {
+	user, ok := TryGetUserFromRequest(r)
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		//http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
 	vars := mux.Vars(r)
@@ -315,7 +316,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", sessionUserID, whomID)
+	_, err := database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", user.User_id, whomID)
 	if err != nil {
 		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -356,6 +357,35 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func MyTimeline(w http.ResponseWriter, r *http.Request) {
+	user, ok := TryGetUserFromRequest(r)
+	if !ok {
+		http.Redirect(w, r, "/public", http.StatusFound)
+		return
+	}
+
+	msgs, _ := query_db(`
+        select message.*, user.* from message, user
+        where message.flagged = 0 and message.author_id = user.user_id and (
+            user.user_id = ? or
+            user.user_id in (select whom_id from follower
+                                    where who_id = ?))
+        order by message.pub_date desc limit ?
+    `, user.User_id, user.User_id, PER_PAGE)
+
+	data := Data{
+		Messages: msgs,
+		Endpoint: "timeline", // Add this line
+		User:     &user,
+	}
+
+	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 }
 
 func UserTimeline(w http.ResponseWriter, r *http.Request) {
@@ -402,6 +432,15 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	if ok {
 		data.User = &user
+	}
+
+	profileUserId := get_user_id(data.ProfileUser.Username)
+
+	whom_id_data, err := query_db_one("select whom_id from follower where who_id = ? AND whom_id = ?", user.User_id, profileUserId)
+
+	fmt.Println("whom_id ?", whom_id_data["whom_id"])
+	if whom_id_data["whom_id"] != nil {
+		data.Followed = true
 	}
 
 	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
@@ -563,9 +602,7 @@ func main() {
 			http.FileServer(http.Dir("./static"))))
 
 	// Routing handlers
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/public", http.StatusFound)
-	}).Methods("GET")
+	router.HandleFunc("/", MyTimeline).Methods("GET")
 
 	router.HandleFunc("/public", Timeline).Methods("GET")
 
@@ -578,6 +615,9 @@ func main() {
 	router.HandleFunc("/logout", Logout)
 
 	router.HandleFunc("/register", Register).Methods("GET", "POST")
+
+	router.HandleFunc("/{username}/follow", FollowUser).Methods("GET")
+	router.HandleFunc("/{username}/unfollow", UnfollowUser).Methods("GET")
 
 	fmt.Println("Started listening on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
