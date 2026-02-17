@@ -38,7 +38,7 @@ var registerTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
 )
 var timelineTpl = template.Must(
-	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
+	template.Must(baseTpl.Clone()).Funcs(funcMap).ParseFiles("templates/timeline.html"),
 )
 var userTimelineTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/user_timeline.html"),
@@ -47,15 +47,29 @@ var userTimelineTpl = template.Must(
 // Data Structs: TODO
 type Data struct {
 	User         *User
+	ProfileUser  *User // Add this
 	Error        string
 	FormUsername string
 	Flashes      []string
 	Messages     []map[string]any
+	Endpoint     string // Add this
+	Followed     bool   // Add this
 }
 
 var funcMap = template.FuncMap{
 	"url": func(urlName string) string {
 		return routes[urlName]
+	},
+	"gravatar": gravatar_url,
+	"datetime": func(ts any) string {
+		switch v := ts.(type) {
+		case int64:
+			return FormatDatetime(v)
+		case int:
+			return FormatDatetime(int64(v))
+		default:
+			return ""
+		}
 	},
 }
 
@@ -255,7 +269,6 @@ func gravatar_url(email string, size int) string {
 	trimmed := strings.ToLower(strings.TrimSpace(email))
 	hash := md5.Sum([]byte(trimmed))
 	hashString := hex.EncodeToString(hash[:])
-
 	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
 }
 
@@ -357,25 +370,48 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 
 	msgs, err := query_db(`
-		SELECT message.message_id, message.text, message.pub_date, user.username
-		FROM message
-		JOIN user ON user.user_id = message.author_id
-		WHERE user.username = ?
-		ORDER BY message.pub_date DESC
-		LIMIT ?;
-	`, username, PER_PAGE)
-
+        SELECT message.message_id, message.text, message.pub_date, user.username
+        FROM message
+        JOIN user ON user.user_id = message.author_id
+        WHERE user.username = ?
+        ORDER BY message.pub_date DESC
+        LIMIT ?;
+    `, username, PER_PAGE)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	data := Data{
-		FormUsername: username,
-		Messages:     msgs,
+	// You need to get the profile user data
+	profileUserData, err := query_db_one("SELECT user_id, username FROM user WHERE username = ?", username)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
 	}
 
-	if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+	// Create ProfileUser
+	profileUser := &User{
+		// You need to add UserID to your User struct first
+		// UserID:   int(profileUserData["user_id"].(int64)),
+		Username: profileUserData["username"].(string),
+	}
+
+	data := Data{
+		FormUsername: username,
+		ProfileUser:  profileUser, // Add this
+		Messages:     msgs,
+		Endpoint:     "user_timeline", // Add this
+		// You also need to set Followed based on whether the current user follows this user
+		Followed: false, // Set this appropriately
+	}
+
+	user, ok := TryGetUserFromRequest(r)
+
+	if ok {
+		data.User = &user
+	}
+
+	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -397,6 +433,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{
 		Messages: msgs,
+		Endpoint: "public_timeline", // Add this line
 	}
 	user, ok := TryGetUserFromRequest(r)
 

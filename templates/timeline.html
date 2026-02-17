@@ -1,12 +1,72 @@
 {{define "body"}}
-<h1>Public Timeline</h1>
 
-{{range .Messages}}
-  <div class="message">
-    <p><strong>{{index . "username"}}</strong>: {{index . "text"}}</p>
-  </div>
+<h2>
+{{if eq .Endpoint "public_timeline"}}
+  Public Timeline
+{{else if eq .Endpoint "user_timeline"}}
+  {{.ProfileUser.Username}}'s Timeline
 {{else}}
-  <p><em>No messages yet.</em></p>
+  My Timeline
 {{end}}
+</h2>
+
+{{if .User}}
+
+  {{if eq .Endpoint "user_timeline"}}
+    <div class="followstatus">
+
+      {{if eq .User.User_id .ProfileUser.User_id}}
+        This is you!
+
+      {{else if .Followed}}
+        You are currently following this user.
+        <a class="unfollow" href="/unfollow/{{.ProfileUser.Username}}">
+          Unfollow user
+        </a>.
+
+      {{else}}
+        You are not yet following this user.
+        <a class="follow" href="/follow/{{.ProfileUser.Username}}">
+          Follow user
+        </a>.
+      {{end}}
+
+    </div>
+
+  {{else if eq .Endpoint "timeline"}}
+
+    <div class="twitbox">
+      <h3>What's on your mind {{.User.Username}}?</h3>
+      <form action="/add_message" method="post">
+        <p>
+        <input type="text" name="text" size="60">
+        <input type="submit" value="Share">
+      </form>
+    </div>
+
+  {{end}}
+
+{{end}}
+
+<ul class="messages">
+{{range .Messages}}
+  <li>
+    <img src='{{gravatar (printf "%s" (index . "email")) 48}}'>
+    <p>
+      <strong>
+        <a href='/user/{{index . "username"}}'>
+          {{index . "username"}}
+        </a>
+      </strong>
+      {{index . "text"}}
+      <small>
+        &mdash; {{datetime (index . "pub_date")}}
+      </small>
+    </p>
+  </li>
+{{else}}
+  <li><em>There's no message so far.</em></li>
+{{end}}
+</ul>
 
 {{end}}
