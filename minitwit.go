@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -20,7 +21,7 @@ import (
 
 // configurations
 const PORT = "5001"
-const DATABASE = "test.db"
+const DATABASE = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *sql.DB
@@ -37,7 +38,7 @@ var registerTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/register.html"),
 )
 var timelineTpl = template.Must(
-	template.Must(baseTpl.Clone()).ParseFiles("templates/timeline.html"),
+	template.Must(baseTpl.Clone()).Funcs(funcMap).ParseFiles("templates/timeline.html"),
 )
 var userTimelineTpl = template.Must(
 	template.Must(baseTpl.Clone()).ParseFiles("templates/user_timeline.html"),
@@ -46,19 +47,29 @@ var userTimelineTpl = template.Must(
 // Data Structs: TODO
 type Data struct {
 	User         *User
+	ProfileUser  *User // Add this
 	Error        string
 	FormUsername string
 	Flashes      []string
 	Messages     []map[string]any
-}
-
-type User struct {
-	Username string
+	Endpoint     string // Add this
+	Followed     bool   // Add this
 }
 
 var funcMap = template.FuncMap{
 	"url": func(urlName string) string {
 		return routes[urlName]
+	},
+	"gravatar": gravatar_url,
+	"datetime": func(ts any) string {
+		switch v := ts.(type) {
+		case int64:
+			return FormatDatetime(v)
+		case int:
+			return FormatDatetime(int64(v))
+		default:
+			return ""
+		}
 	},
 }
 
@@ -77,94 +88,59 @@ var (
 	store = sessions.NewCookieStore(key)
 )
 
-func ExampleFunction(writer http.ResponseWriter, request *http.Request) {
-
-	data := Data{
-		User:         &User{Username: "Test"}, //TODO REMOVE
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-	// templates.ExecuteTemplate(writer, "login.html", data) //TODO remove
-	userTimelineTpl.ExecuteTemplate(writer, "example.html", data)
-}
-
-// authentication middleware
-func RequireAuth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, _ := store.Get(r, "cookie-name")
-
-		if session.Values["authenticated"] != true {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 // TODO right now the password is matched agains exactly what is in the db, should be hash
 func Login(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
 
-	// if user is already logged in then redirect to timeline
-	if session.Values["authenticated"] == true {
-		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
-		return
+	// Redirect the user if they are already logged in.
+	_, ok := TryGetUserFromRequest(r)
+	if ok {
+		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
-	data := Data{
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-
-	// Get the login page
+	// On GET request we return the template.
 	if r.Method == http.MethodGet {
-		if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	// POST login
-	if r.Method == http.MethodPost {
-		r.ParseForm()
+	data := Data{
+		Error:        "",
+		FormUsername: "",
+		Flashes:      nil,
+		User:         nil,
+	}
 
-		username := r.Form.Get("username")
-		password := r.Form.Get("password")
+	// Get username and password from the template form.
+	username := r.FormValue("username")
+	password := r.FormValue("password")
 
-		data.FormUsername = username
+	userUser := GetUserByUsername(username)
 
-		// Get DB
-		db := connect_db()
+	// Add user to session and redirect
+	if userUser != nil && userUser.pw_hash == password {
 
-		var pw string
-		query := "SELECT pw_hash FROM user WHERE username = ?"
-		err := db.QueryRow(query, username).Scan(&pw)
-
-		// User not found
-		if err != nil || pw == "" {
-			data.Error = "Invalid username or password"
-			loginTpl.ExecuteTemplate(w, "layout", data)
+		session, err := store.Get(r, "session")
+		if err != nil {
+			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
 
-		// Password mismatch
-		if pw != password {
-			data.Error = "Invalid username or password"
-			loginTpl.ExecuteTemplate(w, "layout", data)
+		session.Values["user_id"] = userUser.User_id
+
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, "Could not save session", http.StatusInternalServerError)
 			return
 		}
-
-		// Set session values (authenticated)
-		session.Values["authenticated"] = true
-		session.Values["username"] = username
-		session.Save(r, w)
-
-		// Redirect after login
-		http.Redirect(w, r, "/timeline", http.StatusSeeOther)
+		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
+	}
+	// If the username or password is wrong display error in login page.
+	data.Error = "Wrong username or password"
+	if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -251,23 +227,21 @@ func query_db_one(query string, args ...any) (map[string]any, error) {
 }
 
 func get_user_id(username string) string {
-	db := connect_db()
-
 	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
 
 	// Query for a single row
-	var res = db.QueryRow(sqlStmt)
-
-	// Var to hold result of scan
-	var user_id string
-
-	// The Scan function copies the row entries (Just one entry in this case) to its argument (a pointer)
-	var err = res.Scan(&user_id)
+	var res, err = query_db_one(sqlStmt)
 	if err != nil {
 		log.Fatal(err)
+		return ""
 	}
 
-	return user_id
+	if res == nil {
+		return ""
+	}
+
+	userid := res["user_id"].(int64)
+	return strconv.FormatInt(userid, 10)
 }
 
 func ensure_schema(db *sql.DB) {
@@ -285,7 +259,6 @@ func ensure_schema(db *sql.DB) {
 	}
 }
 
-// TODO: FormatDatetime(timestamp)
 func FormatDatetime(timestamp int64) string { //return format string
 	t := time.Unix(timestamp, 0)
 	t = t.UTC()
@@ -297,7 +270,6 @@ func gravatar_url(email string, size int) string {
 	trimmed := strings.ToLower(strings.TrimSpace(email))
 	hash := md5.Sum([]byte(trimmed))
 	hashString := hex.EncodeToString(hash[:])
-
 	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
 }
 
@@ -374,15 +346,24 @@ func add_message(writer http.ResponseWriter, request *http.Request) {
 	*/
 }
 
+// Removes user_id from session and redirects to "/"
 func Logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
 
-	// This tells the browser to delete the cookie immediately, effectively destroying the session
-	session.Options.MaxAge = -1
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, "session error", http.StatusInternalServerError)
+		return
+	}
 
-	session.Save(r, w)
+	delete(session.Values, "user_id")
 
-	http.Redirect(w, r, "/timeline", http.StatusSeeOther)
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, "could not save session", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func UserTimeline(w http.ResponseWriter, r *http.Request) {
@@ -390,25 +371,48 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 
 	msgs, err := query_db(`
-		SELECT message.message_id, message.text, message.pub_date, user.username
-		FROM message
-		JOIN user ON user.user_id = message.author_id
-		WHERE user.username = ?
-		ORDER BY message.pub_date DESC
-		LIMIT ?;
-	`, username, PER_PAGE)
-
+        SELECT message.message_id, message.text, message.pub_date, user.username
+        FROM message
+        JOIN user ON user.user_id = message.author_id
+        WHERE user.username = ?
+        ORDER BY message.pub_date DESC
+        LIMIT ?;
+    `, username, PER_PAGE)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	data := Data{
-		FormUsername: username,
-		Messages:     msgs,
+	// You need to get the profile user data
+	profileUserData, err := query_db_one("SELECT user_id, username FROM user WHERE username = ?", username)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
 	}
 
-	if err := userTimelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+	// Create ProfileUser
+	profileUser := &User{
+		// You need to add UserID to your User struct first
+		// UserID:   int(profileUserData["user_id"].(int64)),
+		Username: profileUserData["username"].(string),
+	}
+
+	data := Data{
+		FormUsername: username,
+		ProfileUser:  profileUser, // Add this
+		Messages:     msgs,
+		Endpoint:     "user_timeline", // Add this
+		// You also need to set Followed based on whether the current user follows this user
+		Followed: false, // Set this appropriately
+	}
+
+	user, ok := TryGetUserFromRequest(r)
+
+	if ok {
+		data.User = &user
+	}
+
+	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -430,6 +434,12 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{
 		Messages: msgs,
+		Endpoint: "public_timeline", // Add this line
+	}
+	user, ok := TryGetUserFromRequest(r)
+
+	if ok {
+		data.User = &user
 	}
 
 	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
@@ -439,52 +449,54 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TODO: Register() done
-
-type User2 struct {
-	user_id  int
-	username string
-	email    string
+type User struct {
+	User_id  int
+	Username string
+	Email    string
 	pw_hash  string
 }
 
-func loadUserFromDB(uid int) User2 {
+func loadUserFromDB(uid int) User {
 	sqlStmt := fmt.Sprintf("select * from user where user_id = %d", uid)
 
 	// Query for a single row
 	data, err := query_db_one(sqlStmt)
 
 	if err != nil {
-		log.Fatal("Oh nooo")
+		log.Fatal(err)
 	}
 
-	user := User2{
-		user_id:  int(data["user_id"].(int64)),
-		username: string(data["username"].(string)),
-		email:    string(data["email"].(string)),
+	user := User{
+		User_id:  int(data["user_id"].(int64)),
+		Username: string(data["username"].(string)),
+		Email:    string(data["email"].(string)),
 		pw_hash:  string(data["pw_hash"].(string)),
 	}
 	return user
 
 }
 
-func GetUserByName(username string) User2 {
+func GetUserByUsername(username string) *User {
 	// Query database for user
 	data, err := query_db_one("SELECT user_id, username, email, pw_hash FROM user WHERE username = ?", username)
 
 	if err != nil {
-		log.Fatal("Oh nooo")
+		log.Fatal("Invalid username")
 	}
 
-	//Store user in User2 struct
-	user := User2{
-		user_id:  int(data["user_id"].(int64)),
-		username: string(data["username"].(string)),
-		email:    string(data["email"].(string)),
+	if data == nil {
+		return nil
+	}
+
+	//Store user in User struct
+	user := User{
+		User_id:  int(data["user_id"].(int64)),
+		Username: string(data["username"].(string)),
+		Email:    string(data["email"].(string)),
 		pw_hash:  string(data["pw_hash"].(string)),
 	}
 
-	return user
+	return &user
 }
 
 type contextKey string
@@ -581,59 +593,12 @@ func Login2(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
-	data := Data{
-		Error:        "",
-		FormUsername: "",
-		Flashes:      nil,
-	}
-
-	// On GET request we return the template.
-	if r.Method == http.MethodGet {
-		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil { //TODO PASS DATA?
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	// Get username and password from the template form.
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-
-	userUser := GetUserByName(username)
-
-	// Add user to session and redirect
-	if userUser.pw_hash == password {
-
-		session, err := store.Get(r, "session")
-		if err != nil {
-			http.Error(w, "Session error", http.StatusInternalServerError)
-			return
-		}
-
-		session.Values["user_id"] = userUser.user_id
-
-		err = session.Save(r, w)
-		if err != nil {
-			http.Error(w, "Could not save session", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/public", http.StatusSeeOther)
-		return
-	}
-
-	data.Error = "Wrong password!!!!!!!!!!!!!!!!!!!"
-	// If the username or password is wrong display error in login page.
-	if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func LoginFormValidation(username string, password string) (bool, error) {
-	if username == "" || password == "" {
-		//return false, error.New("username or password cannot be empty")
-	}
-	// credentials look okay
-	return true, nil // no error
+// Returns User if exists and boolean. Boolean is true if user exists
+func TryGetUserFromRequest(r *http.Request) (User, bool) {
+	user, ok := r.Context().Value(userContextKey).(User)
+	return user, ok
 }
 
 func main() {
@@ -657,7 +622,7 @@ func main() {
 
 	router.HandleFunc("/user/{username}", UserTimeline).Methods("GET")
 
-	router.HandleFunc("/login", Login2).Methods("GET", "POST")
+	router.HandleFunc("/login", Login).Methods("GET", "POST")
 
 	router.HandleFunc("/logout", Logout)
 
