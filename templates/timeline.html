@@ -51,10 +51,10 @@
 <ul class="messages">
 {{range .Messages}}
   <li>
-    <img src="{{gravatar (printf "%s" (index . "email")) 48}}">
+    <img src='{{gravatar (printf "%s" (index . "email")) 48}}'>
     <p>
       <strong>
-        <a href="/user/{{index . "username"}}">
+        <a href='/user/{{index . "username"}}'>
           {{index . "username"}}
         </a>
       </strong>
