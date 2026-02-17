@@ -311,13 +311,13 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddMessage(w http.ResponseWriter, r *http.Request) {
-	_, ok := TryGetUserFromRequest(r)
+	user, ok := TryGetUserFromRequest(r)
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)")
+	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)", user.User_id, r.FormValue("text"), FormatDatetime(time.Now().Unix()))
 	if err != nil {
 		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
 		return
