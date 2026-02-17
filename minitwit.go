@@ -519,39 +519,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// func Register(w http.ResponseWriter, r *http.Request) {
-
-// 	if r.Method == http.MethodGet {
-// 		if err := registerTpl.ExecuteTemplate(w, "layout", nil); err != nil {
-// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		}
-// 		return
-// 	}
-// 	if err := r.ParseForm(); err != nil {
-// 		http.Error(w, "Invalid form", http.StatusBadRequest)
-// 		return
-// 	}
-// 	username := r.FormValue("username")
-// 	email := r.FormValue("email")
-// 	password := r.FormValue("password")
-
-// 	if username == "" || password == "" {
-// 		data := Data{Error: "username and password required", FormUsername: username}
-// 		registerTpl.ExecuteTemplate(w, "layout", data)
-// 		return
-// 	}
-
-// 	_, err := database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-// 		username, email, password)
-// 	if err != nil {
-// 		data := Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
-// 		registerTpl.ExecuteTemplate(w, "layout", data)
-// 		return
-// 	}
-
-// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-// }
-
 func Register(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -583,16 +550,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-}
-
-func Login2(w http.ResponseWriter, r *http.Request) {
-
-	// Redirect the user if they are already logged in.
-	_, ok := r.Context().Value(userContextKey).(User2)
-	if ok {
-		http.Redirect(w, r, "/public", http.StatusFound)
-	}
-
 }
 
 // Returns User if exists and boolean. Boolean is true if user exists
