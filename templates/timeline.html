@@ -15,7 +15,7 @@
   {{if eq .Endpoint "user_timeline"}}
     <div class="followstatus">
 
-      {{if eq .User.UserID .ProfileUser.UserID}}
+      {{if eq .User.User_id .ProfileUser.User_id}}
         This is you!
 
       {{else if .Followed}}
