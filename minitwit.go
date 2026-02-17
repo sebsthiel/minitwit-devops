@@ -317,7 +317,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)", user.User_id, r.FormValue("text"), FormatDatetime(time.Now().Unix()))
+	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)", user.User_id, r.FormValue("text"), time.Now().Unix())
 	if err != nil {
 		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
 		return
