@@ -310,26 +310,18 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
-// TODO: AddMessage()
-
-func add_message(writer http.ResponseWriter, request *http.Request) {
-	session, _ := store.Get(request, "cookie-name")
-
-	// check if user is logged in
-	if session.Values["authenticated"] == false {
-		//http.Redirect()
+func AddMessage(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := r.Header.Get("X-User-ID") // placeholder for session logic
+	if sessionUserID == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
 
-	/*
-		// get db
-		var db = connect_db()
-
-		// make insert stmt
-		var stmt = fmt.Sprintf("insert into message (%s, %s, pub_date, flagged)", (session['user_id'], request.form['text'], int(time.time())))
-
-		// if logged in insert message into db
-		db.Exec(stmt)
-	*/
+	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)")
+	if err != nil {
+		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // Removes user_id from session and redirects to "/"
@@ -512,6 +504,8 @@ func main() {
 	router.HandleFunc("/public", Timeline).Methods("GET")
 
 	router.HandleFunc("/user/{username}", UserTimeline).Methods("GET")
+
+	router.HandleFunc("/add_message", AddMessage).Methods("POST")
 
 	router.HandleFunc("/login", Login).Methods("GET", "POST")
 
