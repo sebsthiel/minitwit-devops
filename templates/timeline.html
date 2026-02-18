@@ -39,7 +39,7 @@
       <h3>What's on your mind {{.User.Username}}?</h3>
       <form action="/add_message" method="post">
         <p>
-        <input type="text" name="text" size="60">
+        <input type="text" required="true" name="text" size="60">
         <input type="submit" value="Share">
       </form>
     </div>
