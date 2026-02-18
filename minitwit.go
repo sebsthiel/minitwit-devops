@@ -218,13 +218,11 @@ func query_db(query string, args ...any) ([]map[string]any, error) {
 func query_db_one(query string, args ...any) (map[string]any, error) {
 	results, err := query_db(query, args...)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
-
 	if len(results) == 0 {
 		return nil, nil
 	}
-
 	return results[0], nil
 }
 
@@ -300,7 +298,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Add the flash message to the session:
-	AddFlash(w, r, "You are now following " + usernameToFollow)
+	AddFlash(w, r, "You are now following "+usernameToFollow)
 	http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
 }
 
@@ -326,7 +324,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You are no longer following " + usernameToUnfollow)
+	AddFlash(w, r, "You are no longer following "+usernameToUnfollow)
 	http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
@@ -386,7 +384,7 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		Messages: msgs,
 		Endpoint: "timeline", // Add this line
 		User:     &user,
-		Flashes: GetFlashes(w, r),
+		Flashes:  GetFlashes(w, r),
 	}
 
 	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
@@ -402,8 +400,8 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 	// Get the raw []interface{} values from the session
 	raw := session.Flashes()
 	if err := session.Save(r, w); err != nil {
-        return nil // or we could handle error properly
-    }
+		return nil // or we could handle error properly
+	}
 
 	// Extract the messages
 	var flashes []string
@@ -465,7 +463,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		Endpoint:     "user_timeline", // Add this
 		// You also need to set Followed based on whether the current user follows this user
 		Followed: false, // Set this appropriately
-		Flashes: flashes,
+		Flashes:  flashes,
 	}
 
 	user, ok := TryGetUserFromRequest(r)
@@ -503,7 +501,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 	data := Data{
 		Messages: msgs,
 		Endpoint: "public_timeline", // Add this line
-		Flashes: GetFlashes(w, r),
+		Flashes:  GetFlashes(w, r),
 	}
 	user, ok := TryGetUserFromRequest(r)
 
@@ -525,7 +523,7 @@ type User struct {
 	pw_hash  string
 }
 
-func loadUserFromDB(uid int) User {
+func loadUserFromDB(uid int) (User, bool) {
 	sqlStmt := fmt.Sprintf("select * from user where user_id = %d", uid)
 
 	// Query for a single row
@@ -534,6 +532,9 @@ func loadUserFromDB(uid int) User {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if data == nil {
+		return User{}, false
+	}
 
 	user := User{
 		User_id:  int(data["user_id"].(int64)),
@@ -541,7 +542,7 @@ func loadUserFromDB(uid int) User {
 		Email:    string(data["email"].(string)),
 		pw_hash:  string(data["pw_hash"].(string)),
 	}
-	return user
+	return user, true
 
 }
 
@@ -578,10 +579,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		session, _ := store.Get(r, "session")
 
 		if uid, ok := session.Values["user_id"].(int); ok {
-			user := loadUserFromDB(uid)
-
-			ctx := context.WithValue(r.Context(), userContextKey, user)
-			r = r.WithContext(ctx)
+			user, ok := loadUserFromDB(uid)
+			if ok {
+				ctx := context.WithValue(r.Context(), userContextKey, user)
+				r = r.WithContext(ctx)
+			}
 		}
 
 		next.ServeHTTP(w, r)
