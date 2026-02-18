@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // configurations
@@ -119,7 +120,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	userUser := GetUserByUsername(username)
 
 	// Add user to session and redirect
-	if userUser != nil && userUser.pw_hash == password {
+	if userUser != nil && CheckPasswordHash(password, userUser.pw_hash) {
 
 		session, err := store.Get(r, "session")
 		if err != nil {
@@ -551,6 +552,16 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -573,8 +584,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-		username, email, password)
+	var pwHash, err = HashPassword(password)
+
+	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
+		username, email, pwHash)
 	if err != nil {
 		data := Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
 		registerTpl.ExecuteTemplate(w, "layout", data)
