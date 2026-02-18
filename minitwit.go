@@ -98,19 +98,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
-	// On GET request we return the template.
-	if r.Method == http.MethodGet {
-		if err := loginTpl.ExecuteTemplate(w, "layout", nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
 	data := Data{
 		Error:        "",
 		FormUsername: "",
-		Flashes:      nil,
+		Flashes:      GetFlashes(w, r),
 		User:         nil,
+	}
+
+	// On GET request we return the template.
+	if r.Method == http.MethodGet {
+		if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
 	}
 
 	// Get username and password from the template form.
@@ -135,6 +135,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Could not save session", http.StatusInternalServerError)
 			return
 		}
+		AddFlash(w, r, "You were logged in")
 		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
 	}
@@ -277,6 +278,7 @@ func gravatar_url(email string, size int) string {
 // TODO: FollowUser(username)
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	user, ok := TryGetUserFromRequest(r)
+
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		//http.Redirect(w, r, "/public", http.StatusFound)
@@ -297,6 +299,8 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// Add the flash message to the session:
+	AddFlash(w, r, "You are now following " + usernameToFollow)
 	http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
 }
 
@@ -322,7 +326,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	AddFlash(w, r, "You are no longer following " + usernameToUnfollow)
 	http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
@@ -338,6 +342,7 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	AddFlash(w, r, "Your message was recorded")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -357,7 +362,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "could not save session", http.StatusInternalServerError)
 		return
 	}
-
+	AddFlash(w, r, "You were logged out")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -381,6 +386,7 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		Messages: msgs,
 		Endpoint: "timeline", // Add this line
 		User:     &user,
+		Flashes: GetFlashes(w, r),
 	}
 
 	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
@@ -390,9 +396,37 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
+	session, _ := store.Get(r, "session")
+
+	// Get the raw []interface{} values from the session
+	raw := session.Flashes()
+	if err := session.Save(r, w); err != nil {
+        return nil // or we could handle error properly
+    }
+
+	// Extract the messages
+	var flashes []string
+	for _, f := range raw {
+		if msg, ok := f.(string); ok {
+			flashes = append(flashes, msg)
+		}
+	}
+
+	return flashes
+}
+
+func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
+	session, _ := store.Get(r, "session")
+	session.AddFlash(msg)
+	session.Save(r, w)
+}
+
 func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
+
+	flashes := GetFlashes(w, r)
 
 	msgs, err := query_db(`
         SELECT message.message_id, message.text, message.pub_date, user.username
@@ -431,6 +465,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		Endpoint:     "user_timeline", // Add this
 		// You also need to set Followed based on whether the current user follows this user
 		Followed: false, // Set this appropriately
+		Flashes: flashes,
 	}
 
 	user, ok := TryGetUserFromRequest(r)
@@ -468,6 +503,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 	data := Data{
 		Messages: msgs,
 		Endpoint: "public_timeline", // Add this line
+		Flashes: GetFlashes(w, r),
 	}
 	user, ok := TryGetUserFromRequest(r)
 
@@ -593,7 +629,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
-
+	AddFlash(w, r, "You were successfully registered and can login now")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
