@@ -20,13 +20,3 @@ create table message (
   pub_date integer,
   flagged integer
 );
-
-SELECT 
-    message.message_id, 
-    message.text, 
-    message.pub_date, 
-    user.username,
-    user.email
-FROM message
-JOIN user ON user.user_id = message.author_id
-

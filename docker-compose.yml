@@ -1,0 +1,10 @@
+services:
+  minitwit-app:
+    image: minitwit-app
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
