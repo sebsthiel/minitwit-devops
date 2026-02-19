@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"strconv"
 	"strings"
@@ -117,10 +118,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	userUser := GetUserByUsername(username)
+	userUser, errorMessage := ValidateLogin(username, password)
 
 	// Add user to session and redirect
-	if userUser != nil && CheckPasswordHash(password, userUser.pw_hash) {
+	if userUser != nil {
 
 		session, err := store.Get(r, "session")
 		if err != nil {
@@ -140,7 +141,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If the username or password is wrong display error in login page.
-	data.Error = "Wrong username or password"
+	data.Error = errorMessage
 	if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -170,6 +171,18 @@ func init_db() {
 	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func init() {
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 30,
+		HttpOnly: true,
+
+		// IMPORTANT for pytest/local:
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode, // or DefaultMode
 	}
 }
 
@@ -298,8 +311,8 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Add the flash message to the session:
-	AddFlash(w, r, "You are now following "+usernameToFollow)
-	http.Redirect(w, r, "/user/"+usernameToFollow, http.StatusSeeOther)
+	AddFlash(w, r, "You are now following \""+usernameToFollow+"\"")
+	http.Redirect(w, r, "/"+usernameToFollow, http.StatusSeeOther)
 }
 
 // TODO: UnfollowUser(username)
@@ -324,8 +337,8 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You are no longer following "+usernameToUnfollow)
-	http.Redirect(w, r, "/user/"+usernameToUnfollow, http.StatusSeeOther)
+	AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
+	http.Redirect(w, r, "/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
 func AddMessage(w http.ResponseWriter, r *http.Request) {
@@ -435,14 +448,14 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
         LIMIT ?;
     `, username, PER_PAGE)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
 
 	// You need to get the profile user data
 	profileUserData, err := query_db_one("SELECT user_id, username FROM user WHERE username = ?", username)
-	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+	if err != nil || profileUserData["user_id"] == nil {
+		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
 
@@ -612,27 +625,78 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid form", http.StatusBadRequest)
 		return
 	}
+
 	username := r.FormValue("username")
 	email := r.FormValue("email")
-	password := r.FormValue("password")
+	firstPassword := r.FormValue("password")
+	secondPassword := r.FormValue("password2")
 
-	if username == "" || password == "" {
-		data := Data{Error: "username and password required", FormUsername: username}
+	data := Data{}
+
+	ok, registerError := ValidateRegister(username, email, firstPassword, secondPassword)
+
+	data.Error = registerError
+	if !ok {
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
 
-	var pwHash, err = HashPassword(password)
+	var pwHash, err = HashPassword(firstPassword)
 
 	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
 		username, email, pwHash)
 	if err != nil {
-		data := Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
+		data = Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
 	AddFlash(w, r, "You were successfully registered and can login now")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func ValidateRegister(username string, email string, firstPassword string, secondPassword string) (bool, string) {
+	errormessage := ""
+
+	// Have to enter a username
+	if username == "" {
+		return false, "You have to enter a username"
+	}
+
+	if firstPassword == "" {
+		return false, "You have to enter a password"
+	}
+
+	if firstPassword != secondPassword {
+		return false, "The two passwords do not match"
+	}
+
+	_, mailErr := mail.ParseAddress(email)
+	if mailErr != nil {
+		return false, "You have to enter a valid email address"
+	}
+
+	userExists, _ := query_db_one("SELECT username FROM user WHERE username = ?", username)
+
+	// User already exists
+	if userExists["username"] != nil {
+		return false, "The username is already taken"
+	}
+
+	return true, errormessage
+}
+
+func ValidateLogin(username string, password string) (*User, string) {
+	existingUser := GetUserByUsername(username)
+
+	if existingUser == nil {
+		return nil, "Invalid username"
+	}
+
+	if !CheckPasswordHash(password, existingUser.pw_hash) {
+		return nil, "Invalid password"
+	}
+
+	return existingUser, ""
 }
 
 // Returns User if exists and boolean. Boolean is true if user exists
@@ -658,8 +722,6 @@ func main() {
 
 	router.HandleFunc("/public", Timeline).Methods("GET")
 
-	router.HandleFunc("/user/{username}", UserTimeline).Methods("GET")
-
 	router.HandleFunc("/add_message", AddMessage).Methods("POST")
 
 	router.HandleFunc("/login", Login).Methods("GET", "POST")
@@ -670,6 +732,7 @@ func main() {
 
 	router.HandleFunc("/{username}/follow", FollowUser).Methods("GET")
 	router.HandleFunc("/{username}/unfollow", UnfollowUser).Methods("GET")
+	router.HandleFunc("/{username}", UserTimeline).Methods("GET")
 
 	fmt.Println("Started listening on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
