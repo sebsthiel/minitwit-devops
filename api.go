@@ -40,6 +40,26 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 501, "Not implemented yet")
 }
 
+func APIPostFollows(w http.ResponseWriter, r *http.Request) {
+
+	writeJSON(w, 501, "Not implemented yet")
+}
+
+func APIGetFollows(w http.ResponseWriter, r *http.Request) {
+
+	writeJSON(w, 501, "Not implemented yet")
+}
+
+func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
+
+	writeJSON(w, 501, "Not implemented yet")
+}
+
+func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
+
+	writeJSON(w, 501, "Not implemented yet")
+}
+
 func RegisterAPIRoutes(r *mux.Router) {
 
 	api_router := r.PathPrefix("/api").Subrouter()
@@ -52,10 +72,10 @@ func RegisterAPIRoutes(r *mux.Router) {
 	protected_api_router.Use(SimulationAuthMiddleware)
 
 	protected_api_router.HandleFunc("/msgs", APIGetMessages).Methods("GET")
-	// protected_api_router.HandleFunc("/msgs/{username}", APIGetMessagesByUser).Methods("GET")
-	// protected_api_router.HandleFunc("/msgs/{username}", APIPostMessageByUser).Methods("POST")
+	protected_api_router.HandleFunc("/msgs/{username}", APIGetMessagesByUser).Methods("GET")
+	protected_api_router.HandleFunc("/msgs/{username}", APIPostMessageByUser).Methods("POST")
 
-	// protected_api_router.HandleFunc("/fllws/{username}", APIGetFollows).Methods("GET")
-	// protected_api_router.HandleFunc("/fllws/{username}", APIPostFollows).Methods("POST")
+	protected_api_router.HandleFunc("/fllws/{username}", APIGetFollows).Methods("GET")
+	protected_api_router.HandleFunc("/fllws/{username}", APIPostFollows).Methods("POST")
 
 }

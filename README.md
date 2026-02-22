@@ -45,17 +45,18 @@ Stop minitwit (using docker):
 docker compose down
 ```
 
+# Test application
 
-# Simulation API OPENAPI version
-NOTE: We are currently not using this. We are moving away from OPENAPI to just have it in the same application.
-To run the simulation api:
-
+## Run a minitwit simulator against our API:
 ```bash
-cd minitwit_sim_api
-go mod tidy
-go run main.go
+python3 minitwit_simulator.py http://localhost:5001/api
 ```
+## Run
 
-If you get the error that /tmp/minitwit.db is missing, run the minitwit application first. (This will initialize an empty database file)
+
+
+# Simulation API 
+The API is part of the application. It is accessible on the same host but with the route /api.
+See api.go
 
 
