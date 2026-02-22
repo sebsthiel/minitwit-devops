@@ -1,0 +1,17 @@
+package api_models
+
+type LatestValue struct {
+
+	// The latest global value
+	Latest int32 `json:"latest,omitempty"`
+}
+
+// AssertLatestValueRequired checks if the required fields are not zero-ed
+func AssertLatestValueRequired(obj LatestValue) error {
+	return nil
+}
+
+// AssertLatestValueConstraints checks if the values respects the defined constraints
+func AssertLatestValueConstraints(obj LatestValue) error {
+	return nil
+}

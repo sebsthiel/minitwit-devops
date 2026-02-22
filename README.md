@@ -8,7 +8,7 @@ go mod tidy
 You can run it by writing:
 
 ```bash
-go run minitwit.go
+go run .
 ```
 
 When running you can find it on:
@@ -46,8 +46,8 @@ docker compose down
 ```
 
 
-
-# Simulation API
+# Simulation API OPENAPI version
+NOTE: We are currently not using this. We are moving away from OPENAPI to just have it in the same application.
 To run the simulation api:
 
 ```bash
