@@ -1,0 +1,26 @@
+package api_models
+
+type PostMessage struct {
+
+	// Text content of the message
+	Content string `json:"content"`
+}
+
+// AssertPostMessageRequired checks if the required fields are not zero-ed
+func AssertPostMessageRequired(obj PostMessage) error {
+	// elements := map[string]interface{}{
+	// 	"content": obj.Content,
+	// }
+	// for name, el := range elements {
+	// 	if isZero := IsZeroValue(el); isZero {
+	// 		return &RequiredError{Field: name}
+	// 	}
+	// }
+
+	return nil
+}
+
+// AssertPostMessageConstraints checks if the values respects the defined constraints
+func AssertPostMessageConstraints(obj PostMessage) error {
+	return nil
+}
