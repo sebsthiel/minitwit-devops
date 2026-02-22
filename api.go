@@ -60,12 +60,19 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 501, "Not implemented yet")
 }
 
+func APIRegister(w http.ResponseWriter, r *http.Request) {
+
+	writeJSON(w, 501, "Not implemented yet")
+}
+
 func RegisterAPIRoutes(r *mux.Router) {
 
 	api_router := r.PathPrefix("/api").Subrouter()
 
 	// requires no auth:
 	api_router.HandleFunc("/latest", APILatest).Methods("GET")
+
+	api_router.HandleFunc("/register", APIRegister).Methods("POST")
 
 	// protected_api_router - requires auth
 	protected_api_router := api_router.NewRoute().Subrouter()
