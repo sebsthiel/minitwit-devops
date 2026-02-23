@@ -92,17 +92,15 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// Convert the map into a []string.
-	var followerUsernames []string
+	var req api_models.FollowsResponse
 	for _, row := range followers {
 		if username, ok := row["username"].(string); ok {
-			followerUsernames = append(followerUsernames, username)
+			req.Follows = append(req.Follows, username)
 		}
 	}
 
 	// return the response
-	writeJSON(w, http.StatusOK, api_models.FollowsResponse{
-		Follows: followerUsernames,
-	})
+	writeJSON(w, http.StatusOK, req)
 }
 
 func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
