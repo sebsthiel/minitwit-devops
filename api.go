@@ -10,6 +10,8 @@ import (
 
 const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
 
+var latest = -1
+
 // uses the write and encodes the value
 func writeJSON(writer http.ResponseWriter, status int, value any) {
 	writer.Header().Set("Content-Type", "application/json")
@@ -31,8 +33,14 @@ func SimulationAuthMiddleware(next http.Handler) http.Handler {
 }
 
 func APILatest(w http.ResponseWriter, r *http.Request) {
+	if latest == -1 {
+		writeJSON(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
 
-	writeJSON(w, 501, "Not implemented yet")
+	var response api_models.LatestValue
+	response.Latest = int32(latest)
+	writeJSON(w, http.StatusOK, response)
 }
 
 func APIGetMessages(w http.ResponseWriter, r *http.Request) {
