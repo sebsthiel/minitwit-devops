@@ -62,6 +62,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
+
 	// Access variables:
 	vars := mux.Vars(r)
 	username := vars["username"]
@@ -74,11 +75,13 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user and handle if user doesnt exist.
-	userId, userErr := query_db_one("SELECT user_id FROM user WHERE username = ?", username)
-	if userErr != nil {
+	userIdRow, userIdErr := query_db_one("SELECT user_id FROM user WHERE username = ?", username)
+	if userIdErr != nil || len(userIdRow) == 0 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
+
+	userId := userIdRow["user_id"].(int64)
 
 	// Get usernames of users who follow the user.
 	followers, _ := query_db(
