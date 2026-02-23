@@ -57,7 +57,7 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIPostFollows(w http.ResponseWriter, r *http.Request) {
-	// Get variables and decode the requestBody
+	// Get variables
 	vars := mux.Vars(r)
 	username := vars["username"]
 	newLatest, _ := getQueryInt(r, "latest", -1)
@@ -65,6 +65,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 		latest = newLatest
 	}
 
+	// Decode the requestBody
 	var action api_models.FollowAction
 	err := json.NewDecoder(r.Body).Decode(&action)
 	if err != nil {
@@ -72,25 +73,27 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get user_id and handle user not existing.
+	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
 	userId := get_user_id(username)
-	if userId == "" { // 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
+	if userId == "" {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
 
+	// Insert or delete from database depending on follow or unfollow.
 	if action.Follow != "" {
 		followId := get_user_id(action.Follow)
 		database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", userId, followId)
 	} else if action.Unfollow != "" {
 		unfollowId := get_user_id(action.Unfollow)
-		database.Exec("DELETE FROM follower (who_id, whom_id) VALUES (?, ?)", userId, unfollowId)
+		database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", userId, unfollowId)
 	} else {
 		// This shouldnt happen because that means an empty FollowAction.
 	}
 
 	// 204 no content "success"
 	writeJSON(w, http.StatusNoContent, "No Content")
-
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
