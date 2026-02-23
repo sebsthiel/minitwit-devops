@@ -4,11 +4,14 @@ import (
 	"devops/minitwit/api_models"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+
+var latest = 0
 
 // uses the write and encodes the value
 func writeJSON(writer http.ResponseWriter, status int, value any) {
@@ -30,6 +33,19 @@ func SimulationAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func getQueryInt(r *http.Request, key string, defaultVal int) (int, error) {
+	// Get value from query.
+	valStr := r.URL.Query().Get(key)
+
+	// If the value doesnt exist return defauly value and nil
+	if valStr == "" {
+		return defaultVal, nil
+	}
+
+	// Convert the value to int.
+	return strconv.Atoi(valStr)
+}
+
 func APILatest(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, 501, "Not implemented yet")
@@ -41,8 +57,40 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIPostFollows(w http.ResponseWriter, r *http.Request) {
+	// Get variables and decode the requestBody
+	vars := mux.Vars(r)
+	username := vars["username"]
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	if newLatest != -1 {
+		latest = newLatest
+	}
 
-	writeJSON(w, 501, "Not implemented yet")
+	var action api_models.FollowAction
+	err := json.NewDecoder(r.Body).Decode(&action)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	userId := get_user_id(username)
+	if userId == "" { // 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
+		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		return
+	}
+
+	if action.Follow != "" {
+		followId := get_user_id(action.Follow)
+		database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", userId, followId)
+	} else if action.Unfollow != "" {
+		unfollowId := get_user_id(action.Unfollow)
+		database.Exec("DELETE FROM follower (who_id, whom_id) VALUES (?, ?)", userId, unfollowId)
+	} else {
+		// This shouldnt happen because that means an empty FollowAction.
+	}
+
+	// 204 no content "success"
+	writeJSON(w, http.StatusNoContent, "No Content")
+
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
