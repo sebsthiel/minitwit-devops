@@ -59,4 +59,15 @@ python3 minitwit_simulator.py http://localhost:5001/api
 The API is part of the application. It is accessible on the same host but with the route /api.
 See api.go
 
+## Testing the api
+This requires two console windows.
+```bash
+1) Run minitwit
+cd /minitwit-devops
+run go .
+
+2) Run the minitwit_sim_api_test.py inside the test folder.
+cd /minitwit-devops/test
+pytest minitwit_sim_api_test.py
+```
 
