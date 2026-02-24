@@ -26,7 +26,7 @@ func SimulationAuthMiddleware(next http.Handler) http.Handler {
 		if reader.Header.Get("Authorization") != simulatorAuth {
 			writeJSON(writer, http.StatusForbidden, api_models.ErrorResponse{
 				Status:   http.StatusForbidden,
-				ErrorMsg: "You are not authorized to use this resource!",
+				ErrorMsg: "Unauthorized - Must include correct Authorization header",
 			})
 			return
 		}
@@ -58,13 +58,88 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIPostFollows(w http.ResponseWriter, r *http.Request) {
+	// Get variables
+	vars := mux.Vars(r)
+	username := vars["username"]
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	if newLatest != -1 {
+		latest = newLatest
+	}
 
-	writeJSON(w, 501, "Not implemented yet")
+	// Decode the requestBody
+	var action api_models.FollowAction
+	err := json.NewDecoder(r.Body).Decode(&action)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	// Get user_id and handle user not existing.
+	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
+	userId := get_user_id(username)
+	if userId == "" {
+		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		return
+	}
+
+	// Insert or delete from database depending on follow or unfollow.
+	if action.Follow != "" {
+		followId := get_user_id(action.Follow)
+		database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", userId, followId)
+	} else if action.Unfollow != "" {
+		unfollowId := get_user_id(action.Unfollow)
+		database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", userId, unfollowId)
+	} else {
+		// This shouldnt happen because that means an empty FollowAction.
+	}
+
+	// 204 no content "success"
+	writeJSON(w, http.StatusNoContent, "No Content")
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 
-	writeJSON(w, 501, "Not implemented yet")
+	// Access variables:
+	vars := mux.Vars(r)
+	username := vars["username"]
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	no, _ := getQueryInt(r, "no", 100)
+
+	// Update latest if it is in the request.
+	if newLatest != -1 {
+		latest = newLatest
+	}
+
+	// Get user and handle if user doesnt exist.
+	userIdRow, userIdErr := query_db_one("SELECT user_id FROM user WHERE username = ?", username)
+	if userIdErr != nil || len(userIdRow) == 0 {
+		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		return
+	}
+
+	userId := userIdRow["user_id"].(int64)
+
+	// Get usernames of users who follow the user.
+	followers, _ := query_db(
+		`SELECT u.username
+		FROM follower f
+		JOIN user u ON f.whom_id = u.user_id
+		WHERE f.who_id = ?
+		LIMIT ?`,
+		userId,
+		no,
+	)
+
+	// Convert the map into a []string.
+	var req api_models.FollowsResponse
+	for _, row := range followers {
+		if username, ok := row["username"].(string); ok {
+			req.Follows = append(req.Follows, username)
+		}
+	}
+
+	// return the response
+	writeJSON(w, http.StatusOK, req)
 }
 
 func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
