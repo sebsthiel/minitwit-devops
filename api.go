@@ -48,8 +48,14 @@ func getQueryInt(r *http.Request, key string, defaultVal int) (int, error) {
 }
 
 func APILatest(w http.ResponseWriter, r *http.Request) {
+	if latest == -1 {
+		writeJSON(w, http.StatusInternalServerError, api_models.ErrorResponse{Status: http.StatusInternalServerError, ErrorMsg: "Internal Server Error"})
+		return
+	}
 
-	writeJSON(w, 501, "Not implemented yet")
+	var response api_models.LatestValue
+	response.Latest = int32(latest)
+	writeJSON(w, http.StatusOK, response)
 }
 
 func APIGetMessages(w http.ResponseWriter, r *http.Request) {
