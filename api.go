@@ -53,8 +53,39 @@ func APILatest(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIGetMessages(w http.ResponseWriter, r *http.Request) {
+	// Get variables from request.
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	if newLatest != -1 {
+		latest = newLatest
+	}
+	no, _ := getQueryInt(r, "no", 100)
 
-	writeJSON(w, 501, "Not implemented yet")
+	// Query messages from db.
+	messageRows, _ := query_db(
+		`SELECT u.username, m.text, m.pub_date
+		FROM message m
+		JOIN user u ON m.author_id = u.user_id
+		ORDER BY m.pub_date DESC
+		LIMIT ?`,
+		no,
+	)
+
+	// Convert messages (map) into []Message.
+	messages := make([]api_models.Message, 0, len(messageRows))
+	for _, row := range messageRows {
+		username := row["username"].(string)
+		text := row["text"].(string)
+		pubdate := row["pub_date"].(int64)
+
+		messages = append(messages, api_models.Message{
+			Content: text,
+			PubDate: time.Unix(pubdate, 0).Format(time.RFC3339),
+			User:    username,
+		})
+	}
+
+	// return response.
+	writeJSON(w, http.StatusOK, messages)
 }
 
 func APIPostFollows(w http.ResponseWriter, r *http.Request) {
