@@ -3,6 +3,7 @@ package main
 import (
 	"devops/minitwit/api_models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -55,6 +56,7 @@ func APILatest(w http.ResponseWriter, r *http.Request) {
 
 	var response api_models.LatestValue
 	response.Latest = int32(latest)
+	fmt.Printf("LATEST: %+v\n", response)
 	writeJSON(w, http.StatusOK, response)
 }
 
@@ -263,6 +265,11 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
+	}
+
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	if newLatest != -1 {
+		latest = newLatest
 	}
 
 	username := req.Username
