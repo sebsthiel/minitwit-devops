@@ -34,7 +34,7 @@ func SimulationAuthMiddleware(next http.Handler) http.Handler {
 
 func APILatest(w http.ResponseWriter, r *http.Request) {
 	if latest == -1 {
-		writeJSON(w, http.StatusInternalServerError, "Internal Server Error")
+		writeJSON(w, http.StatusInternalServerError, api_models.ErrorResponse{Status: http.StatusInternalServerError, ErrorMsg: "Internal Server Error"})
 		return
 	}
 
