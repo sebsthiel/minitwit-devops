@@ -64,9 +64,14 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	var req api_models.RegisterRequest
 
+	errorResponse := api_models.ErrorResponse{
+		Status:   http.StatusBadRequest,
+		ErrorMsg: "Invalid JSON",
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
 
@@ -75,14 +80,13 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	firstPassword := req.Pwd
 	secondPassword := firstPassword
 
-	data := Data{}
+	errorResponse.Status = http.StatusInternalServerError
 
 	ok, registerError := ValidateRegister(username, email, firstPassword, secondPassword)
 
-	// TODO find fitting error code
-	data.Error = registerError
+	errorResponse.ErrorMsg = registerError
 	if !ok {
-		writeJSON(w, http.StatusTeapot, registerError)
+		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
 
@@ -91,9 +95,8 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
 		username, email, pwHash)
 	if err != nil {
-		data = Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
-		// TODO find fitting error code
-		writeJSON(w, http.StatusTeapot, data)
+		errorResponse.ErrorMsg = "Failed to register: " + err.Error()
+		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
 
