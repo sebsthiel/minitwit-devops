@@ -60,15 +60,9 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 501, "Not implemented yet")
 }
 
-type RegisterRequest struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Pwd      string `json:"pwd"`
-}
-
 func APIRegister(w http.ResponseWriter, r *http.Request) {
 
-	var req RegisterRequest
+	var req api_models.RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
