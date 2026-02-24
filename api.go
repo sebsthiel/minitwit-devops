@@ -72,7 +72,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
@@ -88,8 +88,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	// TODO find fitting error code
 	data.Error = registerError
 	if !ok {
-		print("error 1")
-		writeJSON(w, 501, registerError)
+		writeJSON(w, http.StatusTeapot, registerError)
 		return
 	}
 
@@ -98,14 +97,13 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
 		username, email, pwHash)
 	if err != nil {
-		print(err.Error())
 		data = Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
 		// TODO find fitting error code
-		writeJSON(w, 501, data)
+		writeJSON(w, http.StatusTeapot, data)
 		return
 	}
 
-	writeJSON(w, 200, "User registered succesfully")
+	writeJSON(w, http.StatusOK, "User registered succesfully")
 }
 
 func RegisterAPIRoutes(r *mux.Router) {
