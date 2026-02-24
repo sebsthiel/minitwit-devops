@@ -174,8 +174,32 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
+	// Get variables from request.
+	vars := mux.Vars(r)
+	username := vars["username"]
+	userId := get_user_id(username)
+	if userId == "" {
+		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		return
+	}
+	newLatest, _ := getQueryInt(r, "latest", -1)
+	if newLatest != -1 {
+		latest = newLatest
+	}
 
-	writeJSON(w, 501, "Not implemented yet")
+	// Decode PostMessage from request
+	var req api_models.PostMessage
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	// Add message to the database
+	database.Exec("INSERT INTO message (author_id, text, pub_date, flagged) values (?,?,?,0)", userId, req.Content, time.Now().Unix())
+
+	// return response.
+	writeJSON(w, http.StatusNoContent, "No Content")
 }
 
 func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
