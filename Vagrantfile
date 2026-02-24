@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
     go build -o /usr/local/bin/minitwit .
 
 
-    ufw allow 5001
+    ufw allow 5000
 
     # Start in background
     nohup /usr/local/bin/minitwit > /home/vagrant/output.log 2>&1 &
