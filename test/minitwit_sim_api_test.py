@@ -19,16 +19,17 @@ HEADERS = {'Connection': 'close',
 
 
 def init_db():
-    """Creates the database tables."""
-    with closing(sqlite3.connect(DATABASE)) as db:
-        with open("../schema.sql") as fp:
-            db.cursor().executescript(fp.read())
-        db.commit()
+    print("The test will only pass on an empty database file!")
+    # """Creates the database tables."""
+    # with closing(sqlite3.connect(DATABASE)) as db:
+    #     with open("../schema.sql") as fp:
+    #         db.cursor().executescript(fp.read())
+    #     db.commit()
 
 
-# Empty the database and initialize the schema again
-Path(DATABASE).unlink()
-init_db()
+# # Empty the database and initialize the schema again
+# Path(DATABASE).unlink()
+# init_db()
 
 
 def test_latest():
@@ -44,6 +45,7 @@ def test_latest():
     url = f'{BASE_URL}/latest'
     response = requests.get(url, headers=HEADERS)
     assert response.ok
+    print(response.json()['latest'])
     assert response.json()['latest'] == 1337
 
 
