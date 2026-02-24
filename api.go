@@ -246,7 +246,45 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 
 func APIRegister(w http.ResponseWriter, r *http.Request) {
 
-	writeJSON(w, 501, "Not implemented yet")
+	var req api_models.RegisterRequest
+
+	errorResponse := api_models.ErrorResponse{
+		Status:   http.StatusBadRequest,
+		ErrorMsg: "Invalid JSON",
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		writeJSON(w, int(errorResponse.Status), errorResponse)
+		return
+	}
+
+	username := req.Username
+	email := req.Email
+	firstPassword := req.Pwd
+	secondPassword := firstPassword
+
+	errorResponse.Status = http.StatusInternalServerError
+
+	ok, registerError := ValidateRegister(username, email, firstPassword, secondPassword)
+
+	errorResponse.ErrorMsg = registerError
+	if !ok {
+		writeJSON(w, int(errorResponse.Status), errorResponse)
+		return
+	}
+
+	pwHash, err := HashPassword(firstPassword)
+
+	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
+		username, email, pwHash)
+	if err != nil {
+		errorResponse.ErrorMsg = "Failed to register: " + err.Error()
+		writeJSON(w, int(errorResponse.Status), errorResponse)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, "User registered succesfully")
 }
 
 func RegisterAPIRoutes(r *mux.Router) {
