@@ -71,3 +71,39 @@ cd /minitwit-devops/test
 pytest minitwit_sim_api_test.py
 ```
 
+# Create environment - RUN Vagrant
+## Setting Required Environment Variables for Vagrant + DigitalOcean
+
+### 1. DIGITAL_OCEAN_TOKEN (Required)
+Create a **Personal Access Token (Write scope)** in:
+
+DigitalOcean → API → Tokens/Keys → Generate New Token
+
+Copy the token (looks like `dop_v1_...`).
+
+#### macOS / Linux (bash/zsh)
+
+Temporary (current terminal only):
+
+```bash
+export DIGITAL_OCEAN_TOKEN="dop_v1_..."
+```
+
+Persistent (add to ~/.zshrc or ~/.bashrc):
+
+```bash
+echo 'export DIGITAL_OCEAN_TOKEN="dop_v1_..."' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### 2. DIGITAL_OCEAN_SSH_KEY_NAME (optional)
+
+This is the name of the SSH key object inside DigitalOcean. Default is do-vagrant.
+```bash
+export DIGITAL_OCEAN_SSH_KEY_NAME="do-vagrant"
+```
+
+## Run vagrant
+```bash
+vagrant up --provider=digital_ocean
+```
