@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -168,26 +169,16 @@ func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
 }
 
 func loadUserFromDB(uid int) (User, bool) {
-	sqlStmt := fmt.Sprintf("select * from user where user_id = %d", uid)
-
-	// Query for a single row
-	data, err := query_db_one(sqlStmt)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	if data == nil {
-		return User{}, false
-	}
-
-	user := User{
-		User_id:  int(data["user_id"].(int64)),
-		Username: string(data["username"].(string)),
-		Email:    string(data["email"].(string)),
-		pw_hash:  string(data["pw_hash"].(string)),
+	var user User
+	res := database.First(&user, "user_id = ?", uid)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return User{}, false
+		} else {
+			log.Fatal(res.Error)
+		}
 	}
 	return user, true
-
 }
 
 func GetUserByUsername(username string) *User {
