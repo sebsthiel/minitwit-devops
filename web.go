@@ -340,9 +340,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	var pwHash, err = HashPassword(firstPassword)
 
-	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-		username, email, pwHash)
-	if err != nil {
+	user := User{
+		Username: username,
+		Email:    email,
+		pw_hash:  pwHash,
+	}
+
+	res := database.Create(&user)
+	if res.Error != nil {
 		data = Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
