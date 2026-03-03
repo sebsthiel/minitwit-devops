@@ -18,6 +18,8 @@ import (
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 // Data Structs: TODO
@@ -39,12 +41,25 @@ type User struct {
 	pw_hash  string
 }
 
+type Message struct {
+	Message_id int
+	Author_id  int
+	Text       string
+	Pub_date   int
+	Flagged    int
+}
+
+type Follower struct {
+	Who_id  int
+	Whom_id int
+}
+
 // configurations
 const PORT = "5001"
 const DATABASE = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
-var database *sql.DB
+var database *gorm.DB
 
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
@@ -64,11 +79,12 @@ func read_sql_schema() string {
 	return string(schema)
 }
 
-func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", DATABASE)
+func connect_db() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(DATABASE), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.AutoMigrate(&User{}, &Message{})
 	return db
 }
 
@@ -365,7 +381,6 @@ func main() {
 	database = connect_db()
 	ensure_schema(database)
 	fmt.Println("Starting server")
-
 	router := mux.NewRouter()
 	router.Use(AuthMiddleware)
 
