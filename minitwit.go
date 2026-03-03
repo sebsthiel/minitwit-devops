@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -95,21 +94,6 @@ func get_user_id(username string) string {
 		log.Fatal(res.Error)
 	}
 	return string(user.User_id)
-}
-
-func ensure_schema(db *sql.DB) {
-	var name string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='message'`).Scan(&name)
-	if err == sql.ErrNoRows {
-		sqlStmt := read_sql_schema()
-		if _, err := db.Exec(sqlStmt); err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func FormatDatetime(timestamp int64) string { //return format string
@@ -289,7 +273,6 @@ func init() {
 
 func main() {
 	database = connect_db()
-	ensure_schema(database)
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
 	router.Use(AuthMiddleware)
