@@ -182,25 +182,15 @@ func loadUserFromDB(uid int) (User, bool) {
 }
 
 func GetUserByUsername(username string) *User {
-	// Query database for user
-	data, err := query_db_one("SELECT user_id, username, email, pw_hash FROM user WHERE username = ?", username)
-
-	if err != nil {
-		log.Fatal("Invalid username")
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil
+		} else {
+			log.Fatal("Invalid username")
+		}
 	}
-
-	if data == nil {
-		return nil
-	}
-
-	//Store user in User struct
-	user := User{
-		User_id:  int(data["user_id"].(int64)),
-		Username: string(data["username"].(string)),
-		Email:    string(data["email"].(string)),
-		pw_hash:  string(data["pw_hash"].(string)),
-	}
-
 	return &user
 }
 
