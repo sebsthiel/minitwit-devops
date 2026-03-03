@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/mail"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -84,90 +83,17 @@ func connect_db() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&User{}, &Message{})
+	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
 }
 
-func init_db() {
-	db := connect_db()
-	defer db.Close()
-	sqlStmt := read_sql_schema()
-
-	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Queries the database and returns a list of dictionaries.
-// USE query_db_one if you only want one result
-func query_db(query string, args ...any) ([]map[string]any, error) {
-	rows, err := database.Query(query, args...,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	cols, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-	// results is a slice of rows...
-	var results []map[string]any
-
-	for rows.Next() {
-		values := make([]any, len(cols))
-		valuePtrs := make([]any, len(cols))
-
-		for i := range cols {
-			valuePtrs[i] = &values[i]
-		}
-
-		// put data into pointers
-		err := rows.Scan(valuePtrs...)
-
-		if err != nil {
-			return nil, err
-		}
-
-		rowMap := make(map[string]any)
-		for i, col := range cols {
-			rowMap[col] = values[i]
-		}
-
-		results = append(results, rowMap)
-	}
-	return results, nil
-}
-
-func query_db_one(query string, args ...any) (map[string]any, error) {
-	results, err := query_db(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	if len(results) == 0 {
-		return nil, nil
-	}
-	return results[0], nil
-}
-
 func get_user_id(username string) string {
-	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
-
-	// Query for a single row
-	var res, err = query_db_one(sqlStmt)
-	if err != nil {
-		log.Fatal(err)
-		return ""
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		log.Fatal(res.Error)
 	}
-
-	if res == nil {
-		return ""
-	}
-
-	userid := res["user_id"].(int64)
-	return strconv.FormatInt(userid, 10)
+	return string(user.User_id)
 }
 
 func ensure_schema(db *sql.DB) {
