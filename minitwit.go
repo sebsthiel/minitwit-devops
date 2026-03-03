@@ -117,11 +117,12 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)", user.User_id, r.FormValue("text"), time.Now().Unix())
-	if err != nil {
-		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
+	res := database.Create(&Message{Author_id: user.User_id, Text: r.FormValue("text"), Pub_date: int(time.Now().Unix())})
+	if res.Error != nil {
+		http.Error(w, "Failed post message: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	AddFlash(w, r, "Your message was recorded")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
