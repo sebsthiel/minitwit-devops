@@ -242,14 +242,17 @@ func ValidateRegister(username string, email string, firstPassword string, secon
 		return false, "You have to enter a valid email address"
 	}
 
-	userExists, _ := query_db_one("SELECT username FROM user WHERE username = ?", username)
-
-	// User already exists
-	if userExists["username"] != nil {
-		return false, "The username is already taken"
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return true, errormessage
+		} else {
+			return false, res.Error.Error()
+		}
 	}
 
-	return true, errormessage
+	return false, "The username is already taken"
 }
 
 func ValidateLogin(username string, password string) (*User, string) {
