@@ -34,7 +34,7 @@ type Data struct {
 }
 
 type User struct {
-	User_id  int
+	User_id  int `gorm:"column:user_id;primaryKey;autoIncrement"`
 	Username string
 	Email    string
 	pw_hash  string

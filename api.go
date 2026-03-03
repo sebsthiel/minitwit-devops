@@ -289,10 +289,15 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	pwHash, err := HashPassword(firstPassword)
 
-	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-		username, email, pwHash)
-	if err != nil {
-		errorResponse.ErrorMsg = "Failed to register: " + err.Error()
+	user := User{
+		Username: username,
+		Email:    email,
+		pw_hash:  pwHash,
+	}
+
+	res := database.Create(&user)
+	if res.Error != nil {
+		errorResponse.ErrorMsg = "Failed to register: " + res.Error.Error()
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
