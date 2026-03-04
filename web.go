@@ -198,14 +198,23 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msgs, _ := query_db(`
-        select message.*, user.* from message, user
-        where message.flagged = 0 and message.author_id = user.user_id and (
-            user.user_id = ? or
-            user.user_id in (select whom_id from follower
-                                    where who_id = ?))
-        order by message.pub_date desc limit ?
-    `, user.User_id, user.User_id, PER_PAGE)
+	var msgs []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("m.*, u.*").
+		Joins("JOIN user u ON m.author_id = u.user_id").
+		Where("m.flagged = 0 AND (u.user_id = ? OR u.user_id IN (?) )",
+			user.User_id,
+			database.Model(&Follower{}).Select("whom_id").Where("who_id = ?", user.User_id),
+		).
+		Order("m.pub_date DESC").
+		Limit(PER_PAGE).
+		Find(&msgs)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	data := Data{
 		Messages: msgs,
@@ -305,15 +314,18 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 func Timeline(w http.ResponseWriter, r *http.Request) {
 
-	msgs, err := query_db(`
-		SELECT message.message_id, message.text, message.pub_date, user.username
-		FROM message
-		JOIN user ON user.user_id = message.author_id
-		ORDER BY message.pub_date DESC
-		LIMIT ?;
-	`, PER_PAGE)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	var msgs []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("m.message_id, m.text, m.pub_date, u.username").
+		Joins("JOIN user u ON u.user_id = m.author_id").
+		Order("m.pub_date DESC").
+		Limit(PER_PAGE).
+		Find(&msgs)
+
+	if res.Error != nil {
+		http.Error(w, res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 
