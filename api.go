@@ -72,14 +72,19 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	no, _ := getQueryInt(r, "no", 100)
 
 	// Query messages from db.
-	messageRows, _ := query_db(
-		`SELECT u.username, m.text, m.pub_date
-		FROM message m
-		JOIN user u ON m.author_id = u.user_id
-		ORDER BY m.pub_date DESC
-		LIMIT ?`,
-		no,
-	)
+	var messageRows []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("u.username, m.text, m.pub_date").
+		Joins("JOIN user u ON m.author_id = u.user_id").
+		Order("m.pub_date DESC").
+		Limit(no).
+		Find(&messageRows)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
@@ -233,15 +238,19 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	no, _ := getQueryInt(r, "no", 100)
 
 	// Query messages from db.
-	messageRows, _ := query_db(
-		`SELECT text, pub_date
-		FROM message
-		WHERE author_id = ?
-		ORDER BY pub_date DESC
-		LIMIT ?`,
-		userId,
-		no,
-	)
+	var messageRows []map[string]any
+
+	res := database.
+		Table("message").
+		Select("text, pub_date").
+		Where("author_id = ?", userId).
+		Order("pub_date DESC").
+		Limit(no).
+		Find(&messageRows)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
