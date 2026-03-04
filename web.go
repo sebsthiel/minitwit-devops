@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 var baseTpl = template.Must(
@@ -224,40 +227,49 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	flashes := GetFlashes(w, r)
 
-	msgs, err := query_db(`
-        SELECT message.message_id, message.text, message.pub_date, user.username
-        FROM message
-        JOIN user ON user.user_id = message.author_id
-        WHERE user.username = ?
-        ORDER BY message.pub_date DESC
-        LIMIT ?;
-    `, username, PER_PAGE)
-	if err != nil {
+	type MessageWithAuthor struct {
+		MessageID uint
+		Text      string
+		PubDate   int
+		Username  string
+	}
+
+	var messages []map[string]any
+
+	msgs := database.
+		Table("message").
+		Select("message.message_id, message.text, message.pub_date, user.username").
+		Joins("JOIN user ON user.user_id = message.author_id").
+		Where("user.username = ?", username).
+		Order("message.pub_date DESC").
+		Limit(PER_PAGE).
+		Scan(&messages)
+
+	if msgs.Error != nil {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
+
+	var profileUser User
 
 	// You need to get the profile user data
-	profileUserData, err := query_db_one("SELECT user_id, username FROM user WHERE username = ?", username)
-	if err != nil || profileUserData["user_id"] == nil {
+	profileUserData := database.
+		Select("user_id, username").
+		Where("username = ?", username).
+		First(&profileUser)
+
+	if errors.Is(profileUserData.Error, gorm.ErrRecordNotFound) {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
-
-	profileUserName := profileUserData["username"].(string)
-
-	profileUserId := get_user_id(profileUserName)
-
-	// Create ProfileUser
-	profileUser := &User{
-		Username: profileUserName,
-		User_id:  profileUserId,
+	if profileUserData.Error != nil {
+		log.Fatal(profileUserData.Error)
 	}
 
 	data := Data{
 		FormUsername: username,
-		ProfileUser:  profileUser, // Add this
-		Messages:     msgs,
+		ProfileUser:  &profileUser, // Add this
+		Messages:     messages,
 		Endpoint:     "user_timeline", // Add this
 		// You also need to set Followed based on whether the current user follows this user
 		Followed: false, // Set this appropriately
@@ -270,9 +282,18 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		data.User = &user
 	}
 
-	whom_id_data, err := query_db_one("select whom_id from follower where who_id = ? AND whom_id = ?", user.User_id, profileUserId)
+	var follower Follower
 
-	if whom_id_data["whom_id"] != nil {
+	res := database.
+		Select("whom_id").
+		Where("who_id = ? AND whom_id = ?", user.User_id, get_user_id(profileUser.Username)).
+		First(&follower)
+
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		// Not following
+	} else if res.Error != nil {
+		log.Fatal(res.Error)
+	} else {
 		data.Followed = true
 	}
 
