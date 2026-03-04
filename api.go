@@ -4,6 +4,7 @@ import (
 	"devops/minitwit/api_models"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -116,7 +117,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// Get user_id and handle user not existing.
 	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
@@ -150,24 +151,25 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user and handle if user doesnt exist.
-	userIdRow, userIdErr := query_db_one("SELECT user_id FROM user WHERE username = ?", username)
-	if userIdErr != nil || len(userIdRow) == 0 {
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
-		return
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		log.Fatal(res.Error)
 	}
 
-	userId := userIdRow["user_id"].(int64)
+	var followers []map[string]any
 
-	// Get usernames of users who follow the user.
-	followers, _ := query_db(
-		`SELECT u.username
-		FROM follower f
-		JOIN user u ON f.whom_id = u.user_id
-		WHERE f.who_id = ?
-		LIMIT ?`,
-		userId,
-		no,
-	)
+	res = database.
+		Table("follower AS f").
+		Select("u.username").
+		Joins("JOIN user u ON f.whom_id = u.user_id").
+		Where("f.who_id = ?", user.User_id).
+		Limit(no).
+		Find(&followers)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert the map into a []string.
 	var req api_models.FollowsResponse
@@ -186,7 +188,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
@@ -215,7 +217,7 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
