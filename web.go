@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -127,13 +126,6 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-	/*
-		res := database.Where("who_id = ? AND whom_id = ?", user.User_id, whomID).Delete(&Follower{})
-		if res.Error != nil {
-			http.Error(w, "Failed to unfollow user: " + res.Error.Error(), http.StatusInternalServerError)
-			return
-		}
-	*/
 
 	follower := Follower{
 		Who_id:  user.User_id,
@@ -162,7 +154,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	usernameToUnfollow := vars["username"]
 
 	whomID := get_user_id(usernameToUnfollow)
-	if whomID == "" {
+	if whomID == -1 {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
@@ -254,7 +246,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	profileUserName := profileUserData["username"].(string)
 
-	profileUserId, err := strconv.Atoi(get_user_id(profileUserName))
+	profileUserId := get_user_id(profileUserName)
 
 	// Create ProfileUser
 	profileUser := &User{
