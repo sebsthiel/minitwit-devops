@@ -87,13 +87,13 @@ func connect_db() *gorm.DB {
 	return db
 }
 
-func get_user_id(username string) string {
+func get_user_id(username string) int {
 	var user User
 	res := database.First(&user, "username = ?", username)
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		return -1
 	}
-	return string(user.User_id)
+	return user.User_id
 }
 
 func FormatDatetime(timestamp int64) string { //return format string

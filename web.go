@@ -123,14 +123,26 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 	usernameToFollow := vars["username"]
 
 	whomID := get_user_id(usernameToFollow)
-	if whomID == "" {
+	if whomID == -1 {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
+	/*
+		res := database.Where("who_id = ? AND whom_id = ?", user.User_id, whomID).Delete(&Follower{})
+		if res.Error != nil {
+			http.Error(w, "Failed to unfollow user: " + res.Error.Error(), http.StatusInternalServerError)
+			return
+		}
+	*/
 
-	_, err := database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", user.User_id, whomID)
-	if err != nil {
-		http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
+	follower := Follower{
+		Who_id:  user.User_id,
+		Whom_id: whomID,
+	}
+
+	res := database.Create(&follower)
+	if res.Error != nil {
+		http.Error(w, "Failed to follow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	// Add the flash message to the session:
@@ -155,9 +167,9 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", user.User_id, whomID)
-	if err != nil {
-		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
+	res := database.Where("who_id = ? AND whom_id = ?", user.User_id, whomID).Delete(&Follower{})
+	if res.Error != nil {
+		http.Error(w, "Failed to unfollow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
