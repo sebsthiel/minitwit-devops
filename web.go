@@ -245,7 +245,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	var messages []map[string]any
 
-	msgs := database.
+	res := database.
 		Table("message").
 		Select("message.message_id, message.text, message.pub_date, user.username").
 		Joins("JOIN user ON user.user_id = message.author_id").
@@ -254,7 +254,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		Limit(PER_PAGE).
 		Scan(&messages)
 
-	if msgs.Error != nil {
+	if res.Error != nil {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
@@ -262,17 +262,17 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	var profileUser User
 
 	// You need to get the profile user data
-	profileUserData := database.
+	res = database.
 		Select("user_id, username").
 		Where("username = ?", username).
 		First(&profileUser)
 
-	if errors.Is(profileUserData.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
-	if profileUserData.Error != nil {
-		log.Fatal(profileUserData.Error)
+	if res.Error != nil {
+		log.Fatal(res.Error)
 	}
 
 	data := Data{
@@ -293,7 +293,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	var follower Follower
 
-	res := database.
+	res = database.
 		Select("whom_id").
 		Where("who_id = ? AND whom_id = ?", user.User_id, get_user_id(profileUser.Username)).
 		First(&follower)
