@@ -3,6 +3,7 @@ package main
 import (
 	"devops/minitwit/api_models"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
@@ -154,6 +156,10 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	var user User
 	res := database.First(&user, "username = ?", username)
 	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			return
+		}
 		log.Fatal(res.Error)
 	}
 
