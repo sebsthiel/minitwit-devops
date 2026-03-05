@@ -15,6 +15,7 @@ RUN go mod download
 COPY *.go ./
 COPY templates/ ./templates/
 COPY api_models/ ./api_models/
+COPY static/ ./static/
 
 RUN CGO_ENABLED=1 GOOS=linux go build -o /minitwit-app
 
