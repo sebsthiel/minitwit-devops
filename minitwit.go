@@ -41,7 +41,7 @@ type User struct {
 
 // configurations
 const PORT = "5001"
-const DATABASE = "/tmp/minitwit.db"
+const DATABASE_DEFAULT = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *sql.DB
@@ -56,6 +56,13 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
+func dbPath() string {
+	if p := os.Getenv("DATABASE_PATH"); p != "" {
+		return p
+	}
+	return DATABASE_DEFAULT
+}
+
 func read_sql_schema() string {
 	schema, err := os.ReadFile("schema.sql")
 	if err != nil {
@@ -65,7 +72,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", DATABASE)
+	db, err := sql.Open("sqlite3", dbPath())
 	if err != nil {
 		log.Fatal(err)
 	}
