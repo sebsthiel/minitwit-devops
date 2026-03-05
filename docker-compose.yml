@@ -3,6 +3,10 @@ services:
     image: minitwit-app
     ports:
       - "5001:5001"
+    volumes:
+      - /data:/data
+    environment:
+      - DATABASE_PATH=/data/minitwit.db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001"]
       interval: 30s
