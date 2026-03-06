@@ -309,7 +309,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	user := User{
 		Username: username,
 		Email:    email,
-		pw_hash:  pwHash,
+		Pw_hash:  pwHash,
 	}
 
 	res := database.Create(&user)

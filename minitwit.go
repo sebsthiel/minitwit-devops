@@ -38,11 +38,11 @@ type User struct {
 	User_id  int `gorm:"column:user_id;primaryKey;autoIncrement"`
 	Username string
 	Email    string
-	pw_hash  string
+	Pw_hash  string `gorm:"column:pw_hash"`
 }
 
 type Message struct {
-	Message_id int
+	Message_id int `gorm:"column:message_id;primaryKey;autoIncrement"`
 	Author_id  int
 	Text       string
 	Pub_date   int
@@ -206,7 +206,7 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func CheckPasswordHash(password string, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
@@ -252,7 +252,11 @@ func ValidateLogin(username string, password string) (*User, string) {
 		return nil, "Invalid username"
 	}
 
-	if !CheckPasswordHash(password, existingUser.pw_hash) {
+	if !CheckPasswordHash(password, existingUser.Pw_hash) {
+		print(" ID: ", existingUser.User_id)
+		print(" UN: ", existingUser.Username)
+		print(" Email: ", existingUser.Email)
+		print(" HASH: ", existingUser.Pw_hash)
 		return nil, "Invalid password"
 	}
 

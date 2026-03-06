@@ -298,10 +298,12 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		Where("who_id = ? AND whom_id = ?", user.User_id, get_user_id(profileUser.Username)).
 		First(&follower)
 
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		// Not following
-	} else if res.Error != nil {
-		log.Fatal(res.Error)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			// Not following
+		} else {
+			log.Fatal(res.Error)
+		}
 	} else {
 		data.Followed = true
 	}
@@ -380,7 +382,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	user := User{
 		Username: username,
 		Email:    email,
-		pw_hash:  pwHash,
+		Pw_hash:  pwHash,
 	}
 
 	res := database.Create(&user)
