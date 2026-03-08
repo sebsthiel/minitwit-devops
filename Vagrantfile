@@ -5,46 +5,59 @@ Vagrant.configure("2") do |config|
   # Disable synced folders
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
+  do_token   = ENV.fetch("DIGITAL_OCEAN_TOKEN")
+  ssh_key    = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_PATH", "~/.ssh/do_vagrant")
+  ssh_key    = File.expand_path(ssh_key)
+  ssh_key_nm = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_NAME", "do-vagrant")
+
   # DigitalOcean provider
-  config.vm.provider :digital_ocean do |provider|
-    provider.token = ENV['DIGITAL_OCEAN_TOKEN']   # <-- variable name
+  config.vm.provider :digital_ocean do |provider, override|
+    provider.token = do_token
     provider.image = "ubuntu-22-04-x64"
     provider.region = "fra1"
     provider.size = "s-1vcpu-1gb"
-    provider.ssh_key_name = ENV['asgerkey']   # <-- variable name
+    provider.ssh_key_name = ssh_key_nm 
+    provider.name = "minitwit-dev"
+    
+    # SSH key path
+    override.ssh.private_key_path = ssh_key
   end
-
-  # SSH key path
-  config.ssh.private_key_path = "C:/Users/asger/.ssh/id_rsa"
 
   # Provision
   config.vm.provision "shell", inline: <<-SHELL
+    set -e # Will stop and exit if something fails
+
     apt-get update -y
-    apt-get install -y haveged
-    systemctl enable haveged
-    systemctl start haveged
-    apt-get install -y git build-essential ufw
+    apt-get install -y haveged git ca-certificates curl gnupg lsb-release
+    systemctl enable --now haveged
 
-    # Install Go 1.25.6 (system-wide) per official guidance
-    sudo rm -rf /usr/local/go
-    wget -q https://go.dev/dl/go1.25.6.linux-amd64.tar.gz
-    sudo tar -C /usr/local -xzf go1.25.6.linux-amd64.tar.gz
+    # Docker repo + key
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
 
-    echo 'export PATH=$PATH:/usr/local/go/bin' | sudo tee /etc/profile.d/go.sh >/dev/null
-    export PATH=$PATH:/usr/local/go/bin
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+      > /etc/apt/sources.list.d/docker.list
 
-    go version
+    apt-get update -y
 
-    git clone https://github.com/sebsthiel/minitwit-devops.git /home/vagrant/app
+    # Docker Engine + Compose plugin
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    # Clone/update app
+    if [ ! -d /home/vagrant/app/.git ]; then
+      git clone https://github.com/sebsthiel/minitwit-devops.git /home/vagrant/app
+    else
+      cd /home/vagrant/app
+      git pull
+    fi
+
     cd /home/vagrant/app
 
-    go mod tidy
-    go build -o /usr/local/bin/minitwit .
+    # Build/run
+    sudo docker build -f Dockerfile -t minitwit-app .
+    sudo docker compose up -d --build
 
-
-    ufw allow 5000
-
-    # Start in background
-    nohup /usr/local/bin/minitwit > /home/vagrant/output.log 2>&1 &
+    sudo docker compose ps
   SHELL
 end
