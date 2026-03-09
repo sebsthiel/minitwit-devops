@@ -319,7 +319,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, "User registered succesfully")
+	writeJSON(w, http.StatusNoContent, "User registered succesfully")
 }
 
 func RegisterAPIRoutes(r *mux.Router) {

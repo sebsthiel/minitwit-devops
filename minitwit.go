@@ -56,7 +56,7 @@ type Follower struct {
 
 // configurations
 const PORT = "5001"
-const DATABASE = "/tmp/minitwit.db"
+const DATABASE_DEFAULT = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *gorm.DB
@@ -71,6 +71,13 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
+func dbPath() string {
+	if p := os.Getenv("DATABASE_PATH"); p != "" {
+		return p
+	}
+	return DATABASE_DEFAULT
+}
+
 func read_sql_schema() string {
 	schema, err := os.ReadFile("schema.sql")
 	if err != nil {
@@ -80,7 +87,7 @@ func read_sql_schema() string {
 }
 
 func connect_db() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(DATABASE), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(dbPath()), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
