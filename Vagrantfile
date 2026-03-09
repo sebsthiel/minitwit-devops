@@ -82,6 +82,13 @@ Vagrant.configure("2") do |config|
       apt-get update -y
       apt-get install -y postgresql postgresql-contrib
 
+      apt-get install -y git
+
+      # repo needed to get the schema.sql file
+      if [ ! -d /home/vagrant/app/.git ]; then
+        git clone https://github.com/sebsthiel/minitwit-devops.git /home/vagrant/app
+      fi
+
       systemctl enable postgresql
       systemctl start postgresql
 
@@ -91,8 +98,8 @@ Vagrant.configure("2") do |config|
       sudo -u postgres psql <<EOF
       CREATE USER minitwit_user WITH PASSWORD '${DBPASSWORD}';
       CREATE DATABASE minitwit OWNER minitwit_user;
-      ALTER ROLE minitwit LOGIN;
-    EOF
+      EOF
+      sudo -u postgres psql -d minitwit -f /home/vagrant/app/schema.sql
     SHELL
   end
 end
