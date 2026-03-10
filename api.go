@@ -77,7 +77,7 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	res := database.
 		Table("message AS m").
 		Select("u.username, m.text, m.pub_date").
-		Joins("JOIN user u ON m.author_id = u.user_id").
+		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
 		Order("m.pub_date DESC").
 		Limit(no).
 		Find(&messageRows)
@@ -173,7 +173,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	res = database.
 		Table("follower AS f").
 		Select("u.username").
-		Joins("JOIN user u ON f.whom_id = u.user_id").
+		Joins(`JOIN "user" u ON f.whom_id = u.user_id`).
 		Where("f.who_id = ?", user.User_id).
 		Limit(no).
 		Find(&followers)
