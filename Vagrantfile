@@ -80,7 +80,7 @@ Vagrant.configure("2") do |config|
     db.vm.provision "shell", inline: <<-SHELL
       set -e
       apt-get update -y
-      apt-get install -y postgresql postgresql-contrib pgloader git
+      apt-get install -y postgresql postgresql-contrib git
 
       # repo needed to get the schema.sql file
       if [ ! -d /home/vagrant/app/.git ]; then
