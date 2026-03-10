@@ -13,10 +13,11 @@ RUN go mod download
 
 # Copy our Go source code
 COPY *.go ./
+COPY internal/ ./internal/
 COPY templates/ ./templates/
 COPY api_models/ ./api_models/
 COPY static/ ./static/
-
+COPY schema.sql ./schema.sql
 RUN CGO_ENABLED=1 GOOS=linux go build -o /minitwit-app
 
 EXPOSE 5001
