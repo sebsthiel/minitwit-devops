@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -87,7 +88,14 @@ func read_sql_schema() string {
 }
 
 func connect_db() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(dbPath()), &gorm.Config{
+	var dialector gorm.Dialector
+	if p := os.Getenv("DATABASE_PATH"); p != "" {
+		dialector = postgres.Open(p)
+	} else {
+		dialector = sqlite.Open(DATABASE_DEFAULT)
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
