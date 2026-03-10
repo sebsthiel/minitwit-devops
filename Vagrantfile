@@ -80,17 +80,20 @@ Vagrant.configure("2") do |config|
     db.vm.provision "shell", inline: <<-SHELL
       set -e
       apt-get update -y
-      apt-get install -y postgresql postgresql-contrib
-
-      apt-get install -y git
+      apt-get install -y postgresql postgresql-contrib pgloader git
 
       # repo needed to get the schema.sql file
       if [ ! -d /home/vagrant/app/.git ]; then
         git clone https://github.com/sebsthiel/minitwit-devops.git /home/vagrant/app
       fi
 
+      # Allow remote connections
+      echo "listen_addresses = '*'" >> /etc/postgresql/*/main/postgresql.conf
+      echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/*/main/pg_hba.conf
+
       systemctl enable postgresql
       systemctl start postgresql
+
 
       export DBPASSWORD="#{db_password}"
 
@@ -99,7 +102,7 @@ Vagrant.configure("2") do |config|
       CREATE USER minitwit_user WITH PASSWORD '${DBPASSWORD}';
       CREATE DATABASE minitwit OWNER minitwit_user;
       EOF
-      sudo -u postgres psql -d minitwit -f /home/vagrant/app/schema.sql
+      
     SHELL
   end
 end
