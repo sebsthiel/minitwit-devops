@@ -77,7 +77,7 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	res := database.
 		Table("message AS m").
 		Select("u.username, m.text, m.pub_date").
-		Joins("JOIN user u ON m.author_id = u.user_id").
+		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
 		Order("m.pub_date DESC").
 		Limit(no).
 		Find(&messageRows)
@@ -132,10 +132,13 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// Insert or delete from database depending on follow or unfollow.
 	if action.Follow != "" {
 		followId := get_user_id(action.Follow)
-		database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", userId, followId)
+		database.Create(&Follower{
+			Who_id:  userId,
+			Whom_id: followId,
+		})
 	} else if action.Unfollow != "" {
 		unfollowId := get_user_id(action.Unfollow)
-		database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", userId, unfollowId)
+		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&Follower{})
 	} else {
 		// This shouldnt happen because that means an empty FollowAction.
 	}
@@ -173,7 +176,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	res = database.
 		Table("follower AS f").
 		Select("u.username").
-		Joins("JOIN user u ON f.whom_id = u.user_id").
+		Joins(`JOIN "user" u ON f.whom_id = u.user_id`).
 		Where("f.who_id = ?", user.User_id).
 		Limit(no).
 		Find(&followers)
@@ -217,8 +220,12 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add message to the database
-	database.Exec("INSERT INTO message (author_id, text, pub_date, flagged) values (?,?,?,0)", userId, req.Content, time.Now().Unix())
-
+	database.Create(&Message{
+		Author_id: userId,
+		Text:      req.Content,
+		Pub_date:  int(time.Now().Unix()),
+		Flagged:   0,
+	})
 	// return response.
 	writeJSON(w, http.StatusNoContent, "No Content")
 }

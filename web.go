@@ -203,7 +203,7 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 	res := database.
 		Table("message AS m").
 		Select("m.*, u.*").
-		Joins("JOIN user u ON m.author_id = u.user_id").
+		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
 		Where("m.flagged = 0 AND (u.user_id = ? OR u.user_id IN (?) )",
 			user.User_id,
 			database.Model(&Follower{}).Select("whom_id").Where("who_id = ?", user.User_id),
@@ -248,7 +248,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	res := database.
 		Table("message").
 		Select("message.message_id, message.text, message.pub_date, user.username").
-		Joins("JOIN user ON user.user_id = message.author_id").
+		Joins(`JOIN "user" ON user.user_id = message.author_id`).
 		Where("user.username = ?", username).
 		Order("message.pub_date DESC").
 		Limit(PER_PAGE).
@@ -321,7 +321,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 	res := database.
 		Table("message AS m").
 		Select("m.message_id, m.text, m.pub_date, u.username").
-		Joins("JOIN user u ON u.user_id = m.author_id").
+		Joins(`JOIN "user" u ON u.user_id = m.author_id`).
 		Order("m.pub_date DESC").
 		Limit(PER_PAGE).
 		Find(&msgs)
