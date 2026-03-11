@@ -1,5 +1,6 @@
 services:
   minitwit-app:
+    build: .
     image: minitwit-app
     ports:
       - "5001:5001"
@@ -7,6 +8,23 @@ services:
       - /data:/data
     environment:
       - DATABASE_PATH=/data/minitwit.db
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - minitwit-app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001"]
       interval: 30s

@@ -3,12 +3,15 @@ package main
 import (
 	"devops/minitwit/api_models"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
@@ -69,14 +72,19 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	no, _ := getQueryInt(r, "no", 100)
 
 	// Query messages from db.
-	messageRows, _ := query_db(
-		`SELECT u.username, m.text, m.pub_date
-		FROM message m
-		JOIN user u ON m.author_id = u.user_id
-		ORDER BY m.pub_date DESC
-		LIMIT ?`,
-		no,
-	)
+	var messageRows []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("u.username, m.text, m.pub_date").
+		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
+		Order("m.pub_date DESC").
+		Limit(no).
+		Find(&messageRows)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
@@ -116,7 +124,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// Get user_id and handle user not existing.
 	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
@@ -124,10 +132,13 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// Insert or delete from database depending on follow or unfollow.
 	if action.Follow != "" {
 		followId := get_user_id(action.Follow)
-		database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", userId, followId)
+		database.Create(&Follower{
+			Who_id:  userId,
+			Whom_id: followId,
+		})
 	} else if action.Unfollow != "" {
 		unfollowId := get_user_id(action.Unfollow)
-		database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", userId, unfollowId)
+		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&Follower{})
 	} else {
 		// This shouldnt happen because that means an empty FollowAction.
 	}
@@ -150,24 +161,29 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user and handle if user doesnt exist.
-	userIdRow, userIdErr := query_db_one("SELECT user_id FROM user WHERE username = ?", username)
-	if userIdErr != nil || len(userIdRow) == 0 {
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
-		return
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			return
+		}
+		log.Fatal(res.Error)
 	}
 
-	userId := userIdRow["user_id"].(int64)
+	var followers []map[string]any
 
-	// Get usernames of users who follow the user.
-	followers, _ := query_db(
-		`SELECT u.username
-		FROM follower f
-		JOIN user u ON f.whom_id = u.user_id
-		WHERE f.who_id = ?
-		LIMIT ?`,
-		userId,
-		no,
-	)
+	res = database.
+		Table("follower AS f").
+		Select("u.username").
+		Joins(`JOIN "user" u ON f.whom_id = u.user_id`).
+		Where("f.who_id = ?", user.User_id).
+		Limit(no).
+		Find(&followers)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert the map into a []string.
 	var req api_models.FollowsResponse
@@ -186,7 +202,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 		return
 	}
@@ -204,8 +220,12 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add message to the database
-	database.Exec("INSERT INTO message (author_id, text, pub_date, flagged) values (?,?,?,0)", userId, req.Content, time.Now().Unix())
-
+	database.Create(&Message{
+		Author_id: userId,
+		Text:      req.Content,
+		Pub_date:  int(time.Now().Unix()),
+		Flagged:   0,
+	})
 	// return response.
 	writeJSON(w, http.StatusNoContent, "No Content")
 }
@@ -215,7 +235,7 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 	userId := get_user_id(username)
-	if userId == "" {
+	if userId == -1 {
 		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
@@ -225,15 +245,19 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	no, _ := getQueryInt(r, "no", 100)
 
 	// Query messages from db.
-	messageRows, _ := query_db(
-		`SELECT text, pub_date
-		FROM message
-		WHERE author_id = ?
-		ORDER BY pub_date DESC
-		LIMIT ?`,
-		userId,
-		no,
-	)
+	var messageRows []map[string]any
+
+	res := database.
+		Table("message").
+		Select("text, pub_date").
+		Where("author_id = ?", userId).
+		Order("pub_date DESC").
+		Limit(no).
+		Find(&messageRows)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
@@ -289,10 +313,15 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	pwHash, err := HashPassword(firstPassword)
 
-	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-		username, email, pwHash)
-	if err != nil {
-		errorResponse.ErrorMsg = "Failed to register: " + err.Error()
+	user := User{
+		Username: username,
+		Email:    email,
+		Pw_hash:  pwHash,
+	}
+
+	res := database.Create(&user)
+	if res.Error != nil {
+		errorResponse.ErrorMsg = "Failed to register: " + res.Error.Error()
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}

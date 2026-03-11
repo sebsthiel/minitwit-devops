@@ -3,21 +3,28 @@ package main
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/mail"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/crypto/bcrypt"
+
+	"devops/minitwit/internal/monitoring"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // Data Structs: TODO
@@ -33,10 +40,23 @@ type Data struct {
 }
 
 type User struct {
-	User_id  int
+	User_id  int `gorm:"column:user_id;primaryKey;autoIncrement"`
 	Username string
 	Email    string
-	pw_hash  string
+	Pw_hash  string `gorm:"column:pw_hash"`
+}
+
+type Message struct {
+	Message_id int `gorm:"column:message_id;primaryKey;autoIncrement"`
+	Author_id  int
+	Text       string
+	Pub_date   int
+	Flagged    int
+}
+
+type Follower struct {
+	Who_id  int
+	Whom_id int
 }
 
 // configurations
@@ -44,7 +64,7 @@ const PORT = "5001"
 const DATABASE_DEFAULT = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
-var database *sql.DB
+var database *gorm.DB
 
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
@@ -71,109 +91,33 @@ func read_sql_schema() string {
 	return string(schema)
 }
 
-func connect_db() *sql.DB {
-	db, err := sql.Open("sqlite3", dbPath())
+func connect_db() *gorm.DB {
+	var dialector gorm.Dialector
+	if p := os.Getenv("DATABASE_PATH"); p != "" {
+		dialector = postgres.Open(p)
+	} else {
+		dialector = sqlite.Open(DATABASE_DEFAULT)
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
 }
 
-func init_db() {
-	db := connect_db()
-	defer db.Close()
-	sqlStmt := read_sql_schema()
-
-	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Fatal(err)
+func get_user_id(username string) int {
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		return -1
 	}
-}
-
-// Queries the database and returns a list of dictionaries.
-// USE query_db_one if you only want one result
-func query_db(query string, args ...any) ([]map[string]any, error) {
-	rows, err := database.Query(query, args...,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	cols, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-	// results is a slice of rows...
-	var results []map[string]any
-
-	for rows.Next() {
-		values := make([]any, len(cols))
-		valuePtrs := make([]any, len(cols))
-
-		for i := range cols {
-			valuePtrs[i] = &values[i]
-		}
-
-		// put data into pointers
-		err := rows.Scan(valuePtrs...)
-
-		if err != nil {
-			return nil, err
-		}
-
-		rowMap := make(map[string]any)
-		for i, col := range cols {
-			rowMap[col] = values[i]
-		}
-
-		results = append(results, rowMap)
-	}
-	return results, nil
-}
-
-func query_db_one(query string, args ...any) (map[string]any, error) {
-	results, err := query_db(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	if len(results) == 0 {
-		return nil, nil
-	}
-	return results[0], nil
-}
-
-func get_user_id(username string) string {
-	sqlStmt := fmt.Sprintf("select user_id from user where username = '%s'", username)
-
-	// Query for a single row
-	var res, err = query_db_one(sqlStmt)
-	if err != nil {
-		log.Fatal(err)
-		return ""
-	}
-
-	if res == nil {
-		return ""
-	}
-
-	userid := res["user_id"].(int64)
-	return strconv.FormatInt(userid, 10)
-}
-
-func ensure_schema(db *sql.DB) {
-	var name string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='message'`).Scan(&name)
-	if err == sql.ErrNoRows {
-		sqlStmt := read_sql_schema()
-		if _, err := db.Exec(sqlStmt); err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
+	return user.User_id
 }
 
 func FormatDatetime(timestamp int64) string { //return format string
@@ -197,11 +141,12 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.Exec("insert into message (author_id, text, pub_date, flagged)values (?, ?, ?, 0)", user.User_id, r.FormValue("text"), time.Now().Unix())
-	if err != nil {
-		http.Error(w, "Failed post message: "+err.Error(), http.StatusInternalServerError)
+	res := database.Create(&Message{Author_id: user.User_id, Text: r.FormValue("text"), Pub_date: int(time.Now().Unix())})
+	if res.Error != nil {
+		http.Error(w, "Failed post message: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	AddFlash(w, r, "Your message was recorded")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -233,48 +178,28 @@ func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
 }
 
 func loadUserFromDB(uid int) (User, bool) {
-	sqlStmt := fmt.Sprintf("select * from user where user_id = %d", uid)
-
-	// Query for a single row
-	data, err := query_db_one(sqlStmt)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	if data == nil {
-		return User{}, false
-	}
-
-	user := User{
-		User_id:  int(data["user_id"].(int64)),
-		Username: string(data["username"].(string)),
-		Email:    string(data["email"].(string)),
-		pw_hash:  string(data["pw_hash"].(string)),
+	var user User
+	res := database.First(&user, "user_id = ?", uid)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return User{}, false
+		} else {
+			log.Fatal(res.Error)
+		}
 	}
 	return user, true
-
 }
 
 func GetUserByUsername(username string) *User {
-	// Query database for user
-	data, err := query_db_one("SELECT user_id, username, email, pw_hash FROM user WHERE username = ?", username)
-
-	if err != nil {
-		log.Fatal("Invalid username")
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil
+		} else {
+			log.Fatal("Invalid username")
+		}
 	}
-
-	if data == nil {
-		return nil
-	}
-
-	//Store user in User struct
-	user := User{
-		User_id:  int(data["user_id"].(int64)),
-		Username: string(data["username"].(string)),
-		Email:    string(data["email"].(string)),
-		pw_hash:  string(data["pw_hash"].(string)),
-	}
-
 	return &user
 }
 
@@ -300,7 +225,7 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func CheckPasswordHash(password string, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
@@ -326,14 +251,17 @@ func ValidateRegister(username string, email string, firstPassword string, secon
 		return false, "You have to enter a valid email address"
 	}
 
-	userExists, _ := query_db_one("SELECT username FROM user WHERE username = ?", username)
-
-	// User already exists
-	if userExists["username"] != nil {
-		return false, "The username is already taken"
+	var user User
+	res := database.First(&user, "username = ?", username)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return true, errormessage
+		} else {
+			return false, res.Error.Error()
+		}
 	}
 
-	return true, errormessage
+	return false, "The username is already taken"
 }
 
 func ValidateLogin(username string, password string) (*User, string) {
@@ -343,7 +271,11 @@ func ValidateLogin(username string, password string) (*User, string) {
 		return nil, "Invalid username"
 	}
 
-	if !CheckPasswordHash(password, existingUser.pw_hash) {
+	if !CheckPasswordHash(password, existingUser.Pw_hash) {
+		print(" ID: ", existingUser.User_id)
+		print(" UN: ", existingUser.Username)
+		print(" Email: ", existingUser.Email)
+		print(" HASH: ", existingUser.Pw_hash)
 		return nil, "Invalid password"
 	}
 
@@ -369,11 +301,15 @@ func init() {
 }
 
 func main() {
-	database = connect_db()
-	ensure_schema(database)
-	fmt.Println("Starting server")
+	monitoring.Init()
 
+	database = connect_db()
+	fmt.Println("Starting server")
 	router := mux.NewRouter()
+	router.Handle("/metrics", promhttp.Handler())
+
+	// middleware
+	router.Use(monitoring.MetricsMiddleware)
 	router.Use(AuthMiddleware)
 
 	// load stylesheet
@@ -388,4 +324,5 @@ func main() {
 
 	fmt.Println("Started listening on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
+
 }
