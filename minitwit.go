@@ -16,7 +16,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/crypto/bcrypt"
+
+	"devops/minitwit/internal/monitoring"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -297,9 +301,15 @@ func init() {
 }
 
 func main() {
+	monitoring.Init()
+
 	database = connect_db()
 	fmt.Println("Starting server")
 	router := mux.NewRouter()
+	router.Handle("/metrics", promhttp.Handler())
+
+	// middleware
+	router.Use(monitoring.MetricsMiddleware)
 	router.Use(AuthMiddleware)
 
 	// load stylesheet
@@ -314,4 +324,5 @@ func main() {
 
 	fmt.Println("Started listening on:", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, router))
+
 }
