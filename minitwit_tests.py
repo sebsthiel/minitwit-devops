@@ -1,18 +1,24 @@
-import requests
+import os
 from time import sleep
+
+import requests
 from bs4 import BeautifulSoup
 
 
-FRONTEND_URL = "http://minitwit-app:5001"
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://minitwit-app:5001")
 
 while True:
-    # This is a hack...
-    r = requests.get(FRONTEND_URL)
-    if "mysql.connector.errors.InterfaceError" in r.text:
-        print("Waiting another 5s for DB to be initialized...")
+    # Wait for service DNS and DB readiness before running tests.
+    try:
+        r = requests.get(FRONTEND_URL)
+        if "mysql.connector.errors.InterfaceError" in r.text:
+            print("Waiting another 5s for DB to be initialized...")
+            sleep(5)
+        else:
+            break
+    except requests.RequestException:
+        print("Waiting another 5s for frontend to be reachable...")
         sleep(5)
-    else:
-        break
 
 
 def test_thirty_msgs_on_frontpage():
