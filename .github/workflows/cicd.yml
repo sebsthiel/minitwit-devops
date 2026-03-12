@@ -9,7 +9,6 @@ on:
    #   - master
   # allow manual triggers for now too
   workflow_dispatch:
-    manual: true
 
 
 
@@ -76,12 +75,8 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
-      - name: Deploy to server
-        # Configure the ~./bash_profile and deploy.sh file on the Vagrantfile
-        run: >
-          ssh $SSH_USER@$SSH_HOST
-          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no
-          './deploy.sh'
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Docker Compose Action
+        uses: hoverkraft-tech/compose-action@v2.5.0
+        with:
+          compose-file: ./docker-compose.yml
+          compose-flags: "pull"
