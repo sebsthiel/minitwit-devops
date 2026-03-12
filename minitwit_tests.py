@@ -3,7 +3,7 @@ from time import sleep
 from bs4 import BeautifulSoup
 
 
-FRONTEND_URL = "http://minitwit:5000"
+FRONTEND_URL = "http://minitwit-app:5001"
 
 while True:
     # This is a hack...
