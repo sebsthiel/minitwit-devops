@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6.0.2
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -67,15 +67,8 @@ jobs:
     #     env:
     #       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/do_ssh_key
-          chmod 600 ~/.ssh/do_ssh_key
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-
-      - name: SSH Remote Commands
+   
+      - name: Pull images and deploy to test server
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.REMOTE_TEST_HOST }}
