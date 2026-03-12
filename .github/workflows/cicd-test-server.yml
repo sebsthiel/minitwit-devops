@@ -1,5 +1,5 @@
 ---
-name: CI/CD Pipeline
+name: CI/CD Pipeline Test Server
 
 on:
   push:
@@ -78,3 +78,6 @@ jobs:
             cd /home/vagrant/app
             docker compose pull
             docker compose up -d
+
+      # - name: Actions Status Discord
+      #   uses: sarisia/actions-status-discord@v1.16.0
