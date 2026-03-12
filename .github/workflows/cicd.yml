@@ -6,7 +6,7 @@ on:
     # Run workflow every time something is pushed to the main branch
     branches:
       - cicd-pipeline  # For testing purposes. Change to master/main for production.
-   #   - master
+    #   - master
   # allow manual triggers for now too
   workflow_dispatch:
 
@@ -75,7 +75,13 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
-      - name: Docker Compose Action
-        uses: hoverkraft-tech/compose-action@v2.5.0
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v1.2.5
         with:
-          compose-file: ./docker-compose.yml
+          host: ${{ secrets.REMOTE_TEST_HOST }}
+          username: ${{ secrets.REMOTE_TEST_SSH_USER }}
+          key: ${{ secrets.REMOTE_TEST_PRIVATE_SSHKEY }}
+          script: |
+            cd /home/vagrant/app
+            docker compose pull
+            docker compose up -d
