@@ -12,14 +12,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-  minitwit-tests:
-    image: minitwittestimage:latest
-    build:
-      context: .
-      dockerfile: Dockerfile-minitwit-tests
-    depends_on:
-      minitwit-app:
-        condition: service_healthy
-    environment:
-      - FRONTEND_URL=http://minitwit-app:5001
