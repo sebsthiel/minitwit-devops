@@ -79,4 +79,3 @@ jobs:
         uses: hoverkraft-tech/compose-action@v2.5.0
         with:
           compose-file: ./docker-compose.yml
-          compose-flags: "pull"
