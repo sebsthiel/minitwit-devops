@@ -1,30 +1,32 @@
 Vagrant.configure("2") do |config|
-  # Dummy box for DO provider
-  config.vm.box = "dummy"
+  config.vm.define "minitwit-cicd-test-droplet-2" do |vm|
+    # Dummy box for DO provider
+    vm.vm.box = "minitwit-cicd-test-box"
 
-  # Disable synced folders
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+    # Disable synced folders
+    vm.vm.synced_folder ".", "/vagrant", disabled: true
 
-  do_token   = ENV.fetch("DIGITAL_OCEAN_TOKEN")
-  ssh_key    = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_PATH", "~/.ssh/do_vagrant")
-  ssh_key    = File.expand_path(ssh_key)
-  ssh_key_nm = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_NAME", "do-vagrant")
+    do_token   = ENV.fetch("DIGITAL_OCEAN_TOKEN")
+    ssh_key    = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_PATH", "~/.ssh/do_vagrant_cicd_test_ssh_key")
+    ssh_key    = File.expand_path(ssh_key)
+    ssh_key_nm = ENV.fetch("DIGITAL_OCEAN_SSH_KEY_NAME", "do_vagrant_cicd_test_ssh_key")
 
-  # DigitalOcean provider
-  config.vm.provider :digital_ocean do |provider, override|
-    provider.token = do_token
-    provider.image = "ubuntu-22-04-x64"
-    provider.region = "fra1"
-    provider.size = "s-1vcpu-1gb"
-    provider.ssh_key_name = ssh_key_nm 
-    provider.name = "minitwit-dev"
-    
-    # SSH key path
-    override.ssh.private_key_path = ssh_key
-  end
+    # DigitalOcean provider
+    vm.vm.provider :digital_ocean do |provider, override|
+      provider.token = do_token
+      provider.image = "ubuntu-22-04-x64"
+      provider.region = "fra1"
+      provider.size = "s-1vcpu-1gb"
+      provider.ssh_key_name = ssh_key_nm
+      provider.name = "minitwit-cicd-test-droplet-2"
+      override.vm.hostname = "minitwit-cicd-test-droplet-2"
 
-  # Provision
-  config.vm.provision "shell", inline: <<-SHELL
+      # SSH key path
+      override.ssh.private_key_path = ssh_key
+    end
+
+    # Provision
+    vm.vm.provision "shell", inline: <<-SHELL
     set -e # Will stop and exit if something fails
 
     apt-get update -y
@@ -59,5 +61,6 @@ Vagrant.configure("2") do |config|
     sudo docker compose up -d --build
 
     sudo docker compose ps
-  SHELL
+    SHELL
+  end
 end
