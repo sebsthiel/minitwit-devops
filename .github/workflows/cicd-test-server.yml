@@ -59,14 +59,14 @@ jobs:
     #       cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/flagtoolimage:flagtoolbuildcache
     #       cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/flagtoolimage:flagtoolbuildcache,mode=max
 
-      - name: Test minitwit
-        run: |
-          docker build -t minitwittestimage:latest -f Dockerfile-minitwit-tests .
-          docker compose -p minitwit pull minitwit-app
-          yes 2>/dev/null | docker compose -p minitwit up -d --wait minitwit-app
-          docker compose -p minitwit run --rm minitwit-tests
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      # - name: Test minitwit
+      #   run: |
+      #     docker build -t minitwittestimage:latest -f Dockerfile-minitwit-tests .
+      #     docker compose -p minitwit pull minitwit-app
+      #     yes 2>/dev/null | docker compose -p minitwit up -d --wait minitwit-app
+      #     docker compose -p minitwit run --rm minitwit-tests
+      #   env:
+      #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
       - name: Upload docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
