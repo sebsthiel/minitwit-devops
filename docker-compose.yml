@@ -1,7 +1,6 @@
 services:
   minitwit-app:
-    build: .
-    image: minitwit-app
+    image: marcp85/minitwitimage:latest #Changed to match Docker Hub image name
     ports:
       - "5001:5001"
     volumes:

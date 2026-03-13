@@ -1,0 +1,64 @@
+---
+name: CI/CD Pipeline Production Server
+
+on:
+  push:
+    # Run workflow every time something is pushed to the main branch
+    branches:
+      - main 
+      - master
+      
+  workflow_dispatch:
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push minitwitimage
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile-minitwit
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
+
+    
+      - name: Upload docker-compose.yml
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/vagrant/app/"
+
+      - name: Pull images and deploy to test server
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/vagrant/app
+            docker compose pull
+            docker compose up -d
+
+      # - name: Actions Status Discord
+      #   uses: sarisia/actions-status-discord@v1.16.0
