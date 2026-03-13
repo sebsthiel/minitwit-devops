@@ -6,7 +6,7 @@ services:
     volumes:
       - /data:/data
     environment:
-      - DATABASE_PATH=/data/minitwit.db
+      - DATABASE_PATH=${DATABASE_PATH}
 
   prometheus:
     image: prom/prometheus:latest
