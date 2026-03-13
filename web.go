@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"html/template"
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 var baseTpl = template.Must(
@@ -123,14 +125,19 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 	usernameToFollow := vars["username"]
 
 	whomID := get_user_id(usernameToFollow)
-	if whomID == "" {
+	if whomID == -1 {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	_, err := database.Exec("INSERT INTO follower (who_id, whom_id) VALUES (?, ?)", user.User_id, whomID)
-	if err != nil {
-		http.Error(w, "Failed to follow user: "+err.Error(), http.StatusInternalServerError)
+	follower := Follower{
+		Who_id:  user.User_id,
+		Whom_id: whomID,
+	}
+
+	res := database.Create(&follower)
+	if res.Error != nil {
+		http.Error(w, "Failed to follow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	// Add the flash message to the session:
@@ -150,14 +157,14 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	usernameToUnfollow := vars["username"]
 
 	whomID := get_user_id(usernameToUnfollow)
-	if whomID == "" {
+	if whomID == -1 {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	_, err := database.Exec("DELETE FROM follower WHERE who_id = ? AND whom_id = ?", user.User_id, whomID)
-	if err != nil {
-		http.Error(w, "Failed to unfollow user: "+err.Error(), http.StatusInternalServerError)
+	res := database.Where("who_id = ? AND whom_id = ?", user.User_id, whomID).Delete(&Follower{})
+	if res.Error != nil {
+		http.Error(w, "Failed to unfollow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
@@ -191,14 +198,23 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msgs, _ := query_db(`
-        select message.*, user.* from message, user
-        where message.flagged = 0 and message.author_id = user.user_id and (
-            user.user_id = ? or
-            user.user_id in (select whom_id from follower
-                                    where who_id = ?))
-        order by message.pub_date desc limit ?
-    `, user.User_id, user.User_id, PER_PAGE)
+	var msgs []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("m.*, u.*").
+		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
+		Where("m.flagged = 0 AND (u.user_id = ? OR u.user_id IN (?) )",
+			user.User_id,
+			database.Model(&Follower{}).Select("whom_id").Where("who_id = ?", user.User_id),
+		).
+		Order("m.pub_date DESC").
+		Limit(PER_PAGE).
+		Find(&msgs)
+
+	if res.Error != nil {
+		log.Fatal(res.Error)
+	}
 
 	data := Data{
 		Messages: msgs,
@@ -220,40 +236,49 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	flashes := GetFlashes(w, r)
 
-	msgs, err := query_db(`
-        SELECT message.message_id, message.text, message.pub_date, user.username
-        FROM message
-        JOIN user ON user.user_id = message.author_id
-        WHERE user.username = ?
-        ORDER BY message.pub_date DESC
-        LIMIT ?;
-    `, username, PER_PAGE)
-	if err != nil {
+	type MessageWithAuthor struct {
+		MessageID uint
+		Text      string
+		PubDate   int
+		Username  string
+	}
+
+	var messages []map[string]any
+
+	res := database.
+		Table("message").
+		Select("message.message_id, message.text, message.pub_date, user.username").
+		Joins(`JOIN "user" ON user.user_id = message.author_id`).
+		Where("user.username = ?", username).
+		Order("message.pub_date DESC").
+		Limit(PER_PAGE).
+		Scan(&messages)
+
+	if res.Error != nil {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
+
+	var profileUser User
 
 	// You need to get the profile user data
-	profileUserData, err := query_db_one("SELECT user_id, username FROM user WHERE username = ?", username)
-	if err != nil || profileUserData["user_id"] == nil {
+	res = database.
+		Select("user_id, username").
+		Where("username = ?", username).
+		First(&profileUser)
+
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
 	}
-
-	profileUserName := profileUserData["username"].(string)
-
-	profileUserId, err := strconv.Atoi(get_user_id(profileUserName))
-
-	// Create ProfileUser
-	profileUser := &User{
-		Username: profileUserName,
-		User_id:  profileUserId,
+	if res.Error != nil {
+		log.Fatal(res.Error)
 	}
 
 	data := Data{
 		FormUsername: username,
-		ProfileUser:  profileUser, // Add this
-		Messages:     msgs,
+		ProfileUser:  &profileUser, // Add this
+		Messages:     messages,
 		Endpoint:     "user_timeline", // Add this
 		// You also need to set Followed based on whether the current user follows this user
 		Followed: false, // Set this appropriately
@@ -266,9 +291,20 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		data.User = &user
 	}
 
-	whom_id_data, err := query_db_one("select whom_id from follower where who_id = ? AND whom_id = ?", user.User_id, profileUserId)
+	var follower Follower
 
-	if whom_id_data["whom_id"] != nil {
+	res = database.
+		Select("whom_id").
+		Where("who_id = ? AND whom_id = ?", user.User_id, get_user_id(profileUser.Username)).
+		First(&follower)
+
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			// Not following
+		} else {
+			log.Fatal(res.Error)
+		}
+	} else {
 		data.Followed = true
 	}
 
@@ -280,15 +316,18 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 func Timeline(w http.ResponseWriter, r *http.Request) {
 
-	msgs, err := query_db(`
-		SELECT message.message_id, message.text, message.pub_date, user.username
-		FROM message
-		JOIN user ON user.user_id = message.author_id
-		ORDER BY message.pub_date DESC
-		LIMIT ?;
-	`, PER_PAGE)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	var msgs []map[string]any
+
+	res := database.
+		Table("message AS m").
+		Select("m.message_id, m.text, m.pub_date, u.username").
+		Joins(`JOIN "user" u ON u.user_id = m.author_id`).
+		Order("m.pub_date DESC").
+		Limit(PER_PAGE).
+		Find(&msgs)
+
+	if res.Error != nil {
+		http.Error(w, res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -340,9 +379,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	var pwHash, err = HashPassword(firstPassword)
 
-	_, err = database.Exec("INSERT INTO user (username, email, pw_hash) VALUES (?, ?, ?)",
-		username, email, pwHash)
-	if err != nil {
+	user := User{
+		Username: username,
+		Email:    email,
+		Pw_hash:  pwHash,
+	}
+
+	res := database.Create(&user)
+	if res.Error != nil {
 		data = Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
