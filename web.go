@@ -247,9 +247,9 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	res := database.
 		Table("message").
-		Select("message.message_id, message.text, message.pub_date, user.username").
-		Joins(`JOIN "user" ON user.user_id = message.author_id`).
-		Where("user.username = ?", username).
+		Select(`message.message_id, message.text, message.pub_date, "user".username`).
+		Joins(`JOIN "user" ON "user".user_id = message.author_id`).
+		Where(`"user".username = ?`, username).
 		Order("message.pub_date DESC").
 		Limit(PER_PAGE).
 		Scan(&messages)
@@ -319,10 +319,10 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 	var msgs []map[string]any
 
 	res := database.
-		Table("message AS m").
-		Select("m.message_id, m.text, m.pub_date, u.username").
-		Joins(`JOIN "user" u ON u.user_id = m.author_id`).
-		Order("m.pub_date DESC").
+		Table("message").
+		Select(`message.message_id, message.text, message.pub_date, u.username`).
+		Joins(`JOIN "user" u ON u.user_id = message.author_id`).
+		Order("message.pub_date DESC").
 		Limit(PER_PAGE).
 		Find(&msgs)
 
