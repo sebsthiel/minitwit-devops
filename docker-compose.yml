@@ -1,13 +1,12 @@
 services:
   minitwit-app:
-    build: .
-    image: minitwit-app
+    image: marcp85/minitwitimage:latest
     ports:
       - "5001:5001"
     volumes:
       - /data:/data
     environment:
-      - DATABASE_PATH=/data/minitwit.db
+      - DATABASE_PATH=${DATABASE_PATH}
 
   prometheus:
     image: prom/prometheus:latest

@@ -132,10 +132,15 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// Insert or delete from database depending on follow or unfollow.
 	if action.Follow != "" {
 		followId := get_user_id(action.Follow)
-		database.Create(&Follower{
-			Who_id:  userId,
-			Whom_id: followId,
-		})
+		if followId != -1 {
+			database.Create(&Follower{
+				Who_id:  userId,
+				Whom_id: followId,
+			})
+		} else {
+			writeJSON(w, http.StatusNotFound, "User to follow not found (no response body)")
+			return
+		}
 	} else if action.Unfollow != "" {
 		unfollowId := get_user_id(action.Unfollow)
 		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&Follower{})
