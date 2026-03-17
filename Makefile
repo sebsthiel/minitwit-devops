@@ -12,7 +12,7 @@ gofmt:
 
 
 hadolint:
-	docker run --rm -i hadolint/hadolint < ../Dockerfile
+	docker run --rm -i hadolint/hadolint < Dockerfile
 
 checkmake:
 	go run github.com/checkmake/checkmake/cmd/checkmake@latest Makefile
@@ -22,3 +22,7 @@ clean:
 
 test:
 	@echo "No tests defined"
+
+runlocal:
+	docker build -t minitwitimage:local .
+	MINITWIT_IMAGE=minitwitimage:local docker compose up -d
