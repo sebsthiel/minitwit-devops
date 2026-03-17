@@ -1,13 +1,31 @@
 services:
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=minitwit
+      - POSTGRES_USER=minitwit_user
+      - POSTGRES_PASSWORD=mypassword123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minitwit_user -d minitwit"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   minitwit-app:
-    build: .
-    image: minitwit-app
+    image: marcp85/minitwitimage:latest
     ports:
       - "5001:5001"
     volumes:
       - /data:/data
     environment:
-      - DATABASE_PATH=/data/minitwit.db
+      - DATABASE_PATH=postgres://minitwit_user:mypassword123@postgres:5432/minitwit?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   prometheus:
     image: prom/prometheus:latest
@@ -24,9 +42,7 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+      - postgres
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+volumes:
+  postgres_data:
