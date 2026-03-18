@@ -138,7 +138,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 				Whom_id: followId,
 			})
 		} else {
-			writeJSON(w, http.StatusNotFound, "User to follow not found (no response body)")
+			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 			return
 		}
 	} else if action.Unfollow != "" {
