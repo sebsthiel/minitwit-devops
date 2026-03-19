@@ -35,16 +35,11 @@ cp minitwit.db /tmp/
 
 # Run application using docker:
 
-Create docker image:
+The docker commands have been inserted into a Makefile.
+To build and run the application with docker:
 
 ```bash
-docker build -f Dockerfile -t minitwit-app .
-```
-
-Start minitwit (using docker):
-
-```bash
-docker compose up
+make runlocal
 ```
 
 Stop minitwit (using docker):

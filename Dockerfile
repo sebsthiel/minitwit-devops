@@ -3,6 +3,7 @@ FROM golang:1.25
 WORKDIR /app
 
 # Install libsqlite3 which is needed for the application
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc libc6-dev libsqlite3-dev \
  && rm -rf /var/lib/apt/lists/*
