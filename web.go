@@ -24,9 +24,6 @@ var registerTpl = template.Must(
 var timelineTpl = template.Must(
 	template.Must(baseTpl.Clone()).Funcs(funcMap).ParseFiles("templates/timeline.html"),
 )
-var userTimelineTpl = template.Must(
-	template.Must(baseTpl.Clone()).ParseFiles("templates/user_timeline.html"),
-)
 
 var funcMap = template.FuncMap{
 	"url": func(urlName string) string {
@@ -235,13 +232,6 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 
 	flashes := GetFlashes(w, r)
-
-	type MessageWithAuthor struct {
-		MessageID uint
-		Text      string
-		PubDate   int
-		Username  string
-	}
 
 	var messages []map[string]any
 

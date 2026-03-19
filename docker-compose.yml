@@ -1,6 +1,6 @@
 services:
   minitwit-app:
-    image: marcp85/minitwitimage:latest
+    image: ${MINITWIT_IMAGE:-marcp85/minitwitimage:latest}
     ports:
       - "5001:5001"
     volumes:
