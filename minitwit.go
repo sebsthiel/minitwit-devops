@@ -76,21 +76,6 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
-func dbPath() string {
-	if p := os.Getenv("DATABASE_PATH"); p != "" {
-		return p
-	}
-	return DATABASE_DEFAULT
-}
-
-func read_sql_schema() string {
-	schema, err := os.ReadFile("schema.sql")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return string(schema)
-}
-
 func connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {

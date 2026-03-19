@@ -316,7 +316,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pwHash, err := HashPassword(firstPassword)
+	pwHash, _ := HashPassword(firstPassword)
 
 	user := User{
 		Username: username,
