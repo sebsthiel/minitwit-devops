@@ -24,6 +24,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
@@ -84,10 +85,21 @@ func connect_db() *gorm.DB {
 		dialector = sqlite.Open(DATABASE_DEFAULT)
 	}
 
+	// Costumize logger
+	logger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+
 	db, err := gorm.Open(dialector, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
+		Logger: logger,
 	})
 	if err != nil {
 		log.Fatal(err)
