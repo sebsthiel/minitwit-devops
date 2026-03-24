@@ -10,11 +10,20 @@ import (
 	"strconv"
 	"time"
 
+	"os"
+
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
-const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+// const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+var simulatorAuth = os.Getenv("SIMULATOR_AUTH")
+
+func init() {
+	if simulatorAuth == "" {
+		log.Fatal("SIMULATOR_AUTH environment variable not set")
+	}
+}
 
 var latest = -1
 
