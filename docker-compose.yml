@@ -9,6 +9,11 @@ services:
       - DATABASE_PATH=${DATABASE_PATH}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   prometheus:
     image: prom/prometheus:latest
@@ -29,11 +34,6 @@ services:
     volumes:
       - grafana-storage:/var/lib/grafana
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   grafana-storage:
