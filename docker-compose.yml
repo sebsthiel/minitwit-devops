@@ -7,6 +7,7 @@ services:
       - /data:/data
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
+      - LOG_LEVEL=${LOG_LEVEL}
 
   prometheus:
     image: prom/prometheus:latest

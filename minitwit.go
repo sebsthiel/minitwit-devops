@@ -88,7 +88,7 @@ func connect_db() *gorm.DB {
 		dialector = sqlite.Open(DATABASE_DEFAULT)
 	}
 
-	// Costumize logger
+	// Costumize logger //TODO USE zerolog?
 	loggergorm := gormlogger.New(
 		stdlog.New(os.Stdout, "\r\n", stdlog.LstdFlags),
 		gormlogger.Config{
@@ -105,8 +105,7 @@ func connect_db() *gorm.DB {
 		Logger: loggergorm,
 	})
 	if err != nil {
-		//log.Fatal(err)
-		// TODO log
+		log.Fatal().Stack().Err(err).Msg("")
 	}
 	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
@@ -185,8 +184,7 @@ func loadUserFromDB(uid int) (User, bool) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return User{}, false
 		} else {
-			//log.Fatal(res.Error)
-			// TODO log
+			log.Fatal().Stack().Err(res.Error).Msg("")
 		}
 	}
 	return user, true
@@ -199,8 +197,7 @@ func GetUserByUsername(username string) *User {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil
 		} else {
-			//log.Fatal("Invalid username")
-			// TODO log
+			log.Fatal().Err(res.Error).Msg("Invalid username")
 		}
 	}
 	return &user
@@ -303,14 +300,40 @@ func init() {
 	}
 }
 
-func main() {
-	monitoring.Init()
+func loggingConfig() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
-	log.Print("hello world")
+	// If environment variable is not set then it will disable logging
+	fmt.Println("Test: ", os.Getenv("LOG_LEVEL"))
+	if log_level := os.Getenv("LOG_LEVEL"); log_level != "" {
+
+		switch log_level {
+		case "debug":
+			zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		case "info":
+			zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		case "warn":
+			zerolog.SetGlobalLevel(zerolog.WarnLevel)
+		case "error":
+			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+		case "fatal":
+			zerolog.SetGlobalLevel(zerolog.FatalLevel)
+		default:
+			zerolog.SetGlobalLevel(zerolog.Disabled)
+		}
+
+	} else {
+		zerolog.SetGlobalLevel(zerolog.Disabled)
+	}
+}
+
+func main() {
+	monitoring.Init()
+
+	loggingConfig()
 
 	database = connect_db()
-	fmt.Println("Starting server")
+	log.Info().Msg("Starting server")
 	router := mux.NewRouter()
 	router.Handle("/metrics", promhttp.Handler())
 
@@ -327,9 +350,7 @@ func main() {
 	RegisterAPIRoutes(router) /* This i believe has be happen before the normal routes
 	due to the username route which actually could match a username "api"*/
 	RegisterRoutes(router)
-
-	fmt.Println("Started listening on:", PORT)
-	stdlog.Fatal(http.ListenAndServe(":"+PORT, router))
-	// TODO LOG
+	log.Info().Msgf("Started listening on: %s", PORT)
+	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
 
 }

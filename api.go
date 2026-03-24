@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -83,7 +83,7 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 		Find(&messageRows)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	// Convert messages (map) into []Message.
@@ -173,7 +173,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
 			return
 		}
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	var followers []map[string]any
@@ -187,7 +187,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 		Find(&followers)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	// Convert the map into a []string.
@@ -261,7 +261,7 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 		Find(&messageRows)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	// Convert messages (map) into []Message.

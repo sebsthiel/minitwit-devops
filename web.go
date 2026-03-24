@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -210,7 +210,7 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		Find(&msgs)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	data := Data{
@@ -262,7 +262,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Fatal().Stack().Err(res.Error).Msg("")
 	}
 
 	data := Data{
@@ -292,7 +292,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			// Not following
 		} else {
-			log.Fatal(res.Error)
+			log.Fatal().Stack().Err(res.Error).Msg("")
 		}
 	} else {
 		data.Followed = true
