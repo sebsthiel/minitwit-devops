@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
+	stdlog "log"
 	"net/http"
 	"net/mail"
 	"os"
@@ -24,8 +24,11 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Data Structs: TODO
@@ -86,10 +89,10 @@ func connect_db() *gorm.DB {
 	}
 
 	// Costumize logger
-	logger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			LogLevel:                  logger.Warn,
+	loggergorm := gormlogger.New(
+		stdlog.New(os.Stdout, "\r\n", stdlog.LstdFlags),
+		gormlogger.Config{
+			LogLevel:                  gormlogger.Warn,
 			IgnoreRecordNotFoundError: true,
 			Colorful:                  true,
 		},
@@ -99,10 +102,11 @@ func connect_db() *gorm.DB {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
-		Logger: logger,
+		Logger: loggergorm,
 	})
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		// TODO log
 	}
 	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
@@ -181,7 +185,8 @@ func loadUserFromDB(uid int) (User, bool) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return User{}, false
 		} else {
-			log.Fatal(res.Error)
+			//log.Fatal(res.Error)
+			// TODO log
 		}
 	}
 	return user, true
@@ -194,7 +199,8 @@ func GetUserByUsername(username string) *User {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil
 		} else {
-			log.Fatal("Invalid username")
+			//log.Fatal("Invalid username")
+			// TODO log
 		}
 	}
 	return &user
@@ -299,6 +305,9 @@ func init() {
 
 func main() {
 	monitoring.Init()
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	log.Print("hello world")
 
 	database = connect_db()
 	fmt.Println("Starting server")
@@ -320,6 +329,7 @@ func main() {
 	RegisterRoutes(router)
 
 	fmt.Println("Started listening on:", PORT)
-	log.Fatal(http.ListenAndServe(":"+PORT, router))
+	stdlog.Fatal(http.ListenAndServe(":"+PORT, router))
+	// TODO LOG
 
 }
