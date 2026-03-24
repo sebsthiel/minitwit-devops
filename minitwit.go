@@ -105,7 +105,7 @@ func connect_db() *gorm.DB {
 		Logger: loggergorm,
 	})
 	if err != nil {
-		log.Fatal().Stack().Err(err).Msg("")
+		log.Fatal().Stack().Err(err).Msg("GORM error when open database")
 	}
 	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
@@ -184,7 +184,8 @@ func loadUserFromDB(uid int) (User, bool) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return User{}, false
 		} else {
-			log.Fatal().Stack().Err(res.Error).Msg("")
+			log.Warn().Stack().Err(res.Error).Msg("")
+			return User{}, false
 		}
 	}
 	return user, true
@@ -197,7 +198,8 @@ func GetUserByUsername(username string) *User {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil
 		} else {
-			log.Fatal().Err(res.Error).Msg("Invalid username")
+			log.Warn().Err(res.Error).Msg("Invalid username")
+			return nil
 		}
 	}
 	return &user
@@ -350,6 +352,7 @@ func main() {
 	RegisterAPIRoutes(router) /* This i believe has be happen before the normal routes
 	due to the username route which actually could match a username "api"*/
 	RegisterRoutes(router)
+
 	log.Info().Msgf("Started listening on: %s", PORT)
 	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
 

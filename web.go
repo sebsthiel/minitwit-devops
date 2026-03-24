@@ -210,7 +210,8 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 		Find(&msgs)
 
 	if res.Error != nil {
-		log.Fatal().Stack().Err(res.Error).Msg("")
+		log.Warn().Stack().Err(res.Error).Msg("Could not load MyTimeline")
+		return
 	}
 
 	data := Data{
@@ -221,6 +222,7 @@ func MyTimeline(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+		log.Warn().Stack().Int("HTTP_StatusCode", http.StatusInternalServerError).Err(err).Msg("Error when ExecuteTemplate for MyTimeline")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -262,7 +264,8 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if res.Error != nil {
-		log.Fatal().Stack().Err(res.Error).Msg("")
+		log.Warn().Stack().Err(res.Error).Msg("Could not load UserTimeline")
+		return
 	}
 
 	data := Data{
@@ -292,7 +295,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			// Not following
 		} else {
-			log.Fatal().Stack().Err(res.Error).Msg("")
+			log.Warn().Stack().Err(res.Error).Msg("")
 		}
 	} else {
 		data.Followed = true
