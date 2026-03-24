@@ -5,8 +5,9 @@ services:
       - "5001:5001"
     volumes:
       - /data:/data
-    environment:
-      - DATABASE_PATH=${DATABASE_PATH}
+      environment:
+        - DATABASE_PATH=${DATABASE_PATH}
+        - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     restart: unless-stopped
 
   prometheus:
