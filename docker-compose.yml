@@ -8,6 +8,13 @@ services:
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
+      - SIMULATOR_AUTH=${SIMULATOR_AUTH}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   prometheus:
     image: prom/prometheus:latest
@@ -17,6 +24,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - minitwit-app
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -24,9 +32,9 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    restart: unless-stopped
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+volumes:
+  grafana-storage:
