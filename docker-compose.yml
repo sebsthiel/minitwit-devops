@@ -38,6 +38,8 @@ services:
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - grafana-storage:/var/lib/grafana
+    networks:
+      - minitwit-network
     restart: unless-stopped
 
   loki:
