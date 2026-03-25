@@ -17,6 +17,8 @@ import (
 
 var simulatorAuth string
 
+const userNotFoundMsg = "User not found (no response body)"
+
 func init() {
 	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
 
@@ -137,8 +139,8 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
 	userId := get_user_id(username)
 	if userId == -1 {
-		log.Warn().Caller().Str("username", username).Msg("User not found (no response body)")
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Warn().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
 
@@ -152,7 +154,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 			})
 		} else {
 			log.Warn().Caller().Int("followId", followId).Msg("Could not find user to follow. User not found (no response body)")
-			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 			return
 		}
 	} else if action.Unfollow != "" {
@@ -188,8 +190,8 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			log.Info().Caller().Str("username", username).Msg("User not found (no response body)")
-			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+			writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 			return
 		}
 		log.Warn().Stack().Err(res.Error).Msg("")
@@ -228,8 +230,8 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	userId := get_user_id(username)
 	if userId == -1 {
-		log.Info().Caller().Str("username", username).Msg("User not found (no response body)")
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
@@ -263,8 +265,8 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	userId := get_user_id(username)
 	if userId == -1 {
-		log.Info().Caller().Str("username", username).Msg("User not found (no response body)")
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {

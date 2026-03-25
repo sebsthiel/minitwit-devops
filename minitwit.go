@@ -306,9 +306,9 @@ func loggingConfig() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	// If environment variable is not set then it will disable logging
-	if log_level := os.Getenv("LOG_LEVEL"); log_level != "" {
+	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {
 
-		switch log_level {
+		switch logLevel {
 		case "debug":
 			zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		case "info":
