@@ -30,7 +30,7 @@ jobs:
           sudo chmod +x /usr/local/bin/geckodriver
 
       - name: Install python deps
-        run: python -m pip install --upgrade pip && pip install pytest selenium psycopg2-binary
+        run: python -m pip install --upgrade pip && pip install pytest selenium psycopg2-binary psycopg2
 
       - name: Start postgres and app containers
         run: |

@@ -33,6 +33,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 import os
+import psycopg2
 
 
 GUI_URL = "http://localhost:5001/register"
@@ -43,12 +44,23 @@ if not DB_PATH:
     raise RuntimeError("DATABASE_PATH must be set to a PostgreSQL DSN")
 
 
-def _connect_db(db_path: str):
+def get_connection():
     try:
-        import psycopg2
-    except Exception as exc:
-        raise RuntimeError("psycopg2 is required for PostgreSQL tests") from exc
-    return psycopg2.connect(db_path)
+        return psycopg2.connect(
+            database="minitwit-test",
+            user="test",
+            password="test",
+            host="127.0.0.1",
+            port=5432,
+        )
+    except:
+        return False
+conn = get_connection()
+if conn:
+    print("Connection to the PostgreSQL established successfully.")
+else:
+    print("Connection to the PostgreSQL encountered and error.")
+
 
 
 def _register_user_via_gui(driver, data):
@@ -74,8 +86,7 @@ def _new_driver():
     return webdriver.Firefox(service=Service(GECKODRIVER_PATH), options=firefox_options)
 
 
-def _get_user_by_name(db_path, name):
-    with _connect_db(db_path) as conn:
+def _get_user_by_name(conn, name):
         with conn.cursor() as cur:
             cur.execute('SELECT username FROM "user" WHERE username = %s', (name,))
             row = cur.fetchone()
@@ -94,8 +105,7 @@ def test_register_user_via_gui():
 
     # cleanup, make test case idempotent
    
-def _delete_user_by_name(db_path, name):
-    with _connect_db(db_path) as conn:
+def _delete_user_by_name(conn, name):
         with conn.cursor() as cur:
             cur.execute('DELETE FROM "user" WHERE username = %s', (name,))
         conn.commit()
@@ -105,13 +115,13 @@ def test_register_user_via_gui_and_check_db_entry():
     This is an end-to-end test. Before registering a user via the UI, it checks that no such user exists in the
     database yet. After registering a user, it checks that the respective user appears in the database.
     """
-    assert _get_user_by_name(DB_PATH, "Me") is None
+    assert _get_user_by_name(conn, "Me") is None
     with _new_driver() as driver:
         generated_msg = _register_user_via_gui(driver, ["Me", "me@some.where", "secure123", "secure123"])[0].text
         expected_msg = "You were successfully registered and can login now"
         assert generated_msg == expected_msg
 
-        assert _get_user_by_name(DB_PATH, "Me") == "Me"
+        assert _get_user_by_name(conn, "Me") == "Me"
 
         # cleanup, make test case idempotent
-        _delete_user_by_name(DB_PATH, "Me")
+        _delete_user_by_name(conn, "Me")
