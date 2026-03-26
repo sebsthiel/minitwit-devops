@@ -153,7 +153,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 				Whom_id: followId,
 			})
 		} else {
-			log.Warn().Caller().Int("followId", followId).Msg("Could not find user to follow. User not found (no response body)")
+			log.Warn().Caller().Str("followUsername", action.Follow).Msg("Could not find user to follow. User not found (no response body)")
 			writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 			return
 		}
