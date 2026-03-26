@@ -17,9 +17,11 @@ services:
     image: ${MINITWIT_IMAGE:-marcp85/minitwitimage:latest}
     ports:
       - "5001:5001"
+    volumes:
+      - /data:/data
     environment:
-      DATABASE_PATH: postgresql://test:test@postgres:5432/minitwit_test
-      SIMULATOR_AUTH: ${SIMULATOR_AUTH:-}
+      - DATABASE_PATH=${DATABASE_PATH}
+      - SIMULATOR_AUTH=${SIMULATOR_AUTH:-}
     depends_on:
       postgres:
         condition: service_healthy
