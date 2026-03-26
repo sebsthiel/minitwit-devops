@@ -26,6 +26,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - minitwit-app
+    networks:
+      - minitwit-network
     restart: unless-stopped
 
   grafana:

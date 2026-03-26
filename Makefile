@@ -10,7 +10,6 @@ staticcheck:
 gofmt:
 	gofmt -l .
 
-
 hadolint:
 	docker run --rm -i hadolint/hadolint < Dockerfile
 
