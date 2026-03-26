@@ -14,6 +14,7 @@ services:
       retries: 30
 
   minitwit-app:
+    build: .
     image: ${MINITWIT_IMAGE:-marcp85/minitwitimage:latest}
     ports:
       - "5001:5001"
