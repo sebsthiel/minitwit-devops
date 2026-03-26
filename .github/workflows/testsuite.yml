@@ -10,7 +10,7 @@ jobs:
   ui-tests:
     runs-on: ubuntu-latest
     env:
-      DATABASE_PATH: postgresql://test:test@postgres:5432/minitwit_test
+      DATABASE_PATH: postgresql://test:test@127.0.0.1:5432/minitwit_test
       GECKODRIVER_PATH: /usr/local/bin/geckodriver
 
     steps:
