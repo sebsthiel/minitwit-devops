@@ -12,6 +12,7 @@ jobs:
     env:
       DATABASE_PATH: postgresql://test:test@localhost:5432/minitwit_test
       MINITWIT_IMAGE: ${{ secrets.DOCKER_USERNAME }}/minitwitimage:latest
+      GECKODRIVER_PATH: /usr/local/bin/geckodriver
 
     steps:
       - uses: actions/checkout@v4
@@ -20,8 +21,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install system deps
-        run: sudo apt-get update && sudo apt-get install -y firefox firefox-geckodriver
+      - name: Install geckodriver
+        run: |
+          GECKODRIVER_VERSION=0.34.0
+          curl -sSL -o /tmp/geckodriver.tar.gz \
+            "https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
+          tar -xzf /tmp/geckodriver.tar.gz -C /tmp
+          sudo mv /tmp/geckodriver /usr/local/bin/geckodriver
+          sudo chmod +x /usr/local/bin/geckodriver
 
       - name: Install python deps
         run: python -m pip install --upgrade pip && pip install pytest selenium psycopg2-binary
