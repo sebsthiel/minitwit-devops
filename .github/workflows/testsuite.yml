@@ -10,7 +10,7 @@ jobs:
   ui-tests:
     runs-on: ubuntu-latest
     env:
-      DATABASE_PATH: postgresql://test:test@localhost:5432/minitwit_test
+      DATABASE_PATH: postgresql://test:test@postgres:5432/minitwit_test
       MINITWIT_IMAGE: ${{ secrets.DOCKER_USERNAME }}/minitwitimage:latest
       GECKODRIVER_PATH: /usr/local/bin/geckodriver
 
@@ -45,12 +45,6 @@ jobs:
             sleep 2
           done
           exit 1
-
-      - name: Debug container logs
-        if: failure()
-        run: |
-          docker ps -a
-          docker compose -f docker-compose.test.yml logs --tail=200
 
       - name: Run UI tests
         run: pytest test/test_itu_minitwit_ui.py
