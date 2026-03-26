@@ -37,7 +37,7 @@ import psycopg2
 
 
 GUI_URL = "http://localhost:5001/register"
-DB_PATH = os.getenv("DATABASE_PATH")
+DB_PATH = os.getenv("DATABASE_PATH_HOST")
 GECKODRIVER_PATH = os.getenv("GECKODRIVER_PATH", "geckodriver")
 
 if not DB_PATH:

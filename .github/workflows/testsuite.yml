@@ -10,7 +10,8 @@ jobs:
   ui-tests:
     runs-on: ubuntu-latest
     env:
-      DATABASE_PATH: postgresql://test:test@127.0.0.1:5432/minitwit_test
+      DATABASE_PATH_HOST: postgresql://test:test@127.0.0.1:5432/minitwit_test
+      DATABASE_PATH_DOCKER: postgresql://test:test@postgres:5432/minitwit_test
       GECKODRIVER_PATH: /usr/local/bin/geckodriver
 
     steps:
@@ -49,4 +50,6 @@ jobs:
         run: docker compose -f docker-compose.test.yml logs --no-color
 
       - name: Run UI tests
-        run: pytest test/test_itu_minitwit_ui.py
+        run: |
+          export DATABASE_PATH="${DATABASE_PATH_HOST}"
+          pytest test/test_itu_minitwit_ui.py
