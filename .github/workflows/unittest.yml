@@ -40,6 +40,7 @@ jobs:
 
           docker run --pull=always -d --name minitwit --network minitwit_net \
             -e DATABASE_PATH=postgresql://test:test@pg:5432/minitwit_test \
+            -e SIMULATOR_AUTH=${{ secrets.SIMULATOR_AUTH }} \
             -p 5001:5001 \
             "$MINITWIT_IMAGE"
 
