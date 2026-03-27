@@ -4,17 +4,28 @@ import (
 	"devops/minitwit/api_models"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"os"
+
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
-const simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+var simulatorAuth string
+
+const userNotFoundMsg = "User not found (no response body)"
+
+func init() {
+	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
+
+	if simulatorAuth == "" {
+		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
+	}
+}
 
 var latest = -1
 
@@ -59,7 +70,6 @@ func APILatest(w http.ResponseWriter, r *http.Request) {
 
 	var response api_models.LatestValue
 	response.Latest = int32(latest)
-	fmt.Printf("LATEST: %+v\n", response)
 	writeJSON(w, http.StatusOK, response)
 }
 
@@ -83,7 +93,8 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 		Find(&messageRows)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Warn().Stack().Err(res.Error).Msg("")
+		return
 	}
 
 	// Convert messages (map) into []Message.
@@ -117,15 +128,19 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	var action api_models.FollowAction
 	err := json.NewDecoder(r.Body).Decode(&action)
 	if err != nil {
+		log.Warn().Caller().Msg("RequestBody has Invalid JSON")
 		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
+
+	log.Info().Caller().Interface("action", action)
 
 	// Get user_id and handle user not existing.
 	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
 	userId := get_user_id(username)
 	if userId == -1 {
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Warn().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
 
@@ -138,17 +153,21 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 				Whom_id: followId,
 			})
 		} else {
-			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			log.Warn().Caller().Str("followUsername", action.Follow).Msg("Could not find user to follow. User not found (no response body)")
+			writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 			return
 		}
 	} else if action.Unfollow != "" {
 		unfollowId := get_user_id(action.Unfollow)
 		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&Follower{})
+		log.Info().Caller().Int("userId", userId).Int("followId", unfollowId).Msg("Unfollowed")
 	} else {
 		// This shouldnt happen because that means an empty FollowAction.
+		log.Warn().Caller().Msg("This shouldnt happen because that means an empty FollowAction")
 	}
 
 	// 204 no content "success"
+	log.Info().Int("HTTP_StatusCode", http.StatusNoContent).Msg("No Content")
 	writeJSON(w, http.StatusNoContent, "No Content")
 }
 
@@ -168,12 +187,15 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 	// Get user and handle if user doesnt exist.
 	var user User
 	res := database.First(&user, "username = ?", username)
+
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+			log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+			writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 			return
 		}
-		log.Fatal(res.Error)
+		log.Warn().Stack().Err(res.Error).Msg("")
+		return
 	}
 
 	var followers []map[string]any
@@ -187,7 +209,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 		Find(&followers)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Warn().Stack().Err(res.Error).Msg("")
 	}
 
 	// Convert the map into a []string.
@@ -208,7 +230,8 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	userId := get_user_id(username)
 	if userId == -1 {
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
@@ -220,6 +243,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	var req api_models.PostMessage
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		log.Warn().Caller().Msg("Invalid JSON")
 		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
@@ -241,7 +265,8 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	userId := get_user_id(username)
 	if userId == -1 {
-		writeJSON(w, http.StatusNotFound, "User not found (no response body)")
+		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
+		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
@@ -261,7 +286,7 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 		Find(&messageRows)
 
 	if res.Error != nil {
-		log.Fatal(res.Error)
+		log.Warn().Stack().Int("author_id", userId).Int("limit_number", no).Err(res.Error).Msg("")
 	}
 
 	// Convert messages (map) into []Message.
@@ -292,6 +317,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		log.Warn().Caller().Int("HTTP_StatusCode", int(errorResponse.Status)).Msg(errorResponse.ErrorMsg)
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
@@ -312,6 +338,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	errorResponse.ErrorMsg = registerError
 	if !ok {
+		log.Warn().Caller().Int("HTTP_StatusCode", int(errorResponse.Status)).Msg(errorResponse.ErrorMsg)
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}
@@ -327,6 +354,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	res := database.Create(&user)
 	if res.Error != nil {
 		errorResponse.ErrorMsg = "Failed to register: " + res.Error.Error()
+		log.Warn().Caller().Int("HTTP_StatusCode", int(errorResponse.Status)).Msg(errorResponse.ErrorMsg)
 		writeJSON(w, int(errorResponse.Status), errorResponse)
 		return
 	}

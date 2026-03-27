@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
+	stdlog "log"
 	"net/http"
 	"net/mail"
 	"os"
@@ -24,7 +24,11 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Data Structs: TODO
@@ -84,13 +88,24 @@ func connect_db() *gorm.DB {
 		dialector = sqlite.Open(DATABASE_DEFAULT)
 	}
 
+	// Costumize logger //TODO USE zerolog?
+	loggergorm := gormlogger.New(
+		stdlog.New(os.Stdout, "\r\n", stdlog.LstdFlags),
+		gormlogger.Config{
+			LogLevel:                  gormlogger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+
 	db, err := gorm.Open(dialector, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
+		Logger: loggergorm,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Stack().Err(err).Msg("GORM error when open database")
 	}
 	db.AutoMigrate(&User{}, &Message{}, &Follower{})
 	return db
@@ -169,7 +184,8 @@ func loadUserFromDB(uid int) (User, bool) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return User{}, false
 		} else {
-			log.Fatal(res.Error)
+			log.Warn().Stack().Err(res.Error).Msg("")
+			return User{}, false
 		}
 	}
 	return user, true
@@ -182,7 +198,8 @@ func GetUserByUsername(username string) *User {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil
 		} else {
-			log.Fatal("Invalid username")
+			log.Warn().Err(res.Error).Msg("Invalid username")
+			return nil
 		}
 	}
 	return &user
@@ -285,11 +302,39 @@ func init() {
 	}
 }
 
+func loggingConfig() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	// If environment variable is not set then it will disable logging
+	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {
+
+		switch logLevel {
+		case "debug":
+			zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		case "info":
+			zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		case "warn":
+			zerolog.SetGlobalLevel(zerolog.WarnLevel)
+		case "error":
+			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+		case "fatal":
+			zerolog.SetGlobalLevel(zerolog.FatalLevel)
+		default:
+			zerolog.SetGlobalLevel(zerolog.Disabled)
+		}
+
+	} else {
+		zerolog.SetGlobalLevel(zerolog.Disabled)
+	}
+}
+
 func main() {
 	monitoring.Init()
 
+	loggingConfig()
+
 	database = connect_db()
-	fmt.Println("Starting server")
+	log.Info().Msg("Starting server")
 	router := mux.NewRouter()
 	router.Handle("/metrics", promhttp.Handler())
 
@@ -307,7 +352,7 @@ func main() {
 	due to the username route which actually could match a username "api"*/
 	RegisterRoutes(router)
 
-	fmt.Println("Started listening on:", PORT)
-	log.Fatal(http.ListenAndServe(":"+PORT, router))
+	log.Info().Msgf("Started listening on: %s", PORT)
+	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
 
 }
