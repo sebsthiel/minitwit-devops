@@ -28,7 +28,14 @@ jobs:
 
       - name: Start latest minitwit image
         run: |
-          docker run -p 5001:5001 -v /data:/data -e DATABASE_PATH=${DATABASE_PATH} -e LOG_LEVEL=${LOG_LEVEL} -e SIMULATOR_AUTH=${SIMULATOR_AUTH} marcp85/minitwitimage:latest
+          docker pull marcp85/minitwitimage:latest
+          docker run -d --rm \
+          --name minitwit \
+          -p 5001:5001 \
+          -v "${{ github.workspace }}/data:/data" \
+          -e "DATABASE_PATH=${DATABASE_PATH}" \
+          -e "LOG_LEVEL=${LOG_LEVEL}" \
+          -e "SIMULATOR_AUTH=${SIMULATOR_AUTH}" \ marcp85/minitwitimage:latest
 
       - name: Wait for app
         run: |
