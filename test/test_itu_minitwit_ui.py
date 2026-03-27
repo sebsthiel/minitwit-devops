@@ -47,7 +47,7 @@ if not DB_PATH:
 def get_connection():
     try:
         return psycopg2.connect(
-            database="minitwit-test",
+            database="minitwit_test",
             user="test",
             password="test",
             host="127.0.0.1",

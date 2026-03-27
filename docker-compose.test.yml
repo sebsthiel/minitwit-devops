@@ -14,13 +14,20 @@ services:
       retries: 30
 
   minitwit-app:
-    build: .
     image: ${MINITWIT_IMAGE:-marcp85/minitwitimage:latest}
     ports:
       - "5001:5001"
     environment:
       - DATABASE_PATH=${DATABASE_PATH_DOCKER}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
       postgres:
         condition: service_healthy
+
+
+  

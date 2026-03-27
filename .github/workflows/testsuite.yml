@@ -13,6 +13,7 @@ jobs:
       DATABASE_PATH_HOST: postgresql://test:test@127.0.0.1:5432/minitwit_test
       DATABASE_PATH_DOCKER: postgresql://test:test@postgres:5432/minitwit_test
       GECKODRIVER_PATH: /usr/local/bin/geckodriver
+      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +41,7 @@ jobs:
 
       - name: Start postgres and app containers
         run: |
-          docker compose -f docker-compose.test.yml up -d --build
+          docker compose -f docker-compose.test.yml up -d 
 
       - name: Wait for app
         run: |
@@ -50,9 +51,6 @@ jobs:
           done
           exit 1
 
-      - name: Dump container logs on failure
-        if: failure()
-        run: docker compose -f docker-compose.test.yml logs --no-color
 
       - name: Run UI tests
         run: |
