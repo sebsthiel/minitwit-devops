@@ -83,6 +83,7 @@ def _register_user_via_gui(driver, data):
 def _new_driver():
     firefox_options = Options()
     firefox_options.add_argument("--headless")
+    firefox_options.binary_location = "/usr/bin/firefox"
     return webdriver.Firefox(options=firefox_options)
 
 
