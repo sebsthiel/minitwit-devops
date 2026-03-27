@@ -9,6 +9,10 @@ on:
 jobs:
   simulator-api-tests:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_PATH: ${{ secrets.DATABASE_PATH }}
+      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
 
     steps:
       - uses: actions/checkout@v4
