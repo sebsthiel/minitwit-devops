@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install Firefox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
       - name: Install geckodriver
         run: |
           GECKODRIVER_VERSION=0.34.0
