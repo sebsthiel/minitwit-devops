@@ -28,7 +28,6 @@ jobs:
 
       - name: Start latest minitwit image
         run: |
-          docker pull marcp85/minitwitimage:latest
           docker run -d --rm \
           --name minitwit \
           -p 5001:5001 \
