@@ -83,7 +83,7 @@ def _register_user_via_gui(driver, data):
 def _new_driver():
     firefox_options = Options()
     firefox_options.add_argument("--headless")
-    return webdriver.Firefox(service=Service(GECKODRIVER_PATH), options=firefox_options)
+    return webdriver.Firefox(options=firefox_options)
 
 
 def _get_user_by_name(conn, name):
