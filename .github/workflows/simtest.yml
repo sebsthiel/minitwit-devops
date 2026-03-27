@@ -1,5 +1,5 @@
 ---
-name: Simulator API Tests
+name: Simulator API Tests test
 
 on:
   workflow_dispatch:
