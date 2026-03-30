@@ -1,14 +1,15 @@
-package main
+package api
 
 import (
 	"devops/minitwit/api_models"
+	"devops/minitwit/internal/models"
+	"devops/minitwit/internal/services"
 	"encoding/json"
 	"errors"
 	"net/http"
+	//"os"
 	"strconv"
 	"time"
-
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -20,16 +21,15 @@ var simulatorAuth string
 const userNotFoundMsg = "User not found (no response body)"
 
 func init() {
-	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
+	simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
 
-	if simulatorAuth == "" {
-		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
-	}
+	//if simulatorAuth == "" {
+		//log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
+	//}
 }
 
 var latest = -1
 
-// uses the write and encodes the value
 func writeJSON(writer http.ResponseWriter, status int, value any) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(status)
@@ -50,21 +50,21 @@ func SimulationAuthMiddleware(next http.Handler) http.Handler {
 }
 
 func getQueryInt(r *http.Request, key string, defaultVal int) (int, error) {
-	// Get value from query.
 	valStr := r.URL.Query().Get(key)
 
-	// If the value doesnt exist return defauly value and nil
 	if valStr == "" {
 		return defaultVal, nil
 	}
 
-	// Convert the value to int.
 	return strconv.Atoi(valStr)
 }
 
 func APILatest(w http.ResponseWriter, r *http.Request) {
 	if latest == -1 {
-		writeJSON(w, http.StatusInternalServerError, api_models.ErrorResponse{Status: http.StatusInternalServerError, ErrorMsg: "Internal Server Error"})
+		writeJSON(w, http.StatusInternalServerError, api_models.ErrorResponse{
+			Status:   http.StatusInternalServerError,
+			ErrorMsg: "Internal Server Error",
+		})
 		return
 	}
 
@@ -74,14 +74,12 @@ func APILatest(w http.ResponseWriter, r *http.Request) {
 }
 
 func APIGetMessages(w http.ResponseWriter, r *http.Request) {
-	// Get variables from request.
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
 		latest = newLatest
 	}
 	no, _ := getQueryInt(r, "no", 100)
 
-	// Query messages from db.
 	var messageRows []map[string]any
 
 	res := database.
@@ -97,7 +95,6 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
 	for _, row := range messageRows {
 		username := row["username"].(string)
@@ -111,20 +108,18 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	// return response.
 	writeJSON(w, http.StatusOK, messages)
 }
 
 func APIPostFollows(w http.ResponseWriter, r *http.Request) {
-	// Get variables
 	vars := mux.Vars(r)
 	username := vars["username"]
+
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
 		latest = newLatest
 	}
 
-	// Decode the requestBody
 	var action api_models.FollowAction
 	err := json.NewDecoder(r.Body).Decode(&action)
 	if err != nil {
@@ -133,22 +128,17 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info().Caller().Interface("action", action)
-
-	// Get user_id and handle user not existing.
-	// 404 http.NotFound() user not found Should this be used for follow and unfollow or only username?
-	userId := get_user_id(username)
+	userId := services.GetUserID(username)
 	if userId == -1 {
 		log.Warn().Caller().Str("username", username).Msg(userNotFoundMsg)
 		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
 
-	// Insert or delete from database depending on follow or unfollow.
 	if action.Follow != "" {
-		followId := get_user_id(action.Follow)
+		followId := services.GetUserID(action.Follow)
 		if followId != -1 {
-			database.Create(&Follower{
+			database.Create(&models.Follower{
 				Who_id:  userId,
 				Whom_id: followId,
 			})
@@ -158,34 +148,26 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else if action.Unfollow != "" {
-		unfollowId := get_user_id(action.Unfollow)
-		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&Follower{})
+		unfollowId := services.GetUserID(action.Unfollow)
+		database.Where("who_id = ? AND whom_id = ?", userId, unfollowId).Delete(&models.Follower{})
 		log.Info().Caller().Int("userId", userId).Int("followId", unfollowId).Msg("Unfollowed")
-	} else {
-		// This shouldnt happen because that means an empty FollowAction.
-		log.Warn().Caller().Msg("This shouldnt happen because that means an empty FollowAction")
 	}
 
-	// 204 no content "success"
 	log.Info().Int("HTTP_StatusCode", http.StatusNoContent).Msg("No Content")
 	writeJSON(w, http.StatusNoContent, "No Content")
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
-
-	// Access variables:
 	vars := mux.Vars(r)
 	username := vars["username"]
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	no, _ := getQueryInt(r, "no", 100)
 
-	// Update latest if it is in the request.
 	if newLatest != -1 {
 		latest = newLatest
 	}
 
-	// Get user and handle if user doesnt exist.
-	var user User
+	var user models.User
 	res := database.First(&user, "username = ?", username)
 
 	if res.Error != nil {
@@ -212,7 +194,6 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 		log.Warn().Stack().Err(res.Error).Msg("")
 	}
 
-	// Convert the map into a []string.
 	var req api_models.FollowsResponse
 	for _, row := range followers {
 		if username, ok := row["username"].(string); ok {
@@ -220,26 +201,24 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// return the response
 	writeJSON(w, http.StatusOK, req)
 }
 
 func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
-	// Get variables from request.
 	vars := mux.Vars(r)
 	username := vars["username"]
-	userId := get_user_id(username)
+	userId := services.GetUserID(username)
 	if userId == -1 {
 		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
 		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
 		return
 	}
+
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
 		latest = newLatest
 	}
 
-	// Decode PostMessage from request
 	var req api_models.PostMessage
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -248,33 +227,32 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add message to the database
-	database.Create(&Message{
+	database.Create(&models.Message{
 		Author_id: userId,
 		Text:      req.Content,
 		Pub_date:  int(time.Now().Unix()),
 		Flagged:   0,
 	})
-	// return response.
+
 	writeJSON(w, http.StatusNoContent, "No Content")
 }
 
 func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
-	// Get variables from request.
 	vars := mux.Vars(r)
 	username := vars["username"]
-	userId := get_user_id(username)
+	userId := services.GetUserID(username)
 	if userId == -1 {
 		log.Info().Caller().Str("username", username).Msg(userNotFoundMsg)
 		writeJSON(w, http.StatusNotFound, userNotFoundMsg)
+		return
 	}
+
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
 		latest = newLatest
 	}
 	no, _ := getQueryInt(r, "no", 100)
 
-	// Query messages from db.
 	var messageRows []map[string]any
 
 	res := database.
@@ -289,7 +267,6 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 		log.Warn().Stack().Int("author_id", userId).Int("limit_number", no).Err(res.Error).Msg("")
 	}
 
-	// Convert messages (map) into []Message.
 	messages := make([]api_models.Message, 0, len(messageRows))
 	for _, row := range messageRows {
 		text := row["text"].(string)
@@ -302,12 +279,10 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	// return response.
 	writeJSON(w, http.StatusOK, messages)
 }
 
 func APIRegister(w http.ResponseWriter, r *http.Request) {
-
 	var req api_models.RegisterRequest
 
 	errorResponse := api_models.ErrorResponse{
@@ -334,7 +309,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	errorResponse.Status = http.StatusInternalServerError
 
-	ok, registerError := ValidateRegister(username, email, firstPassword, secondPassword)
+	ok, registerError := services.ValidateRegister(username, email, firstPassword, secondPassword)
 
 	errorResponse.ErrorMsg = registerError
 	if !ok {
@@ -343,9 +318,9 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pwHash, _ := HashPassword(firstPassword)
+	pwHash, _ := services.HashPassword(firstPassword)
 
-	user := User{
+	user := models.User{
 		Username: username,
 		Email:    email,
 		Pw_hash:  pwHash,
@@ -360,26 +335,4 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusNoContent, "User registered succesfully")
-}
-
-func RegisterAPIRoutes(r *mux.Router) {
-
-	api_router := r.PathPrefix("/api").Subrouter()
-
-	// requires no auth:
-	api_router.HandleFunc("/latest", APILatest).Methods("GET")
-
-	api_router.HandleFunc("/register", APIRegister).Methods("POST")
-
-	// protected_api_router - requires auth
-	protected_api_router := api_router.NewRoute().Subrouter()
-	protected_api_router.Use(SimulationAuthMiddleware)
-
-	protected_api_router.HandleFunc("/msgs", APIGetMessages).Methods("GET")
-	protected_api_router.HandleFunc("/msgs/{username}", APIGetMessagesByUser).Methods("GET")
-	protected_api_router.HandleFunc("/msgs/{username}", APIPostMessageByUser).Methods("POST")
-
-	protected_api_router.HandleFunc("/fllws/{username}", APIGetFollows).Methods("GET")
-	protected_api_router.HandleFunc("/fllws/{username}", APIPostFollows).Methods("POST")
-
 }

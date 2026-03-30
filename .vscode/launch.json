@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run API",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/api",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Run Web",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/web",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
