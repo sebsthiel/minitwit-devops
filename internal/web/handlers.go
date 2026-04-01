@@ -1,45 +1,47 @@
 package web
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
 	"devops/minitwit/api_models"
 	"devops/minitwit/internal/auth"
 	"devops/minitwit/internal/models"
-	"devops/minitwit/internal/services"
 	"devops/minitwit/internal/session"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 )
 
 const PER_PAGE = 30
 
 func convertAPIMessagesToTemplateMessages(apiMsgs []api_models.Message) []map[string]any {
+
 	msgs := make([]map[string]any, 0, len(apiMsgs))
 
 	for _, m := range apiMsgs {
+
+		pubDateUnix := int64(0)
+
+		parsedTime, err := time.Parse(time.RFC3339, m.PubDate)
+
+		if err == nil {
+			pubDateUnix = parsedTime.Unix()
+		}
+
 		msgs = append(msgs, map[string]any{
 			"text":     m.Content,
 			"username": m.User,
-			"pub_date": 0,
+			"pub_date": pubDateUnix,
 		})
 	}
 
 	return msgs
 }
 
-var database *gorm.DB
-
-func SetDB(db *gorm.DB) {
-	database = db
-}
-
 func Login(w http.ResponseWriter, r *http.Request) {
+
 	_, ok := auth.TryGetUserFromRequest(r)
+
 	if ok {
 		http.Redirect(w, r, "/public", http.StatusFound)
 		return
@@ -53,233 +55,130 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+
+		loginTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
 
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	userUser, errorMessage := services.ValidateLogin(username, password)
+	client := NewAPIClient()
 
-	if userUser != nil {
-		sessionData, err := session.GetStore().Get(r, "session")
-		if err != nil {
-			http.Error(w, "Session error", http.StatusInternalServerError)
-			return
-		}
+	user, err := client.Login(username, password)
 
-		sessionData.Values["user_id"] = userUser.User_id
+	if err == nil && user != nil {
 
-		err = sessionData.Save(r, w)
-		if err != nil {
-			http.Error(w, "Could not save session", http.StatusInternalServerError)
-			return
-		}
+		sessionData, _ := session.GetStore().Get(r, "session")
+
+		sessionData.Values["user_id"] = int(user["user_id"].(float64))
+		sessionData.Values["username"] = user["username"].(string)
+
+		sessionData.Save(r, w)
+
 		session.AddFlash(w, r, "You were logged in")
+
 		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
 	}
 
-	data.Error = errorMessage
-	if err := loginTpl.ExecuteTemplate(w, "layout", data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	data.Error = err.Error()
+
+	loginTpl.ExecuteTemplate(w, "layout", data)
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == http.MethodGet {
+
+		registerTpl.ExecuteTemplate(w, "layout", nil)
+		return
 	}
+
+	username := r.FormValue("username")
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	data := models.Data{}
+
+	client := NewAPIClient()
+
+	err := client.RegisterUser(username, email, password)
+
+	if err != nil {
+
+		data.Error = err.Error()
+
+		registerTpl.ExecuteTemplate(w, "layout", data)
+		return
+	}
+
+	session.AddFlash(w, r, "You were successfully registered")
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func FollowUser(w http.ResponseWriter, r *http.Request) {
+
 	user, ok := auth.TryGetUserFromRequest(r)
+
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	vars := mux.Vars(r)
-	usernameToFollow := vars["username"]
+	username := mux.Vars(r)["username"]
 
-	whomID := services.GetUserID(usernameToFollow)
-	if whomID == -1 {
-		http.Error(w, "User not found", http.StatusNotFound)
+	client := NewAPIClient()
+
+	err := client.FollowUser(user.Username, username)
+
+	if err != nil {
+
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
 
-	follower := models.Follower{
-		Who_id:  user.User_id,
-		Whom_id: whomID,
-	}
+	session.AddFlash(w, r, "You are now following \""+username+"\"")
 
-	res := database.Create(&follower)
-	if res.Error != nil {
-		http.Error(w, "Failed to follow user: "+res.Error.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	session.AddFlash(w, r, "You are now following \""+usernameToFollow+"\"")
-	http.Redirect(w, r, "/"+usernameToFollow, http.StatusSeeOther)
+	http.Redirect(w, r, "/"+username, http.StatusSeeOther)
 }
 
 func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+
 	user, ok := auth.TryGetUserFromRequest(r)
+
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	vars := mux.Vars(r)
-	usernameToUnfollow := vars["username"]
+	username := mux.Vars(r)["username"]
 
-	whomID := services.GetUserID(usernameToUnfollow)
-	if whomID == -1 {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
+	client := NewAPIClient()
 
-	res := database.Where("who_id = ? AND whom_id = ?", user.User_id, whomID).Delete(&models.Follower{})
-	if res.Error != nil {
-		http.Error(w, "Failed to unfollow user: "+res.Error.Error(), http.StatusInternalServerError)
-		return
-	}
+	err := client.UnfollowUser(user.Username, username)
 
-	session.AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
-	http.Redirect(w, r, "/"+usernameToUnfollow, http.StatusSeeOther)
-}
-
-func Logout(w http.ResponseWriter, r *http.Request) {
-	sessionData, err := session.GetStore().Get(r, "session")
 	if err != nil {
-		http.Error(w, "session error", http.StatusInternalServerError)
+
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
 
-	delete(sessionData.Values, "user_id")
+	session.AddFlash(w, r, "You are no longer following \""+username+"\"")
 
-	err = sessionData.Save(r, w)
-	if err != nil {
-		http.Error(w, "could not save session", http.StatusInternalServerError)
-		return
-	}
-
-	session.AddFlash(w, r, "You were logged out")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func MyTimeline(w http.ResponseWriter, r *http.Request) {
-	user, ok := auth.TryGetUserFromRequest(r)
-	if !ok {
-		http.Redirect(w, r, "/public", http.StatusFound)
-		return
-	}
-
-	var msgs []map[string]any
-
-	res := database.
-		Table("message AS m").
-		Select("m.*, u.*").
-		Joins(`JOIN "user" u ON m.author_id = u.user_id`).
-		Where("m.flagged = 0 AND (u.user_id = ? OR u.user_id IN (?) )",
-			user.User_id,
-			database.Model(&models.Follower{}).Select("whom_id").Where("who_id = ?", user.User_id),
-		).
-		Order("m.pub_date DESC").
-		Limit(PER_PAGE).
-		Find(&msgs)
-
-	if res.Error != nil {
-		log.Warn().Stack().Err(res.Error).Msg("Could not load MyTimeline")
-		return
-	}
-
-	data := models.Data{
-		Messages: msgs,
-		Endpoint: "timeline",
-		User:     &user,
-		Flashes:  session.GetFlashes(w, r),
-	}
-
-	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
-		log.Warn().Stack().Int("HTTP_StatusCode", http.StatusInternalServerError).Err(err).Msg("Error when ExecuteTemplate for MyTimeline")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func UserTimeline(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	username := vars["username"]
-
-	flashes := session.GetFlashes(w, r)
-
-	var messages []map[string]any
-
-	res := database.
-		Table("message").
-		Select(`message.message_id, message.text, message.pub_date, "user".username`).
-		Joins(`JOIN "user" ON "user".user_id = message.author_id`).
-		Where(`"user".username = ?`, username).
-		Order("message.pub_date DESC").
-		Limit(PER_PAGE).
-		Scan(&messages)
-
-	if res.Error != nil {
-		http.Redirect(w, r, "/public", http.StatusFound)
-		return
-	}
-
-	var profileUser models.User
-
-	res = database.
-		Select("user_id, username").
-		Where("username = ?", username).
-		First(&profileUser)
-
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		http.Redirect(w, r, "/public", http.StatusFound)
-		return
-	}
-	if res.Error != nil {
-		log.Warn().Stack().Err(res.Error).Msg("Could not load UserTimeline")
-		return
-	}
-
-	data := models.Data{
-		FormUsername: username,
-		ProfileUser:  &profileUser,
-		Messages:     messages,
-		Endpoint:     "user_timeline",
-		Followed:     false,
-		Flashes:      flashes,
-	}
-
-	user, ok := auth.TryGetUserFromRequest(r)
-	if ok {
-		data.User = &user
-	}
-
-	var follower models.Follower
-
-	res = database.
-		Select("whom_id").
-		Where("who_id = ? AND whom_id = ?", user.User_id, services.GetUserID(profileUser.Username)).
-		First(&follower)
-
-	if res.Error == nil {
-		data.Followed = true
-	}
-
-	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	http.Redirect(w, r, "/"+username, http.StatusSeeOther)
 }
 
 func Timeline(w http.ResponseWriter, r *http.Request) {
+
 	client := NewAPIClient()
 
 	apiMsgs, err := client.GetPublicMessages()
+
 	if err != nil {
-		http.Error(w, "Could not load public timeline from API: "+err.Error(), http.StatusBadGateway)
+
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
 
@@ -292,80 +191,254 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, ok := auth.TryGetUserFromRequest(r)
+
 	if ok {
 		data.User = &user
 	}
 
-	if err := timelineTpl.ExecuteTemplate(w, "layout", data); err != nil {
+	err = timelineTpl.ExecuteTemplate(w, "layout", data)
+
+	if err != nil {
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		if err := registerTpl.ExecuteTemplate(w, "layout", nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+func UserTimeline(w http.ResponseWriter, r *http.Request) {
+
+	username := mux.Vars(r)["username"]
+
+	client := NewAPIClient()
+
+	apiMsgs, err := client.GetUserMessages(username)
+
+	if err != nil {
+
+		http.Redirect(w, r, "/public", http.StatusFound)
+		return
+	}
+
+	msgs := convertAPIMessagesToTemplateMessages(apiMsgs)
+
+	viewer, logged := auth.TryGetUserFromRequest(r)
+
+	followed := false
+
+	if logged && viewer.Username != username {
+
+		follows, _ := client.GetFollows(viewer.Username)
+
+		for _, f := range follows {
+
+			if f == username {
+
+				followed = true
+				break
+			}
 		}
+	}
+
+	data := models.Data{
+
+		FormUsername: username,
+		Messages:     msgs,
+		Endpoint:     "user_timeline",
+		Flashes:      session.GetFlashes(w, r),
+
+		ProfileUser: &models.User{
+			Username: username,
+		},
+
+		User: &viewer,
+
+		Followed: followed,
+	}
+
+	err = timelineTpl.ExecuteTemplate(w, "layout", data)
+
+	if err != nil {
+
+		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid form", http.StatusBadRequest)
-		return
-	}
-
-	username := r.FormValue("username")
-	email := r.FormValue("email")
-	firstPassword := r.FormValue("password")
-	secondPassword := r.FormValue("password2")
-
-	data := models.Data{}
-
-	ok, registerError := services.ValidateRegister(username, email, firstPassword, secondPassword)
-
-	data.Error = registerError
-	if !ok {
-		registerTpl.ExecuteTemplate(w, "layout", data)
-		return
-	}
-
-	pwHash, err := services.HashPassword(firstPassword)
-
-	user := models.User{
-		Username: username,
-		Email:    email,
-		Pw_hash:  pwHash,
-	}
-
-	res := database.Create(&user)
-	if res.Error != nil {
-		data = models.Data{Error: "Failed to register: " + err.Error(), FormUsername: username}
-		registerTpl.ExecuteTemplate(w, "layout", data)
-		return
-	}
-
-	session.AddFlash(w, r, "You were successfully registered and can login now")
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func AddMessage(w http.ResponseWriter, r *http.Request) {
+
 	user, ok := auth.TryGetUserFromRequest(r)
+
 	if !ok {
+
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	res := database.Create(&models.Message{
-		Author_id: user.User_id,
-		Text:      r.FormValue("text"),
-		Pub_date:  int(time.Now().Unix()),
-	})
-	if res.Error != nil {
-		http.Error(w, "Failed post message: "+res.Error.Error(), http.StatusInternalServerError)
+	client := NewAPIClient()
+
+	err := client.PostMessage(user.Username, r.FormValue("text"))
+
+	if err != nil {
+
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
 
 	session.AddFlash(w, r, "Your message was recorded")
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+
+	sessionData, _ := session.GetStore().Get(r, "session")
+
+	delete(sessionData.Values, "user_id")
+	delete(sessionData.Values, "username")
+
+	sessionData.Save(r, w)
+
+	session.AddFlash(w, r, "You were logged out")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// func MyTimeline(w http.ResponseWriter, r *http.Request) {
+
+// 	user, ok := auth.TryGetUserFromRequest(r)
+
+// 	if !ok {
+
+// 		http.Redirect(
+// 			w,
+// 			r,
+// 			"/public",
+// 			http.StatusFound,
+// 		)
+
+// 		return
+// 	}
+
+// 	client := NewAPIClient()
+
+// 	apiMsgs, err := client.GetUserMessages(user.Username)
+
+// 	if err != nil {
+
+// 		http.Redirect(
+// 			w,
+// 			r,
+// 			"/public",
+// 			http.StatusFound,
+// 		)
+
+// 		return
+// 	}
+
+// 	msgs := convertAPIMessagesToTemplateMessages(apiMsgs)
+
+// 	data := models.Data{
+
+// 		Messages: msgs,
+
+// 		Endpoint: "timeline",
+
+// 		User: &user,
+
+// 		Flashes: session.GetFlashes(w, r),
+// 	}
+
+// 	err = timelineTpl.ExecuteTemplate(
+// 		w,
+// 		"layout",
+// 		data,
+// 	)
+
+// 	if err != nil {
+
+// 		http.Error(
+// 			w,
+// 			err.Error(),
+// 			http.StatusInternalServerError,
+// 		)
+
+// 		return
+// 	}
+// }
+
+func MyTimeline(w http.ResponseWriter, r *http.Request) {
+
+	user, ok := auth.TryGetUserFromRequest(r)
+
+	if !ok {
+
+		http.Redirect(
+			w,
+			r,
+			"/public",
+			http.StatusFound,
+		)
+
+		return
+	}
+
+	client := NewAPIClient()
+
+	// get your messages
+	myMsgs, err := client.GetUserMessages(user.Username)
+
+	if err != nil {
+
+		http.Redirect(w, r, "/public", http.StatusFound)
+
+		return
+	}
+
+	allMsgs := myMsgs
+
+	// get users you follow
+	follows, err := client.GetFollows(user.Username)
+
+	if err == nil {
+
+		for _, f := range follows {
+
+			msgs, err := client.GetUserMessages(f)
+
+			if err == nil {
+
+				allMsgs = append(allMsgs, msgs...)
+			}
+		}
+	}
+
+	msgs := convertAPIMessagesToTemplateMessages(allMsgs)
+
+	data := models.Data{
+
+		Messages: msgs,
+
+		Endpoint: "timeline",
+
+		User: &user,
+
+		Flashes: session.GetFlashes(w, r),
+	}
+
+	err = timelineTpl.ExecuteTemplate(
+		w,
+		"layout",
+		data,
+	)
+
+	if err != nil {
+
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+
+		return
+	}
 }

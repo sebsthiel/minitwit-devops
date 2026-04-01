@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/joho/godotenv"
+
 	"devops/minitwit/internal/api"
 	"devops/minitwit/internal/auth"
 	"devops/minitwit/internal/db"
@@ -12,10 +14,10 @@ import (
 )
 
 func main() {
+	_ = godotenv.Load()
 	database := db.Connect()
 
 	services.SetDB(database)
-	auth.SetDB(database)
 
 	router := mux.NewRouter()
 	router.Use(auth.AuthMiddleware)

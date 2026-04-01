@@ -8,22 +8,24 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
-const DATABASE_DEFAULT = "minitwit.db"
-
 func Connect() *gorm.DB {
 	var dialector gorm.Dialector
 
-	if p := os.Getenv("DATABASE_PATH"); p != "" {
-		dialector = postgres.Open(p)
-	} else {
-		dialector = sqlite.Open(DATABASE_DEFAULT)
+	dbURL := os.Getenv("DATABASE_PATH")
+
+	if dbURL == "" {
+
+		log.Fatal().
+			Msg("DATABASE_PATH not set")
+
 	}
+
+	dialector = postgres.Open(dbURL)
 
 	loggergorm := gormlogger.New(
 		stdlog.New(os.Stdout, "\r\n", stdlog.LstdFlags),

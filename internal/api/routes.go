@@ -16,6 +16,8 @@ func RegisterRoutes(r *mux.Router, db *gorm.DB) {
 	apiRouter.HandleFunc("/latest", APILatest).Methods("GET")
 	apiRouter.HandleFunc("/register", APIRegister).Methods("POST")
 
+	apiRouter.HandleFunc("/login", APILogin).Methods("POST")
+
 	// auth protected
 	protectedAPIRouter := apiRouter.NewRoute().Subrouter()
 	protectedAPIRouter.Use(SimulationAuthMiddleware)

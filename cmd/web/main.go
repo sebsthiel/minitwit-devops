@@ -1,23 +1,17 @@
 package main
 
 import (
+	"devops/minitwit/internal/auth"
+	"devops/minitwit/internal/web"
 	"net/http"
 
-	"devops/minitwit/internal/auth"
-	"devops/minitwit/internal/db"
-	"devops/minitwit/internal/services"
-	"devops/minitwit/internal/web"
+	"github.com/joho/godotenv"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	database := db.Connect()
-
-	web.SetDB(database)
-	services.SetDB(database)
-	auth.SetDB(database)
-
+	godotenv.Load()
 	router := mux.NewRouter()
 	router.Use(auth.AuthMiddleware)
 

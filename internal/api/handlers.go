@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
 	//"os"
 	"strconv"
 	"time"
@@ -24,7 +25,7 @@ func init() {
 	simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
 
 	//if simulatorAuth == "" {
-		//log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
+	//log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
 	//}
 }
 
@@ -335,4 +336,74 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusNoContent, "User registered succesfully")
+}
+
+func APILogin(w http.ResponseWriter, r *http.Request) {
+
+	var req struct {
+		Username string `json:"username"`
+
+		Password string `json:"password"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+
+		writeJSON(
+
+			w,
+
+			http.StatusBadRequest,
+
+			api_models.ErrorResponse{
+
+				Status: http.StatusBadRequest,
+
+				ErrorMsg: "Invalid JSON",
+			},
+		)
+
+		return
+	}
+
+	user, errMsg := services.ValidateLogin(
+
+		req.Username,
+
+		req.Password,
+	)
+
+	if user == nil {
+
+		writeJSON(
+
+			w,
+
+			http.StatusUnauthorized,
+
+			api_models.ErrorResponse{
+
+				Status: http.StatusUnauthorized,
+
+				ErrorMsg: errMsg,
+			},
+		)
+
+		return
+	}
+
+	writeJSON(
+
+		w,
+
+		http.StatusOK,
+
+		map[string]any{
+
+			"user_id": user.User_id,
+
+			"username": user.Username,
+		},
+	)
 }
