@@ -33,12 +33,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 import os
+import shutil
 import psycopg2
 
 
 GUI_URL = "http://localhost:5001/register"
-DB_PATH = os.getenv("DATABASE_PATH_HOST")
+DB_PATH = os.getenv("DATABASE_PATH") or os.getenv("DATABASE_PATH_HOST")
 GECKODRIVER_PATH = os.getenv("GECKODRIVER_PATH", "geckodriver")
+FIREFOX_BIN = os.getenv("FIREFOX_BIN") or shutil.which("firefox")
 
 if not DB_PATH:
     raise RuntimeError("DATABASE_PATH must be set to a PostgreSQL DSN")
@@ -83,8 +85,10 @@ def _register_user_via_gui(driver, data):
 def _new_driver():
     firefox_options = Options()
     firefox_options.add_argument("--headless")
-    firefox_options.binary_location = "/usr/bin/firefox"
-    return webdriver.Firefox(options=firefox_options)
+    if FIREFOX_BIN:
+        firefox_options.binary_location = FIREFOX_BIN
+    firefox_service = Service(executable_path=GECKODRIVER_PATH)
+    return webdriver.Firefox(service=firefox_service, options=firefox_options)
 
 
 def _get_user_by_name(conn, name):

@@ -12,7 +12,6 @@ jobs:
     env:
       DATABASE_PATH_HOST: postgresql://test:test@127.0.0.1:5432/minitwit_test
       DATABASE_PATH_DOCKER: postgresql://test:test@postgres:5432/minitwit_test
-      GECKODRIVER_PATH: /usr/local/bin/geckodriver
       SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
 
     steps:
@@ -22,26 +21,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Firefox
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
+      - name: Setup Firefox
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@v1
+        with:
+          firefox-version: latest-esr
+
+      - name: Check Firefox version
+        run: firefox --version
 
       - name: Install geckodriver
         run: |
-          GECKODRIVER_VERSION=0.34.0
+          GECKODRIVER_VERSION=0.36.0
           curl -sSL -o /tmp/geckodriver.tar.gz \
             "https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
           tar -xzf /tmp/geckodriver.tar.gz -C /tmp
           sudo mv /tmp/geckodriver /usr/local/bin/geckodriver
           sudo chmod +x /usr/local/bin/geckodriver
 
+      - name: Check geckodriver version
+        run: geckodriver --version
+
       - name: Install python deps
         run: python -m pip install --upgrade pip && pip install pytest selenium psycopg2-binary psycopg2
 
       - name: Start postgres and app containers
         run: |
-          docker compose -f docker-compose.test.yml up -d 
+          docker compose -f docker-compose.test.yml up -d
 
       - name: Wait for app
         run: |
@@ -51,8 +57,10 @@ jobs:
           done
           exit 1
 
-
       - name: Run UI tests
+        env:
+          DATABASE_PATH: ${{ env.DATABASE_PATH_HOST }}
+          FIREFOX_BIN: ${{ steps.setup-firefox.outputs.firefox-path }}
+          GECKODRIVER_PATH: /usr/local/bin/geckodriver
         run: |
-          export DATABASE_PATH="${DATABASE_PATH_HOST}"
           pytest test/test_itu_minitwit_ui.py
