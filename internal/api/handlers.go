@@ -19,15 +19,9 @@ import (
 
 var simulatorAuth string
 
+const msgInvalidJSON = "Invalid JSON"
+
 const userNotFoundMsg = "User not found (no response body)"
-
-func init() {
-	simulatorAuth = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
-
-	//if simulatorAuth == "" {
-	//log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
-	//}
-}
 
 var latest = -1
 
@@ -125,7 +119,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&action)
 	if err != nil {
 		log.Warn().Caller().Msg("RequestBody has Invalid JSON")
-		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		writeJSON(w, http.StatusBadRequest, msgInvalidJSON)
 		return
 	}
 
@@ -155,7 +149,8 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info().Int("HTTP_StatusCode", http.StatusNoContent).Msg("No Content")
-	writeJSON(w, http.StatusNoContent, "No Content")
+	w.WriteHeader(http.StatusNoContent)
+	return
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
@@ -224,7 +219,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Warn().Caller().Msg("Invalid JSON")
-		writeJSON(w, http.StatusBadRequest, "Invalid JSON")
+		writeJSON(w, http.StatusBadRequest, msgInvalidJSON)
 		return
 	}
 
@@ -235,7 +230,8 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 		Flagged:   0,
 	})
 
-	writeJSON(w, http.StatusNoContent, "No Content")
+	w.WriteHeader(http.StatusNoContent)
+	return
 }
 
 func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
@@ -288,7 +284,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	errorResponse := api_models.ErrorResponse{
 		Status:   http.StatusBadRequest,
-		ErrorMsg: "Invalid JSON",
+		ErrorMsg: msgInvalidJSON,
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -335,31 +331,23 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusNoContent, "User registered succesfully")
+	w.WriteHeader(http.StatusNoContent)
+	return
 }
 
 func APILogin(w http.ResponseWriter, r *http.Request) {
 
-	var req struct {
-		Username string `json:"username"`
-
-		Password string `json:"password"`
-	}
+	var req api_models.LoginRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
-
 	if err != nil {
+		log.Warn().Err(err).Msg("Failed to decode login request")
 
 		writeJSON(
-
 			w,
-
 			http.StatusBadRequest,
-
 			api_models.ErrorResponse{
-
-				Status: http.StatusBadRequest,
-
+				Status:   http.StatusBadRequest,
 				ErrorMsg: "Invalid JSON",
 			},
 		)
@@ -367,29 +355,21 @@ func APILogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, errMsg := services.ValidateLogin(
-
-		req.Username,
-
-		req.Password,
-	)
-
+	user, errMsg := services.ValidateLogin(req.Username, req.Password)
 	if user == nil {
+		log.Warn().
+			Str("username", req.Username).
+			Str("reason", errMsg).
+			Msg("Login failed")
 
 		writeJSON(
-
 			w,
-
 			http.StatusUnauthorized,
-
 			api_models.ErrorResponse{
-
-				Status: http.StatusUnauthorized,
-
+				Status:   http.StatusUnauthorized,
 				ErrorMsg: errMsg,
 			},
 		)
-
 		return
 	}
 

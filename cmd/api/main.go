@@ -11,6 +11,7 @@ import (
 	"devops/minitwit/internal/services"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -24,5 +25,7 @@ func main() {
 
 	api.RegisterRoutes(router, database)
 
-	http.ListenAndServe(":5001", router)
+	if err := http.ListenAndServe(":5001", router); err != nil {
+		log.Fatal().Err(err).Msg("API server failed to start")
+	}
 }

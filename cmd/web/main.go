@@ -5,9 +5,9 @@ import (
 	"devops/minitwit/internal/web"
 	"net/http"
 
-	"github.com/joho/godotenv"
-
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -21,5 +21,7 @@ func main() {
 		http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))),
 	)
 
-	http.ListenAndServe(":5000", router)
+	if err := http.ListenAndServe(":5000", router); err != nil {
+		log.Fatal().Err(err).Msg("Web server failed to start")
+	}
 }

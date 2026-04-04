@@ -58,7 +58,8 @@ func FormatDatetime(timestamp int64) string {
 
 func gravatarURL(email string, size int) string {
 	trimmed := strings.ToLower(strings.TrimSpace(email))
+	// Gravatar requires MD5 of the normalized email address for avatar lookup.
 	hash := md5.Sum([]byte(trimmed))
 	hashString := hex.EncodeToString(hash[:])
-	return fmt.Sprintf("http://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
+	return fmt.Sprintf("https://www.gravatar.com/avatar/%s?d=identicon&s=%d", hashString, size)
 }

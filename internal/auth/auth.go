@@ -19,9 +19,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		sess, _ := session.GetStore().Get(r, "session")
 
 		uid, uidOK := sess.Values["user_id"].(int)
-		username, nameOK := sess.Values["username"].(string)
+		username, usernameOK := sess.Values["username"].(string)
 
-		if uidOK && nameOK {
+		if uidOK && usernameOK {
 
 			user := models.User{
 				User_id:  uid,

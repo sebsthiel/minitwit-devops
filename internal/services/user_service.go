@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	queryUsername = "username = ?"
+	queryUserID   = "user_id = ?"
+)
+
 var database *gorm.DB
 
 func SetDB(db *gorm.DB) {
@@ -19,7 +24,7 @@ func SetDB(db *gorm.DB) {
 
 func GetUserID(username string) int {
 	var user models.User
-	res := database.First(&user, "username = ?", username)
+	res := database.First(&user, queryUsername, username)
 	if res.Error != nil {
 		return -1
 	}
@@ -28,7 +33,7 @@ func GetUserID(username string) int {
 
 func LoadUserFromDB(uid int) (models.User, bool) {
 	var user models.User
-	res := database.First(&user, "user_id = ?", uid)
+	res := database.First(&user, queryUserID, uid)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return models.User{}, false
@@ -41,7 +46,7 @@ func LoadUserFromDB(uid int) (models.User, bool) {
 
 func GetUserByUsername(username string) *models.User {
 	var user models.User
-	res := database.First(&user, "username = ?", username)
+	res := database.First(&user, queryUsername, username)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil
@@ -57,12 +62,12 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password string, hash string) bool {
+func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
-func ValidateRegister(username string, email string, firstPassword string, secondPassword string) (bool, string) {
+func ValidateRegister(username, email, firstPassword, secondPassword string) (bool, string) {
 	if username == "" {
 		return false, "You have to enter a username"
 	}
@@ -81,7 +86,7 @@ func ValidateRegister(username string, email string, firstPassword string, secon
 	}
 
 	var user models.User
-	res := database.First(&user, "username = ?", username)
+	res := database.First(&user, queryUsername, username)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return true, ""
@@ -92,7 +97,7 @@ func ValidateRegister(username string, email string, firstPassword string, secon
 	return false, "The username is already taken"
 }
 
-func ValidateLogin(username string, password string) (*models.User, string) {
+func ValidateLogin(username, password string) (*models.User, string) {
 	existingUser := GetUserByUsername(username)
 
 	if existingUser == nil {
