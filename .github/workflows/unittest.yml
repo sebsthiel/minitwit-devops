@@ -25,6 +25,7 @@ jobs:
       - name: Start postgres and minitwit containers
         run: |
           docker compose -f docker-compose.test.yml up -d --build
+
       - name: Wait for app
         run: |
           for i in {1..30}; do
@@ -32,6 +33,7 @@ jobs:
             sleep 2
           done
           exit 1
+
       - name: Dump container logs on failure
         if: failure()
         run: docker compose -f docker-compose.test.yml logs --no-color
