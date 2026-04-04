@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
-      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
+      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH || 'Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh' }}
 
     steps:
       - uses: actions/checkout@v4

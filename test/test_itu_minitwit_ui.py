@@ -98,35 +98,40 @@ def _get_user_by_name(conn, name):
             return row[0] if row else None
    
 
+def _delete_user_by_name(conn, name):
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM "user" WHERE username = %s', (name,))
+        conn.commit()
+
+
 def test_register_user_via_gui():
     """
     This is a UI test. It only interacts with the UI that is rendered in the browser and checks that visual
     responses that users observe are displayed.
     """
-    with _new_driver() as driver:
-        generated_msg = _register_user_via_gui(driver, ["Me", "me@some.where", "secure123", "secure123"])[0].text
-        expected_msg = "You were successfully registered and can login now"
-        assert generated_msg == expected_msg
+    _delete_user_by_name(conn, "Me")
+    try:
+        with _new_driver() as driver:
+            generated_msg = _register_user_via_gui(driver, ["Me", "me@some.where", "secure123", "secure123"])[0].text
+            expected_msg = "You were successfully registered and can login now"
+            assert generated_msg == expected_msg
+    finally:
+        _delete_user_by_name(conn, "Me")
 
-    # cleanup, make test case idempotent
-   
-def _delete_user_by_name(conn, name):
-        with conn.cursor() as cur:
-            cur.execute('DELETE FROM "user" WHERE username = %s', (name,))
-        conn.commit()
 
 def test_register_user_via_gui_and_check_db_entry():
     """
     This is an end-to-end test. Before registering a user via the UI, it checks that no such user exists in the
     database yet. After registering a user, it checks that the respective user appears in the database.
     """
+    _delete_user_by_name(conn, "Me")
     assert _get_user_by_name(conn, "Me") is None
-    with _new_driver() as driver:
-        generated_msg = _register_user_via_gui(driver, ["Me", "me@some.where", "secure123", "secure123"])[0].text
-        expected_msg = "You were successfully registered and can login now"
-        assert generated_msg == expected_msg
+    try:
+        with _new_driver() as driver:
+            generated_msg = _register_user_via_gui(driver, ["Me", "me@some.where", "secure123", "secure123"])[0].text
+            expected_msg = "You were successfully registered and can login now"
+            assert generated_msg == expected_msg
 
-        assert _get_user_by_name(conn, "Me") == "Me"
-
-        # cleanup, make test case idempotent
+            assert _get_user_by_name(conn, "Me") == "Me"
+    finally:
         _delete_user_by_name(conn, "Me")
