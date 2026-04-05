@@ -19,7 +19,7 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - DATABASE_PATH=${DATABASE_PATH_DOCKER}
+      - DATABASE_PATH=${DATABASE_PATH}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH:-}
     depends_on:
       postgres:
