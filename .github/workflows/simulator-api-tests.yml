@@ -1,10 +1,12 @@
 ---
-name: Simulator API Tests test
+name: Simulator API Tests
 
 on:
   workflow_dispatch:
   push:
-    branches: [feature/testsuite]
+    branches:
+      - main
+      - master
 
 jobs:
   simulator-api-tests:

@@ -1,13 +1,15 @@
 ---
-name: Unit Tests (Image)
+name: Unit Tests
 
 on:
   workflow_dispatch:
   push:
-    branches: [feature/testsuite]
+    branches:
+      - main
+      - master
 
 jobs:
-  refactored-tests:
+  unit-tests:
     runs-on: ubuntu-latest
     env:
       DATABASE_PATH: postgresql://test:test@postgres:5432/minitwit_test
