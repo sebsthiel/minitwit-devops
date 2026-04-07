@@ -1,0 +1,4 @@
+DATABASE_PATH=postgresql://minitwit_user:minitwitpw123@104.248.247.141/minitwit
+LOG_LEVEL=warn
+SIMULATOR_AUTH="Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+API_BASE_URL=http://localhost:5001

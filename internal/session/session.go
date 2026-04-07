@@ -13,13 +13,17 @@ const sessionName = "session"
 var store *sessions.CookieStore
 
 func init() {
+
 	sessionKey := os.Getenv("SESSION_KEY")
+
 	if sessionKey == "" {
-		log.Fatal().Msg("SESSION_KEY not set")
+		sessionKey = "dev_session_key_123"
 	}
-	secureCookies := os.Getenv("COOKIE_SECURE") != "false"
+
+	secureCookies := os.Getenv("COOKIE_SECURE") == "true"
 
 	store = sessions.NewCookieStore([]byte(sessionKey))
+
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 30,
@@ -34,14 +38,18 @@ func GetStore() *sessions.CookieStore {
 }
 
 func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
+
 	sess, _ := store.Get(r, sessionName)
 
 	raw := sess.Flashes()
+
 	if err := sess.Save(r, w); err != nil {
+		log.Warn().Err(err).Msg("Failed to save session flashes")
 		return nil
 	}
 
 	var flashes []string
+
 	for _, f := range raw {
 		if msg, ok := f.(string); ok {
 			flashes = append(flashes, msg)
@@ -52,7 +60,12 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 }
 
 func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
+
 	sess, _ := store.Get(r, sessionName)
+
 	sess.AddFlash(msg)
-	_ = sess.Save(r, w)
+
+	if err := sess.Save(r, w); err != nil {
+		log.Warn().Err(err).Msg("Failed to save flash message")
+	}
 }
