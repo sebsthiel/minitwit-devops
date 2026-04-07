@@ -2,25 +2,20 @@ FROM golang:1.25
 
 WORKDIR /app
 
-# Install libsqlite3 which is needed for the application
-# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc libc6-dev libsqlite3-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy and download go modules
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy our Go source code
-COPY *.go ./
-COPY internal/ ./internal/
-COPY templates/ ./templates/
-COPY api_models/ ./api_models/
-COPY static/ ./static/
-COPY schema.sql ./schema.sql
-RUN CGO_ENABLED=1 GOOS=linux go build -o /minitwit-app
+COPY . .
 
+#Build API
+RUN CGO_ENABLED=1 GOOS=linux go build -o api ./cmd/api
+
+#Build WEB
+RUN CGO_ENABLED=1 GOOS=linux go build -o web ./cmd/web
+
+EXPOSE 5000
 EXPOSE 5001
-
-CMD ["/minitwit-app"]

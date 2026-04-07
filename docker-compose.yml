@@ -1,21 +1,32 @@
 services:
-  minitwit-app:
-    image: ${MINITWIT_IMAGE:-marcp85/minitwitimage:latest}
-    container_name: minitwit
+  api:
+    build: .
+    container_name: minitwit-api
     ports:
       - "5001:5001"
-    volumes:
-      - /data:/data
     environment:
-      - DATABASE_PATH=${DATABASE_PATH}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - SIMULATOR_AUTH=${SIMULATOR_AUTH}
+      DATABASE_PATH: ${DATABASE_PATH}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SIMULATOR_AUTH: ${SIMULATOR_AUTH}
+    command: ./api
+    networks:
+      - minitwit-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  web:
+    build: .
+    container_name: minitwit-web
+    ports:
+      - "5000:5000"
+    environment:
+      API_BASE_URL: http://api:5001/
+      SESSION_KEY: ${SESSION_KEY}
+    command: ./web
+    depends_on:
+      - api
+    networks:
+      - minitwit-network
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
@@ -25,7 +36,8 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
-      - minitwit-app
+      - api
+      - web
     networks:
       - minitwit-network
     restart: unless-stopped
@@ -49,7 +61,7 @@ services:
     container_name: loki
     volumes:
       - loki-storage:/loki
-      - ./loki/loki-config.yml:/mnt/config/loki-config.yml              # Mount the loki config file.
+      - ./loki/loki-config.yml:/mnt/config/loki-config.yml
     command: -config.file=/mnt/config/loki-config.yml
     ports:
       - "3100:3100"
@@ -61,9 +73,9 @@ services:
     image: grafana/promtail:latest
     container_name: promtail
     volumes:
-      - ./promtail/promtail-config.yml:/mnt/config/promtail-config.yml  # Mount the promtail-config.yml file.
-      - /var/run/docker.sock:/var/run/docker.sock                       # Mounting the log directory from host.
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro        # Mounting the log directory from host.
+      - ./promtail/promtail-config.yml:/mnt/config/promtail-config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: -config.file=/mnt/config/promtail-config.yml
     depends_on:
       - loki
@@ -71,10 +83,10 @@ services:
       - minitwit-network
     restart: unless-stopped
 
-networks:                 # Network shared between services so we can refer to them by name
+networks:
   minitwit-network:
-    external: false
     name: minitwit-network
+    driver: bridge
 
 volumes:
   grafana-storage:
