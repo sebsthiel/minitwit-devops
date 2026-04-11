@@ -19,8 +19,10 @@ COPY templates/ ./templates/
 COPY api_models/ ./api_models/
 COPY static/ ./static/
 COPY schema.sql ./schema.sql
-RUN CGO_ENABLED=1 GOOS=linux go build -o /minitwit-app
+RUN CGO_ENABLED=1 GOOS=linux go build -o /api ./cmd/api
+RUN CGO_ENABLED=1 GOOS=linux go build -o /web ./cmd/web
 
+EXPOSE 5000
 EXPOSE 5001
 
 CMD ["/minitwit-app"]
