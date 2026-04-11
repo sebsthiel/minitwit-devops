@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy our Go source code
-COPY *.go ./
+COPY *.go ./x½
 COPY internal/ ./internal/
 COPY templates/ ./templates/
 COPY api_models/ ./api_models/
