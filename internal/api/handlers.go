@@ -231,7 +231,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusNoContent)
-	return
+	
 }
 
 func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +332,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	return
+	
 }
 
 func APILogin(w http.ResponseWriter, r *http.Request) {
