@@ -150,7 +150,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 
 	log.Info().Int("HTTP_StatusCode", http.StatusNoContent).Msg("No Content")
 	w.WriteHeader(http.StatusNoContent)
-	return
+
 }
 
 func APIGetFollows(w http.ResponseWriter, r *http.Request) {
@@ -231,7 +231,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusNoContent)
-	
+
 }
 
 func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +332,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	
+
 }
 
 func APILogin(w http.ResponseWriter, r *http.Request) {
