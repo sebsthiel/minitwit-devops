@@ -1,27 +1,27 @@
 services:
   api:
-    build: .
+    image: ${MINITWIT_API_IMAGE:-marcp85/minitwit-api:latest}
     container_name: minitwit-api
     ports:
       - "5001:5001"
+    volumes:
+      - /data:/data
     environment:
       DATABASE_PATH: ${DATABASE_PATH}
       LOG_LEVEL: ${LOG_LEVEL}
       SIMULATOR_AUTH: ${SIMULATOR_AUTH}
-    command: ./api
     networks:
       - minitwit-network
     restart: unless-stopped
 
   web:
-    build: .
+    image: ${MINITWIT_WEB_IMAGE:-marcp85/minitwit-web:latest}
     container_name: minitwit-web
     ports:
       - "5000:5000"
     environment:
-      API_BASE_URL: http://api:5001/
+      API_BASE_URL: http://api:5001
       SESSION_KEY: ${SESSION_KEY}
-    command: ./web
     depends_on:
       - api
     networks:
@@ -61,7 +61,7 @@ services:
     container_name: loki
     volumes:
       - loki-storage:/loki
-      - ./loki/loki-config.yml:/mnt/config/loki-config.yml
+      - ./loki/loki-config.yml:/mnt/config/loki-config.yml # Mount the loki config file.
     command: -config.file=/mnt/config/loki-config.yml
     ports:
       - "3100:3100"
@@ -73,9 +73,9 @@ services:
     image: grafana/promtail:latest
     container_name: promtail
     volumes:
-      - ./promtail/promtail-config.yml:/mnt/config/promtail-config.yml
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail/promtail-config.yml:/mnt/config/promtail-config.yml # Mount the promtail-config.yml file.
+      - /var/run/docker.sock:/var/run/docker.sock # Mounting the log directory from host.
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro # Mounting the log directory from host.
     command: -config.file=/mnt/config/promtail-config.yml
     depends_on:
       - loki
@@ -83,10 +83,10 @@ services:
       - minitwit-network
     restart: unless-stopped
 
-networks:
+networks: # Network shared between services so we can refer to them by name
   minitwit-network:
+    external: false
     name: minitwit-network
-    driver: bridge
 
 volumes:
   grafana-storage:

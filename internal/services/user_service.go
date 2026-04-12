@@ -26,6 +26,7 @@ func GetUserID(username string) int {
 	var user models.User
 	res := database.First(&user, queryUsername, username)
 	if res.Error != nil {
+		log.Warn().Err(res.Error).Str("username", username).Msg("Failed to get user ID")
 		return -1
 	}
 	return user.User_id

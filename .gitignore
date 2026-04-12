@@ -204,3 +204,12 @@ go.work.sum
 
 minitwit
 
+.vscode/
+.env
+.env*
+*.db
+*.exe
+cmd/api/api
+cmd/web/web
+*.exe
+
