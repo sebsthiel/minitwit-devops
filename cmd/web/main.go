@@ -1,10 +1,8 @@
 package main
 
 import (
+	"devops/minitwit/internal/src"
 	"net/http"
-
-	"devops/minitwit/internal/auth"
-	"devops/minitwit/internal/web"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -14,9 +12,11 @@ import (
 func main() {
 	_ = godotenv.Load()
 
+	database := minitwit.Connect_db()
+
 	router := mux.NewRouter()
-	router.Use(auth.AuthMiddleware)
-	web.RegisterRoutes(router)
+	router.Use(minitwit.AuthMiddleware)
+	minitwit.RegisterRoutes(router, database)
 
 	router.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/",

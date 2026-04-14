@@ -4,9 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"devops/minitwit/internal/api"
-	"devops/minitwit/internal/db"
-	"devops/minitwit/internal/services"
+	"devops/minitwit/internal/src"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -16,8 +14,7 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	database := db.Connect()
-	services.SetDB(database)
+	database := minitwit.Connect_db()
 
 	simulatorAuth := os.Getenv("SIMULATOR_AUTH")
 	if simulatorAuth == "" {
@@ -25,7 +22,7 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	api.RegisterRoutes(router, database)
+	minitwit.RegisterAPIRoutes(router, database)
 
 	log.Info().Msg("API server starting on :5001")
 	if err := http.ListenAndServe(":5001", router); err != nil {
