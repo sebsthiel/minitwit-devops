@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"os"
-
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -18,14 +16,6 @@ import (
 var simulatorAuth string
 
 const userNotFoundMsg = "User not found (no response body)"
-
-func init() {
-	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
-
-	if simulatorAuth == "" {
-		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
-	}
-}
 
 var latest = -1
 

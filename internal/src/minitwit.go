@@ -347,11 +347,6 @@ func start() {
 		Handler(http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
 
-	/* Routing handlers
-	RegisterAPIRoutes(router) // This i believe has be happen before the normal routes
-	due to the username route which actually could match a username "api"*/
-	
-
 	log.Info().Msgf("Started listening on: %s", PORT)
 	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
 
