@@ -1,8 +1,8 @@
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
+    # TODO Fix this:
+    #image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
+    image: minitwitapiimage:local
     container_name: minitwit-api
     ports:
       - "5001:5001"
@@ -22,9 +22,9 @@ services:
       retries: 3
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
+    # TODO Fix this:
+    #image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
+    image: minitwitwebimage:local
     container_name: minitwit-web
     ports:
       - "5000:5000"

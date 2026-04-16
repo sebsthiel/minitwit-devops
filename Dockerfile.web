@@ -19,6 +19,7 @@ COPY templates/ ./templates/
 COPY api_models/ ./api_models/
 COPY static/ ./static/
 COPY schema.sql ./schema.sql
+COPY ./cmd/web/ ./cmd/web/
 
 # Build Web
 RUN CGO_ENABLED=1 GOOS=linux go build -o web ./cmd/web
