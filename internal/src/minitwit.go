@@ -329,7 +329,7 @@ func loggingConfig() {
 }
 
 
-func start() {
+func Start() {
 	monitoring.Init()
 
 	loggingConfig()

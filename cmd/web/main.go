@@ -12,6 +12,8 @@ import (
 func main() {
 	_ = godotenv.Load()
 
+	minitwit.Start()
+
 	database := minitwit.Connect_db()
 
 	router := mux.NewRouter()

@@ -14,6 +14,9 @@ import (
 func main() {
 	_ = godotenv.Load()
 
+	// Initialize logging
+	minitwit.Start()
+
 	database := minitwit.Connect_db()
 
 	simulatorAuth := os.Getenv("SIMULATOR_AUTH")
