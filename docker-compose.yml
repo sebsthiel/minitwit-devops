@@ -20,7 +20,7 @@ services:
       retries: 3
 
   web:
-    #image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
+    image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
     container_name: minitwit-web
     ports:
       - "5000:5000"
