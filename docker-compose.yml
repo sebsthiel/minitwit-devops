@@ -1,8 +1,6 @@
 services:
   api:
-    # TODO Fix this:
-    #image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
-    image: minitwitapiimage:local
+    image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
     container_name: minitwit-api
     ports:
       - "5001:5001"
@@ -22,9 +20,7 @@ services:
       retries: 3
 
   web:
-    # TODO Fix this:
     #image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
-    image: minitwitwebimage:local
     container_name: minitwit-web
     ports:
       - "5000:5000"
