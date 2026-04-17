@@ -43,8 +43,8 @@ jobs:
           file: ./Dockerfile.api
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:webbuildcache,mode=max
       
       # TODO Get confirmation about this split
       - name: Build and push minitwitwebimage
@@ -54,8 +54,8 @@ jobs:
           file: ./Dockerfile.web
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache,mode=max
 
       - name: Upload docker-compose.yml
         uses: appleboy/scp-action@v0.1.7

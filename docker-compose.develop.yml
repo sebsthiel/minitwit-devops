@@ -10,7 +10,6 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
       - SESSION_KEY=${SESSION_KEY}
-    command: ./api
     networks:
       - minitwit-network
     restart: unless-stopped
@@ -31,7 +30,6 @@ services:
       - SESSION_KEY=${SESSION_KEY}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
       - COOKIE_SECURE=false
-    command: ./web
     depends_on:
       - api
     networks:

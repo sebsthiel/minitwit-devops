@@ -23,5 +23,6 @@ test:
 	@echo "No tests defined"
 
 runlocal:
-	docker build -t minitwitimage:local .
-	MINITWIT_IMAGE=minitwitimage:local docker compose up -d
+	docker build -t minitwitapiimage:local -f Dockerfile.api .
+	docker build -t minitwitwebimage:local -f Dockerfile.web .
+	docker compose -f docker-compose.develop.yml up -d
