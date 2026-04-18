@@ -358,6 +358,11 @@ func RegisterAPIRoutes(r *mux.Router, db *gorm.DB) {
 
 	database = db
 
+	// endpoint for health check
+	api_router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+    	w.WriteHeader(http.StatusOK)
+	})
+
 	// requires no auth:
 	api_router.HandleFunc("/latest", APILatest).Methods("GET")
 

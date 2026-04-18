@@ -20,6 +20,7 @@ COPY api_models/ ./api_models/
 COPY static/ ./static/
 COPY schema.sql ./schema.sql
 COPY ./cmd/api/ ./cmd/api/
+COPY .env .env
 
 # Build API
 RUN CGO_ENABLED=1 GOOS=linux go build -o api ./cmd/api

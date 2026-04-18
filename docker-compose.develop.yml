@@ -10,11 +10,12 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
       - SESSION_KEY=${SESSION_KEY}
+    command: ./api
     networks:
       - minitwit-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -32,6 +33,7 @@ services:
       - COOKIE_SECURE=false
     depends_on:
       - api
+    command: ./web
     networks:
       - minitwit-network
     restart: unless-stopped

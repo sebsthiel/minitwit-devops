@@ -2,8 +2,10 @@ package main
 
 import (
 	"devops/minitwit/internal/src"
+	"devops/minitwit/internal/monitoring"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
@@ -12,14 +14,18 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	minitwit.Start()
+	monitoring.Init()
+
+	minitwit.StartLogging()
 
 	database := minitwit.Connect_db()
 
 	router := mux.NewRouter()
 	router.Use(minitwit.AuthMiddleware)
 	minitwit.RegisterRoutes(router, database)
-
+	router.Handle("/metrics", promhttp.Handler())
+	router.Use(monitoring.MetricsMiddleware)
+	
 	router.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))),

@@ -13,13 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"golang.org/x/crypto/bcrypt"
 
-	"devops/minitwit/internal/monitoring"
+	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -328,27 +325,7 @@ func loggingConfig() {
 	}
 }
 
-
-func Start() {
-	monitoring.Init()
-
+func StartLogging() {
 	loggingConfig()
-
 	log.Info().Msg("Starting server")
-	router := mux.NewRouter()
-	router.Handle("/metrics", promhttp.Handler())
-
-	// middleware
-	router.Use(monitoring.MetricsMiddleware)
-	router.Use(AuthMiddleware)
-
-	// load stylesheet
-	router.PathPrefix("/static/").
-		Handler(http.StripPrefix("/static/",
-			http.FileServer(http.Dir("./static"))))
-
-	log.Info().Msgf("Started listening on: %s", PORT)
-	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
-
 }
-
