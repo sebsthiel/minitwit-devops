@@ -1,6 +1,10 @@
 services:
   api:
-    image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
+    # Locally built image:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: minitwitapiimage:local
     container_name: minitwit-api
     ports:
       - "5001:5001"
@@ -12,13 +16,17 @@ services:
       - minitwit-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
   web:
-    image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
+    # Locally built image:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: minitwitwebimage:local
     container_name: minitwit-web
     ports:
       - "5000:5000"

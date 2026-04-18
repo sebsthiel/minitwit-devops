@@ -1,4 +1,4 @@
-package main
+package minitwit
 
 import (
 	"devops/minitwit/api_models"
@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -19,14 +17,6 @@ var simulatorAuth string
 
 const userNotFoundMsg = "User not found (no response body)"
 
-func init() {
-	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
-
-	if simulatorAuth == "" {
-		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
-	}
-}
-
 var latest = -1
 
 // uses the write and encodes the value
@@ -34,6 +24,10 @@ func writeJSON(writer http.ResponseWriter, status int, value any) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(status)
 	_ = json.NewEncoder(writer).Encode(value)
+}
+
+func SetSimAuth(simAuth string) {
+	simulatorAuth = simAuth
 }
 
 func SimulationAuthMiddleware(next http.Handler) http.Handler {
@@ -362,9 +356,16 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusNoContent, "User registered succesfully")
 }
 
-func RegisterAPIRoutes(r *mux.Router) {
+func RegisterAPIRoutes(r *mux.Router, db *gorm.DB) {
 
 	api_router := r.PathPrefix("/api").Subrouter()
+
+	database = db
+
+	// endpoint for health check
+	api_router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	// requires no auth:
 	api_router.HandleFunc("/latest", APILatest).Methods("GET")
