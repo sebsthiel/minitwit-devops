@@ -26,7 +26,7 @@ func writeJSON(writer http.ResponseWriter, status int, value any) {
 	_ = json.NewEncoder(writer).Encode(value)
 }
 
-func SetSimAuth(simAuth string){
+func SetSimAuth(simAuth string) {
 	simulatorAuth = simAuth
 }
 
@@ -364,7 +364,7 @@ func RegisterAPIRoutes(r *mux.Router, db *gorm.DB) {
 
 	// endpoint for health check
 	api_router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-    	w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 	})
 
 	// requires no auth:

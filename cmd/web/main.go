@@ -1,13 +1,13 @@
 package main
 
 import (
-	"devops/minitwit/internal/src"
 	"devops/minitwit/internal/monitoring"
+	"devops/minitwit/internal/src"
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,7 +25,7 @@ func main() {
 	minitwit.RegisterRoutes(router, database)
 	router.Handle("/metrics", promhttp.Handler())
 	router.Use(monitoring.MetricsMiddleware)
-	
+
 	router.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))),

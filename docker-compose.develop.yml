@@ -1,6 +1,9 @@
 services:
   api:
     # Locally built image:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
     image: minitwitapiimage:local
     container_name: minitwit-api
     ports:
@@ -22,6 +25,9 @@ services:
 
   web:
     # Locally built image:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
     image: minitwitwebimage:local
     container_name: minitwit-web
     ports:
