@@ -1,4 +1,4 @@
-package main
+package minitwit
 
 import (
 	"errors"
@@ -388,7 +388,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
-func RegisterRoutes(router *mux.Router) {
+func RegisterRoutes(router *mux.Router, db *gorm.DB) {
+
+	database = db
+
 	router.HandleFunc("/", MyTimeline).Methods("GET")
 
 	router.HandleFunc("/public", Timeline).Methods("GET")
