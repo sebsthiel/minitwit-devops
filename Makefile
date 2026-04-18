@@ -18,10 +18,17 @@ checkmake:
 	go run github.com/checkmake/checkmake/cmd/checkmake@latest Makefile
 
 clean:
-	@echo "Nothing to clean"
+	docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.develop.yml \
+  -f docker-compose.monitoring.yml \
+  down
 
 test:
 	@echo "No tests defined"
 
 runlocal:
 	docker compose -f docker-compose.develop.yml up -d
+
+runlocalmonitoring:
+	docker compose -f docker-compose.monitoring.yml up -d

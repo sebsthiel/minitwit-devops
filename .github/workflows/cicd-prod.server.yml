@@ -63,7 +63,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "docker-compose.yml"
+          source: |
+            docker-compose.yml
+            docker-compose.monitoring.yml
           target: "/home/vagrant/app/"
 
       - name: Pull images and deploy to test server
@@ -74,8 +76,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/vagrant/app
-            docker compose pull
-            docker compose up -d
+            docker compose -f docker-compose.yml -f docker-compose.monitoring.yml pull
+            docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d --remove-orphans
 
       # - name: Actions Status Discord
       #   uses: sarisia/actions-status-discord@v1.16.0
