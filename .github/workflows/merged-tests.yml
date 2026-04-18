@@ -31,6 +31,15 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml up -d --build
 
+      - name: Wait for postgres
+        run: |
+          for i in {1..30}; do
+            docker exec minitwit-devops-postgres-1 pg_isready -U test && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+
       - name: Wait for app
         run: |
           for i in {1..30}; do
