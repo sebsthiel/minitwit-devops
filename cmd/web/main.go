@@ -2,17 +2,15 @@ package main
 
 import (
 	"devops/minitwit/internal/monitoring"
-	"devops/minitwit/internal/src"
+	minitwit "devops/minitwit/internal/src"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	_ = godotenv.Load()
 
 	monitoring.Init()
 

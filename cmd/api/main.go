@@ -9,17 +9,11 @@ import (
 	"devops/minitwit/internal/monitoring"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	//_ = godotenv.Load()
-
-	if err := godotenv.Load(); err != nil {
-		log.Warn().Msg("No .env file found")
-	}
 
 	monitoring.Init()
 

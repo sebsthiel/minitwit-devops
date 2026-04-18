@@ -12,8 +12,6 @@ services:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
-      - SESSION_KEY=${SESSION_KEY}
-    command: ./api
     networks:
       - minitwit-network
     restart: unless-stopped
@@ -33,13 +31,9 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - API_BASE_URL=http://api:5001
-      - SESSION_KEY=${SESSION_KEY}
+      - DATABASE_PATH=${DATABASE_PATH}
+      - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
-      - COOKIE_SECURE=false
-    depends_on:
-      - api
-    command: ./web
     networks:
       - minitwit-network
     restart: unless-stopped
