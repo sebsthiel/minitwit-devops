@@ -26,6 +26,10 @@ func writeJSON(writer http.ResponseWriter, status int, value any) {
 	_ = json.NewEncoder(writer).Encode(value)
 }
 
+func SetSimAuth(simAuth string){
+	simulatorAuth = simAuth
+}
+
 func SimulationAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, reader *http.Request) {
 		if reader.Header.Get("Authorization") != simulatorAuth {

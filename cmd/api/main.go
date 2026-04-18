@@ -33,6 +33,8 @@ func main() {
 		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
 	}
 
+	minitwit.SetSimAuth(simulatorAuth)
+
 	router := mux.NewRouter()
 	minitwit.RegisterAPIRoutes(router, database)
 
