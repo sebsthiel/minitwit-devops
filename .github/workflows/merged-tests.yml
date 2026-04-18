@@ -4,13 +4,16 @@ on:
   workflow_call:
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  tests:
+    name: All Tests
     runs-on: ubuntu-latest
+
     env:
       DATABASE_PATH: postgresql://test:test@postgres:5432/minitwit_test
       DATABASE_PATH_DOCKER: postgresql://test:test@postgres:5432/minitwit_test
-      SIMULATOR_AUTH: test-token
+      DATABASE_PATH_HOST: postgresql://test:test@127.0.0.1:5432/minitwit_test
+      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
+      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,12 +22,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install python deps
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest requests psycopg2-binary
+          pip install pytest requests selenium psycopg2-binary psycopg2
 
-      - name: Start postgres and minitwit containers
+      - name: Start containers
         run: |
           docker compose -f docker-compose.test.yml up -d --build
 
@@ -36,69 +39,17 @@ jobs:
           done
           exit 1
 
-      - name: Dump container logs on failure
-        if: failure()
-        run: docker compose -f docker-compose.test.yml logs --no-color
-
-      - name: Run refactored tests
-        run: pytest test/refactored_minitwit_tests.py
-
-  simulator-api-tests:
-    name: Simulator API Tests
-    runs-on: ubuntu-latest
-    env:
-      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
-      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH || 'Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh' }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install python deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest requests
-
-      - name: Build and run app
-        run: make runlocal
-
-      - name: Wait for app
-        run: |
-          for i in {1..30}; do
-            curl -fsS http://localhost:5001/ && exit 0
-            sleep 2
-          done
-          exit 1
-
-      - name: Run minitwit simulator API tests
+      - name: Run simulator API tests
         run: pytest test/minitwit_sim_api_test.py
 
-  ui-tests:
-    name: UI Tests
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_PATH_HOST: postgresql://test:test@127.0.0.1:5432/minitwit_test
-      DATABASE_PATH_DOCKER: postgresql://test:test@postgres:5432/minitwit_test
-      SIMULATOR_AUTH: ${{ secrets.SIMULATOR_AUTH }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Run unit tests
+        run: pytest test/refactored_minitwit_tests.py
 
       - name: Setup Firefox
         id: setup-firefox
         uses: browser-actions/setup-firefox@v1
         with:
           firefox-version: latest-esr
-
-      - name: Check Firefox version
-        run: firefox --version
 
       - name: Install geckodriver
         run: |
@@ -109,30 +60,13 @@ jobs:
           sudo mv /tmp/geckodriver /usr/local/bin/geckodriver
           sudo chmod +x /usr/local/bin/geckodriver
 
-      - name: Check geckodriver version
-        run: geckodriver --version
-
-      - name: Install python deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest selenium psycopg2-binary psycopg2
-
-      - name: Start postgres and app containers
-        run: |
-          docker compose -f docker-compose.test.yml up -d
-
-      - name: Wait for app
-        run: |
-          for i in {1..30}; do
-            curl -fsS http://localhost:5001/ && exit 0
-            sleep 2
-          done
-          exit 1
-
       - name: Run UI tests
         env:
           DATABASE_PATH: ${{ env.DATABASE_PATH_HOST }}
           FIREFOX_BIN: ${{ steps.setup-firefox.outputs.firefox-path }}
           GECKODRIVER_PATH: /usr/local/bin/geckodriver
-        run: |
-          pytest test/test_itu_minitwit_ui.py
+        run: pytest test/test_itu_minitwit_ui.py
+
+      - name: Stop containers
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
