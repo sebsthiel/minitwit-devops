@@ -37,7 +37,7 @@ import shutil
 import psycopg2
 
 
-GUI_URL = "http://localhost:5001/register"
+GUI_URL = "http://localhost:5000/register"
 DB_PATH = os.getenv("DATABASE_PATH") or os.getenv("DATABASE_PATH_HOST")
 GECKODRIVER_PATH = os.getenv("GECKODRIVER_PATH", "geckodriver")
 FIREFOX_BIN = os.getenv("FIREFOX_BIN") or shutil.which("firefox")
