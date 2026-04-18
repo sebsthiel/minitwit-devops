@@ -45,9 +45,6 @@ jobs:
           for i in {1..30}; do
             curl -fsS http://localhost:5001/api/health && exit 0
             sleep 2
-            docker ps
-            docker logs minitwit-api
-            echo "${SIMULATOR_AUTH:0:4}"
           done
           exit 1
 
