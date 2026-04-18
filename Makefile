@@ -19,10 +19,10 @@ checkmake:
 
 clean:
 	docker compose \
-  -f docker-compose.yml \
-  -f docker-compose.develop.yml \
-  -f docker-compose.monitoring.yml \
-  down
+	-f docker-compose.yml \
+	-f docker-compose.develop.yml \
+	-f docker-compose.monitoring.yml \
+	down --remove-orphans
 
 test:
 	@echo "No tests defined"
