@@ -1,13 +1,10 @@
----
 name: CI/CD Pipeline Production Server
 
 on:
   push:
-    # Run workflow every time something is pushed to the main branch
     branches:
       - main
       - master
-
   workflow_dispatch:
 
 jobs:
@@ -21,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-            go-version: '1.25'  
+          go-version: '1.25'
 
       - name: Quality checks - Static analysis
         run: make all
@@ -56,6 +53,19 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache,mode=max
+
+  tests:
+    needs: build
+    uses: ./.github/workflows/merged-tests.yml
+    secrets: inherit
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
 
       - name: Upload docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
