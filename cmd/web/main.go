@@ -17,6 +17,7 @@ func main() {
 	minitwit.StartLogging()
 
 	database := minitwit.Connect_db()
+	minitwit.Migrate_database(database)
 
 	router := mux.NewRouter()
 	router.Use(minitwit.AuthMiddleware)

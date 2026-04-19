@@ -60,6 +60,11 @@ type Follower struct {
 	Whom_id int
 }
 
+type Latest struct {
+	Key   string `gorm:"primaryKey"`
+	Value int
+}
+
 // configurations
 const PORT = "5001"
 const DATABASE_DEFAULT = "/tmp/minitwit.db"
@@ -104,8 +109,29 @@ func Connect_db() *gorm.DB {
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg("GORM error when open database")
 	}
-	db.AutoMigrate(&User{}, &Message{}, &Follower{})
+
 	return db
+}
+
+func Migrate_database(db *gorm.DB) {
+	db.AutoMigrate(&User{}, &Message{}, &Follower{}, &Latest{})
+}
+
+func GetLatestValue() int {
+	var latest Latest
+	err := database.First(&latest, "key = ?", "latest").Error
+	if err != nil {
+		log.Err(err).Msg("Could not get latest value")
+		return -1
+	}
+	return latest.Value
+}
+
+func SaveLatestValue(value int) {
+	database.Save(&Latest{
+		Key:   "latest",
+		Value: value,
+	})
 }
 
 func get_user_id(username string) int {

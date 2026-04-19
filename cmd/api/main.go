@@ -21,6 +21,7 @@ func main() {
 	minitwit.StartLogging()
 
 	database := minitwit.Connect_db()
+	minitwit.Migrate_database(database)
 
 	simulatorAuth := os.Getenv("SIMULATOR_AUTH")
 	if simulatorAuth == "" {
