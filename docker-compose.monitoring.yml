@@ -4,8 +4,6 @@ services:
     ports:
       - target: 9090
         published: 9090
-        protocol: tcp
-        mode: host
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
@@ -20,8 +18,6 @@ services:
     ports:
       - target: 3000
         published: 3000
-        protocol: tcp
-        mode: host
     depends_on:
       - prometheus
     volumes:
@@ -43,8 +39,6 @@ services:
     ports:
       - target: 3100
         published: 3100
-        protocol: tcp
-        mode: host
     networks:
       - minitwit-network
     deploy:
