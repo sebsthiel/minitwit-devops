@@ -73,9 +73,7 @@ jobs:
           host: ${{ secrets.SSH_HOST_SWARM }}
           username: ${{ secrets.SSH_USER_SWARM }}
           key: ${{ secrets.SSH_KEY_SWARM }}
-          source: |
-            docker-compose.yml
-            docker-compose.monitoring.yml
+          source: docker-compose.yml,docker-compose.monitoring.yml
           target: "/home/minitwit/"
 
       - name: Pull images and deploy to test server
