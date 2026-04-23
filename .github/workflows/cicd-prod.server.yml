@@ -70,24 +70,25 @@ jobs:
       - name: Upload docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SSH_HOST_SWARM }}
+          username: ${{ secrets.SSH_USER_SWARM }}
+          key: ${{ secrets.SSH_KEY_SWARM }}
           source: |
             docker-compose.yml
             docker-compose.monitoring.yml
-          target: "/home/vagrant/app/"
+          target: "/home/minitwit/"
 
       - name: Pull images and deploy to test server
         uses: appleboy/ssh-action@v1.2.5
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SSH_HOST_SWARM }}
+          username: ${{ secrets.SSH_USER_SWARM }}
+          key: ${{ secrets.SSH_KEY_SWARM }}
           script: |
-            cd /home/vagrant/app
+            cd /home/minitwit
             docker compose -f docker-compose.yml -f docker-compose.monitoring.yml pull
-            docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d --remove-orphans
+            docker stack deploy -c docker-compose.yml minitwit
+            docker stack deploy -c docker-compose.monitoring.yml monitoring
 
       # - name: Actions Status Discord
       #   uses: sarisia/actions-status-discord@v1.16.0
