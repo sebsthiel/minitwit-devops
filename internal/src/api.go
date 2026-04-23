@@ -1,4 +1,4 @@
-package main
+package minitwit
 
 import (
 	"devops/minitwit/api_models"
@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -19,21 +17,15 @@ var simulatorAuth string
 
 const userNotFoundMsg = "User not found (no response body)"
 
-func init() {
-	simulatorAuth = os.Getenv("SIMULATOR_AUTH")
-
-	if simulatorAuth == "" {
-		log.Fatal().Msg("SIMULATOR_AUTH environment variable not set")
-	}
-}
-
-var latest = -1
-
 // uses the write and encodes the value
 func writeJSON(writer http.ResponseWriter, status int, value any) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(status)
 	_ = json.NewEncoder(writer).Encode(value)
+}
+
+func SetSimAuth(simAuth string) {
+	simulatorAuth = simAuth
 }
 
 func SimulationAuthMiddleware(next http.Handler) http.Handler {
@@ -63,6 +55,7 @@ func getQueryInt(r *http.Request, key string, defaultVal int) (int, error) {
 }
 
 func APILatest(w http.ResponseWriter, r *http.Request) {
+	var latest = GetLatestValue()
 	if latest == -1 {
 		writeJSON(w, http.StatusInternalServerError, api_models.ErrorResponse{Status: http.StatusInternalServerError, ErrorMsg: "Internal Server Error"})
 		return
@@ -77,7 +70,7 @@ func APIGetMessages(w http.ResponseWriter, r *http.Request) {
 	// Get variables from request.
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 	no, _ := getQueryInt(r, "no", 100)
 
@@ -121,7 +114,7 @@ func APIPostFollows(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 
 	// Decode the requestBody
@@ -181,7 +174,7 @@ func APIGetFollows(w http.ResponseWriter, r *http.Request) {
 
 	// Update latest if it is in the request.
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 
 	// Get user and handle if user doesnt exist.
@@ -236,7 +229,7 @@ func APIPostMessageByUser(w http.ResponseWriter, r *http.Request) {
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 
 	// Decode PostMessage from request
@@ -270,7 +263,7 @@ func APIGetMessagesByUser(w http.ResponseWriter, r *http.Request) {
 	}
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 	no, _ := getQueryInt(r, "no", 100)
 
@@ -324,7 +317,7 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 
 	newLatest, _ := getQueryInt(r, "latest", -1)
 	if newLatest != -1 {
-		latest = newLatest
+		SaveLatestValue(newLatest)
 	}
 
 	username := req.Username
@@ -362,9 +355,16 @@ func APIRegister(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusNoContent, "User registered succesfully")
 }
 
-func RegisterAPIRoutes(r *mux.Router) {
+func RegisterAPIRoutes(r *mux.Router, db *gorm.DB) {
 
 	api_router := r.PathPrefix("/api").Subrouter()
+
+	database = db
+
+	// endpoint for health check
+	api_router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	// requires no auth:
 	api_router.HandleFunc("/latest", APILatest).Methods("GET")

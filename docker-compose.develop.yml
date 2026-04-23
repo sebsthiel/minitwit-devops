@@ -1,6 +1,7 @@
 services:
   api:
-    image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
+    # Locally built image:
+    image: minitwit-api:dev
     ports:
       - target: 5001
         published: 5001
@@ -21,7 +22,8 @@ services:
         condition: on-failure
 
   web:
-    image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
+    # Locally built image:
+    image: minitwit-web:dev
     ports:
       - target: 5000
         published: 5000
@@ -46,6 +48,3 @@ networks:  # Network shared between services so we can refer to them by name
     external: true
     name: minitwit-network
 
-volumes:
-  grafana-storage:
-  loki-storage:

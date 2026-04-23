@@ -1,13 +1,10 @@
----
 name: CI/CD Pipeline Production Server
 
 on:
   push:
-    # Run workflow every time something is pushed to the main branch
     branches:
       - main
       - master
-
   workflow_dispatch:
 
 jobs:
@@ -21,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-            go-version: '1.25'  
+          go-version: '1.25'
 
       - name: Quality checks - Static analysis
         run: make all
@@ -35,35 +32,64 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push minitwitimage
+      # TODO Get confirmation about this split
+      - name: Build and push minitwitapiimage
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile.api
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitimage:webbuildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitapiimage:webbuildcache,mode=max
+      
+      # TODO Get confirmation about this split
+      - name: Build and push minitwitwebimage
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile.web
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwitwebimage:webbuildcache,mode=max
+
+  tests:
+    needs: build
+    uses: ./.github/workflows/merged-tests.yml
+    secrets: inherit
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
 
       - name: Upload docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "docker-compose.yml"
-          target: "/home/vagrant/app/"
+          host: ${{ secrets.SSH_HOST_SWARM }}
+          username: ${{ secrets.SSH_USER_SWARM }}
+          key: ${{ secrets.SSH_KEY_SWARM }}
+          source: |
+            docker-compose.yml
+            docker-compose.monitoring.yml
+          target: "/home/minitwit/"
 
       - name: Pull images and deploy to test server
         uses: appleboy/ssh-action@v1.2.5
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SSH_HOST_SWARM }}
+          username: ${{ secrets.SSH_USER_SWARM }}
+          key: ${{ secrets.SSH_KEY_SWARM }}
           script: |
-            cd /home/vagrant/app
-            docker compose pull
-            docker compose up -d
+            cd /home/minitwit
+            set -a && source .env && set +a
+            docker compose -f docker-compose.yml -f docker-compose.monitoring.yml pull
+            docker stack deploy -c docker-compose.yml minitwit
+            docker stack deploy -c docker-compose.monitoring.yml monitoring
 
       # - name: Actions Status Discord
       #   uses: sarisia/actions-status-discord@v1.16.0

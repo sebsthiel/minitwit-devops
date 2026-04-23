@@ -1,4 +1,4 @@
-package main
+package minitwit
 
 import (
 	"context"
@@ -13,13 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"golang.org/x/crypto/bcrypt"
 
-	"devops/minitwit/internal/monitoring"
+	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -63,6 +60,11 @@ type Follower struct {
 	Whom_id int
 }
 
+type Latest struct {
+	Key   string `gorm:"primaryKey"`
+	Value int
+}
+
 // configurations
 const PORT = "5001"
 const DATABASE_DEFAULT = "/tmp/minitwit.db"
@@ -80,7 +82,7 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
-func connect_db() *gorm.DB {
+func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {
 		dialector = postgres.Open(p)
@@ -107,8 +109,29 @@ func connect_db() *gorm.DB {
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg("GORM error when open database")
 	}
-	db.AutoMigrate(&User{}, &Message{}, &Follower{})
+
 	return db
+}
+
+func Migrate_database(db *gorm.DB) {
+	db.AutoMigrate(&User{}, &Message{}, &Follower{}, &Latest{})
+}
+
+func GetLatestValue() int {
+	var latest Latest
+	err := database.First(&latest, "key = ?", "latest").Error
+	if err != nil {
+		log.Err(err).Msg("Could not get latest value")
+		return -1
+	}
+	return latest.Value
+}
+
+func SaveLatestValue(value int) {
+	database.Save(&Latest{
+		Key:   "latest",
+		Value: value,
+	})
 }
 
 func get_user_id(username string) int {
@@ -328,31 +351,7 @@ func loggingConfig() {
 	}
 }
 
-func main() {
-	monitoring.Init()
-
+func StartLogging() {
 	loggingConfig()
-
-	database = connect_db()
 	log.Info().Msg("Starting server")
-	router := mux.NewRouter()
-	router.Handle("/metrics", promhttp.Handler())
-
-	// middleware
-	router.Use(monitoring.MetricsMiddleware)
-	router.Use(AuthMiddleware)
-
-	// load stylesheet
-	router.PathPrefix("/static/").
-		Handler(http.StripPrefix("/static/",
-			http.FileServer(http.Dir("./static"))))
-
-	// Routing handlers
-	RegisterAPIRoutes(router) /* This i believe has be happen before the normal routes
-	due to the username route which actually could match a username "api"*/
-	RegisterRoutes(router)
-
-	log.Info().Msgf("Started listening on: %s", PORT)
-	log.Log().Stack().Err(http.ListenAndServe(":"+PORT, router)).Msg("")
-
 }
