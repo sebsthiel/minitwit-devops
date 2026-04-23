@@ -86,6 +86,7 @@ jobs:
           key: ${{ secrets.SSH_KEY_SWARM }}
           script: |
             cd /home/minitwit
+            set -a && source .env && set +a
             docker compose -f docker-compose.yml -f docker-compose.monitoring.yml pull
             docker stack deploy -c docker-compose.yml minitwit
             docker stack deploy -c docker-compose.monitoring.yml monitoring
