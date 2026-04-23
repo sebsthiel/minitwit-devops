@@ -1,45 +1,47 @@
 services:
   api:
     # Locally built image:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    container_name: minitwit-api
+    image: minitwit-api:dev
     ports:
-      - "5001:5001"
+      - target: 5001
+        published: 5001
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:
       - minitwit-network
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
 
   web:
     # Locally built image:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    container_name: minitwit-web
+    image: minitwit-web:dev
     ports:
-      - "5000:5000"
+      - target: 5000
+        published: 5000
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:
       - minitwit-network
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
 
 networks:  # Network shared between services so we can refer to them by name
   minitwit-network:

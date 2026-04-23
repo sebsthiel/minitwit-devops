@@ -27,6 +27,10 @@ clean:
 test:
 	@echo "No tests defined"
 
+buildlocal:
+	docker build -t minitwit-api:dev -f Dockerfile.api .
+	docker build -t minitwit-web:dev -f Dockerfile.web .
+
 runlocal:
 	docker compose -f docker-compose.develop.yml up -d
 

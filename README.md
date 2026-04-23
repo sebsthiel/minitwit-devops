@@ -33,7 +33,57 @@ To make the application use this database you need to copy the minitwit.db from 
 cp minitwit.db /tmp/
 ```
 
-# Run application using docker:
+# Run application using docker Swarm
+
+NOTE !
+So far the there is only one replica for API and Web. We want probably 3 replicas for each. However if we have more replicas we need to remove the line "mode: host" from the "ports" section of each service. I Can't seem to get that to work. So it works for 1 replica per service, but we want more. 
+
+## 0. Built local images (for running locally)
+Docker swarm does not support building the images using "build" in the compose file. Therefore the local images must be built before deploying the stack:
+```bash
+# API
+docker build -t minitwit-api:dev -f Dockerfile.api .
+# Web
+docker build -t minitwit-web:dev -f Dockerfile.web .
+```
+
+## 1. Initialize the swarm (first time only)
+```bash
+docker swarm init
+```
+## 2. Create the shared overlay network (first time only)
+```bash
+docker network create --driver overlay minitwit-network
+```
+## 3. Load environment variables
+Load the variables from the .env file into the shell environment:
+```bash
+set -a && source .env && set +a
+```
+## 4. Deploy the stack (Using local images)
+```bash
+# API And Web services
+docker stack deploy -c docker-compose.develop.yml minitwit
+# Monitoring services 
+docker stack deploy -c docker-compose.monitoring.yml monitoring
+```
+## 5. Verify services
+```bash
+docker service ls
+```
+## 6. View logs
+```bash
+## For API
+docker service logs minitwit_api
+## For Web
+docker service logs minitwit_web
+```
+## 7. Remove the stack
+```bash
+docker stack rm minitwit
+```
+
+# Run application using docker Compose (Depricated, probably doens't work anymore):
 
 The docker commands have been inserted into a Makefile.
 To build and run the application with docker:
