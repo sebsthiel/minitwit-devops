@@ -45,6 +45,8 @@ Docker swarm does not support building the images using "build" in the compose f
 docker build -t minitwit-api:dev -f Dockerfile.api .
 # Web
 docker build -t minitwit-web:dev -f Dockerfile.web .
+# both
+make buildlocal
 ```
 
 ## 1. Initialize the swarm (first time only)
@@ -81,6 +83,7 @@ docker service logs minitwit_web
 ## 7. Remove the stack
 ```bash
 docker stack rm minitwit
+docker stack rm monitoring
 ```
 
 # Run application using docker Compose (Depricated, probably doens't work anymore):

@@ -19,6 +19,10 @@ services:
       replicas: 3
       restart_policy:
         condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
 
   web:
     image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
@@ -40,6 +44,10 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
 
 networks:  # Network shared between services so we can refer to them by name
   minitwit-network:
