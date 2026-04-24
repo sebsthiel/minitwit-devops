@@ -12,6 +12,7 @@ common:
       rules_directory: /loki/rules      # Directory to store rules in.
   replication_factor: 1                 # How many copies of each log chunk are kept
   ring:
+    instance_addr: 127.0.0.1
     kvstore:
       store: inmemory
 
