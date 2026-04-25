@@ -33,19 +33,13 @@ buildlocal:
 
 initswarm:
 	@if [ "$$(docker info --format '{{.Swarm.LocalNodeState}}')" != "active" ]; then \
-		echo "Initializing swarm..."; \
-		docker swarm init; \
-	else \
-		echo "Swarm already active"; \
-	fi
+		echo "Initializing swarm..."; docker swarm init; \
+	else echo "Swarm already active"; fi
 
 createnetwork:
 	@if ! docker network ls --format '{{.Name}}' | grep -w $(NETWORK) >/dev/null; then \
-		echo "Creating overlay network..."; \
-		docker network create --driver overlay --attachable $(NETWORK); \
-	else \
-		echo "Network already exists"; \
-	fi
+		echo "Creating overlay network..."; docker network create --driver overlay --attachable $(NETWORK); \
+	else echo "Network already exists"; fi
 
 setenv:
 	@set -a && [ -f .env ] && . ./.env || true && set +a
