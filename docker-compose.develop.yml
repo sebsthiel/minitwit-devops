@@ -3,7 +3,7 @@ services:
     # Locally built image:
     image: minitwit-api:dev
     environment:
-      - DATABASE_PATH=${DATABASE_PATH}
+      - DATABASE_PATH=${DATABASE_PATH:-postgresql://myuser:mypassword@db:5432/mydb}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:
@@ -22,7 +22,7 @@ services:
     # Locally built image:
     image: minitwit-web:dev
     environment:
-      - DATABASE_PATH=${DATABASE_PATH}
+      - DATABASE_PATH=${DATABASE_PATH:-postgresql://myuser:mypassword@db:5432/mydb}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:

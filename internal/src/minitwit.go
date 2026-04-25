@@ -19,10 +19,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+
+	"github.com/antonlindstrom/pgstore"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -67,16 +68,13 @@ type Latest struct {
 
 // configurations
 const PORT = "5001"
-const DATABASE_DEFAULT = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *gorm.DB
 
-var (
-	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-	key   = []byte("super-secret-key")
-	store = sessions.NewCookieStore(key)
-)
+var store *pgstore.PGStore
+
+var key = []byte("super-secret-key")
 
 type contextKey string
 
@@ -86,8 +84,26 @@ func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {
 		dialector = postgres.Open(p)
+		dsn := p
+		if !strings.Contains(p, "sslmode=") {
+			dsn += "?sslmode=disable"
+		}
+		var newStore, err = pgstore.NewPGStore(dsn, key)
+		if err != nil {
+			log.Err(err).Msg("Could not create store for sessions")
+		}
+		store = newStore
+		store.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   86400 * 30,
+			HttpOnly: true,
+
+			// IMPORTANT for pytest/local:
+			Secure:   false,
+			SameSite: http.SameSiteLaxMode, // or DefaultMode
+		}
 	} else {
-		dialector = sqlite.Open(DATABASE_DEFAULT)
+		log.Fatal().Msg("NO DATABASE PATH GIVEN. Hence could not start application")
 	}
 
 	// Costumize logger //TODO USE zerolog?
@@ -311,18 +327,6 @@ func ValidateLogin(username string, password string) (*User, string) {
 func TryGetUserFromRequest(r *http.Request) (User, bool) {
 	user, ok := r.Context().Value(userContextKey).(User)
 	return user, ok
-}
-
-func init() {
-	store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 30,
-		HttpOnly: true,
-
-		// IMPORTANT for pytest/local:
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode, // or DefaultMode
-	}
 }
 
 func loggingConfig() {
