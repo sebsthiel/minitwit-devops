@@ -68,6 +68,11 @@ services:
       - ./nginx.develop.conf:/etc/nginx/nginx.conf:ro
     networks:
       - minitwit-network
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
 
 
 networks:  # Network shared between services so we can refer to them by name
