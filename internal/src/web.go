@@ -89,15 +89,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
-
 		session.Values["user_id"] = userUser.User_id
-
+		session.AddFlash("You were logged in")
 		err = session.Save(r, w)
 		if err != nil {
 			http.Error(w, "Could not save session", http.StatusInternalServerError)
 			return
 		}
-		AddFlash(w, r, "You were logged in")
 		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
 	}
@@ -178,13 +176,12 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	delete(session.Values, "user_id")
-
+	session.AddFlash("You were logged out")
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, "could not save session", http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You were logged out")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
