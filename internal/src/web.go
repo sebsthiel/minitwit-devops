@@ -86,13 +86,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 		session, err := store.Get(r, "session")
 		if err != nil {
+			log.Err(err).Msg("Could not get session")
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
+
 		session.Values["user_id"] = userUser.User_id
-		session.AddFlash("You were logged in")
+		AddFlash(w, r, session, "You were logged in")
 		err = session.Save(r, w)
+		store.Save(r, w, session)
 		if err != nil {
+			log.Err(err).Msg("Could not save session")
 			http.Error(w, "Could not save session", http.StatusInternalServerError)
 			return
 		}
@@ -136,7 +140,8 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Add the flash message to the session:
-	AddFlash(w, r, "You are now following \""+usernameToFollow+"\"")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You are now following \""+usernameToFollow+"\"")
 	http.Redirect(w, r, "/"+usernameToFollow, http.StatusSeeOther)
 }
 
@@ -162,7 +167,8 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to unfollow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You are no longer following \""+usernameToUnfollow+"\"")
 	http.Redirect(w, r, "/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
@@ -171,14 +177,17 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	session, err := store.Get(r, "session")
 	if err != nil {
+		log.Err(err).Msg("Could not get session")
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}
 
 	delete(session.Values, "user_id")
-	session.AddFlash("You were logged out")
+	AddFlash(w, r, session, "You were logged out")
 	err = session.Save(r, w)
+	store.Save(r, w, session)
 	if err != nil {
+		log.Err(err).Msg("Could not save session")
 		http.Error(w, "could not save session", http.StatusInternalServerError)
 		return
 	}
@@ -236,7 +245,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	res := database.
 		Table("message").
-		Select(`message.message_id, message.text, message.pub_date, "user".username, u.email`).
+		Select(`message.message_id, message.text, message.pub_date, "user".username`).
 		Joins(`JOIN "user" ON "user".user_id = message.author_id`).
 		Where(`"user".username = ?`, username).
 		Order("message.pub_date DESC").
@@ -310,7 +319,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 
 	res := database.
 		Table("message").
-		Select(`message.message_id, message.text, message.pub_date, u.username, u.email`).
+		Select(`message.message_id, message.text, message.pub_date, u.username`).
 		Joins(`JOIN "user" u ON u.user_id = message.author_id`).
 		Order("message.pub_date DESC").
 		Limit(PER_PAGE).
@@ -381,7 +390,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
-	AddFlash(w, r, "You were successfully registered and can login now")
+
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You were successfully registered and can login now")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 

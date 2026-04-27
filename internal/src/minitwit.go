@@ -25,6 +25,8 @@ import (
 
 	"github.com/antonlindstrom/pgstore"
 
+	"encoding/gob"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -79,6 +81,11 @@ var key = []byte("super-secret-key")
 type contextKey string
 
 const userContextKey = contextKey("user")
+
+func init() {
+	gob.Register(map[interface{}]interface{}{})
+	gob.Register(int(0))
+}
 
 func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
@@ -186,7 +193,8 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AddFlash(w, r, "Your message was recorded")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "Your message was recorded")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -198,7 +206,7 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 	if err := session.Save(r, w); err != nil {
 		return nil // or we could handle error properly
 	}
-
+	store.Save(r, w, session)
 	// Extract the messages
 	var flashes []string
 	for _, f := range raw {
@@ -206,14 +214,13 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 			flashes = append(flashes, msg)
 		}
 	}
-
 	return flashes
 }
 
-func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
-	session, _ := store.Get(r, "session")
+func AddFlash(w http.ResponseWriter, r *http.Request, session *sessions.Session, msg string) {
 	session.AddFlash(msg)
 	session.Save(r, w)
+	store.Save(r, w, session)
 }
 
 func loadUserFromDB(uid int) (User, bool) {
@@ -246,9 +253,19 @@ func GetUserByUsername(username string) *User {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Info().
+			Str("method", r.Method).
+			Str("path", r.URL.Path).
+			Str("remote", r.RemoteAddr).
+			Msg("AuthMiddleware called")
 
-		session, _ := store.Get(r, "session")
-
+		session, err := store.Get(r, "session")
+		if err != nil {
+			log.Err(err).Msg("Could not get session")
+			http.Error(w, "Session error", http.StatusInternalServerError)
+			return
+		}
+		log.Info().Msgf("session values: %v - isNew: %v - ID: %v", session.Values, session.IsNew, session.ID)
 		if uid, ok := session.Values["user_id"].(int); ok {
 			user, ok := loadUserFromDB(uid)
 			if ok {
