@@ -86,6 +86,7 @@ docker stack rm minitwit
 docker stack rm monitoring
 ```
 
+
 # Run application using docker Compose (Depricated, probably doens't work anymore):
 
 The docker commands have been inserted into a Makefile.
