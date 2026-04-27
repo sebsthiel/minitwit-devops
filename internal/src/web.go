@@ -57,6 +57,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Redirect the user if they are already logged in.
 	_, ok := TryGetUserFromRequest(r)
 	if ok {
+		log.Debug().Msg("WAIT WHAAAAAT")
 		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
@@ -93,13 +94,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 		session.Values["user_id"] = userUser.User_id
 		AddFlash(w, r, session, "You were logged in")
-		err = session.Save(r, w)
-		store.Save(r, w, session)
-		if err != nil {
-			log.Err(err).Msg("Could not save session")
-			http.Error(w, "Could not save session", http.StatusInternalServerError)
-			return
-		}
+		log.Debug().Msgf("User %s logged in successfully", username)
 		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
 	}

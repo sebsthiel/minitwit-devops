@@ -208,6 +208,7 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 	}
 	store.Save(r, w, session)
 	// Extract the messages
+	log.Debug().Msgf("Raw flashes: %v", raw)
 	var flashes []string
 	for _, f := range raw {
 		if msg, ok := f.(string); ok {
@@ -219,7 +220,12 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 
 func AddFlash(w http.ResponseWriter, r *http.Request, session *sessions.Session, msg string) {
 	session.AddFlash(msg)
-	session.Save(r, w)
+	err := session.Save(r, w)
+	if err != nil {
+		log.Err(err).Msg("Could not save session")
+		http.Error(w, "Could not save session", http.StatusInternalServerError)
+		return
+	}
 	store.Save(r, w, session)
 }
 
@@ -253,11 +259,11 @@ func GetUserByUsername(username string) *User {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Info().
-			Str("method", r.Method).
-			Str("path", r.URL.Path).
-			Str("remote", r.RemoteAddr).
-			Msg("AuthMiddleware called")
+		// log.Info().
+		// 	Str("method", r.Method).
+		// 	Str("path", r.URL.Path).
+		// 	Str("remote", r.RemoteAddr).
+		// 	Msg("AuthMiddleware called")
 
 		session, err := store.Get(r, "session")
 		if err != nil {
@@ -265,7 +271,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
-		log.Info().Msgf("session values: %v - isNew: %v - ID: %v", session.Values, session.IsNew, session.ID)
+		// log.Info().Msgf("session values: %v - isNew: %v - ID: %v", session.Values, session.IsNew, session.ID)
 		if uid, ok := session.Values["user_id"].(int); ok {
 			user, ok := loadUserFromDB(uid)
 			if ok {
