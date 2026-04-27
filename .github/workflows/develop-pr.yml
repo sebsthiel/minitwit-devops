@@ -25,6 +25,12 @@ jobs:
 
       - name: Build
         run: go build ./...
+      
+      - name: Scan Docker image with Trivy
+        run: |
+          docker build -t minitwit-api:test -f Dockerfile.api .
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL minitwit-api:test
 
   tests:
     needs: quality-gate
