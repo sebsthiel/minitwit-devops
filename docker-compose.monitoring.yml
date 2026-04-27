@@ -35,10 +35,12 @@ services:
     volumes:
       - loki-storage:/loki
       - ./loki/loki-config.yml:/mnt/config/loki-config.yml  # Mount the loki config file
-    command: -config.file=/mnt/config/loki-config.yml
+    command: -config.file=/mnt/config/loki-config.yml -target=all
     ports:
       - target: 3100
         published: 3100
+      - target: 9096      # Add this
+        published: 9096
     networks:
       - minitwit-network
     deploy:
@@ -58,7 +60,7 @@ services:
     networks:
       - minitwit-network
     deploy:
-      replicas: 1
+      mode: global
       restart_policy:
         condition: on-failure
 

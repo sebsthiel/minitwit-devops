@@ -65,6 +65,33 @@ type Latest struct {
 	Value int
 }
 
+const (
+	AppWeb = "web"
+	AppApi = "api"
+)
+
+const (
+	EndpointRegister       = "register"
+	EndpointLatest         = "latest"
+	EndpointAuthentication = "authentication"
+	EndpointMsg            = "msg"
+	EndpointMsgUsername    = "msg_username"
+	EndpointFllwsUsername  = "fllws_username"
+)
+
+const (
+	KeyApp              = "app"
+	KeyEndpoint         = "endpoint"
+	KeyMethod           = "method"
+	KeyStatusCode       = "statuscode"
+	KeyUsername         = "username"
+	KeyLatestValue      = "latest_value"
+	KeyAuthToken        = "authtoken"
+	KeyLimit            = "limit"
+	KeyFollowUsername   = "followusername"
+	KeyUnfollowUsername = "unfollowusername"
+)
+
 // configurations
 const PORT = "5001"
 const DATABASE_DEFAULT = "/tmp/minitwit.db"
@@ -230,7 +257,6 @@ func GetUserByUsername(username string) *User {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		session, _ := store.Get(r, "session")
 
 		if uid, ok := session.Values["user_id"].(int); ok {
@@ -327,6 +353,8 @@ func init() {
 
 func loggingConfig() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	log.Warn().Msgf("LOG_LEVEL is %s", os.Getenv("LOG_LEVEL"))
 
 	// If environment variable is not set then it will disable logging
 	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {

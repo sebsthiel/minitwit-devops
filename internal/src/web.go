@@ -53,7 +53,7 @@ var routes = map[string]string{
 
 // TODO right now the password is matched agains exactly what is in the db, should be hash
 func Login(w http.ResponseWriter, r *http.Request) {
-
+	log.Info().Msg("login hit!")
 	// Redirect the user if they are already logged in.
 	_, ok := TryGetUserFromRequest(r)
 	if ok {
