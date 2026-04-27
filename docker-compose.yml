@@ -1,9 +1,6 @@
 services:
   api:
     image: ${MINITWIT_IMAGE:-marcp85/minitwitapiimage:latest}
-    ports:
-      - target: 5001   # Remove this when simulator uses the reverse proxy endpoint
-        published: 5001
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
@@ -22,9 +19,6 @@ services:
 
   web:
     image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
-    ports:
-      - target: 5000 # Remove this when simulator uses the reverse proxy endpoint
-        published: 5000 
     environment:
       - DATABASE_PATH=${DATABASE_PATH}
       - LOG_LEVEL=${LOG_LEVEL}
