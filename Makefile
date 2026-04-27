@@ -1,6 +1,6 @@
 .PHONY: staticcheck gofmt hadolint analysis checkmake all clean test
 
-all: staticcheck gofmt hadolint checkmake
+all: staticcheck gofmt hadolint checkmake semgrep
 
 staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
@@ -36,3 +36,6 @@ runlocal:
 
 runlocalmonitoring:
 	docker compose -f docker-compose.monitoring.yml up -d
+
+semgrep:
+	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep --config=auto /src
