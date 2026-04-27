@@ -60,6 +60,7 @@ services:
   
   nginx:
     image: nginx:latest
+    container_name: nginx
     ports:
       - target: 80
         published: 80

@@ -43,9 +43,9 @@ jobs:
       - name: Wait for app
         run: |
           for i in {1..30}; do
-            docker service ls
-            echo "========"
             docker ps
+            ls
+            docker logs nginx
             curl -fsS http://localhost/api/health && exit 0
             sleep 2
           done
