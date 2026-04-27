@@ -17,7 +17,7 @@ import requests
 # otherwise use the database that you got previously
 BASE_URL = "http://localhost:5000"
 
-def register(username, password, password2=None, email=None):
+def register(username, password, password2=None, email=None, session = None):
     """Helper function to register a user"""
     if password2 is None:
         password2 = password
