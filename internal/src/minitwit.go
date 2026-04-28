@@ -85,6 +85,8 @@ const userContextKey = contextKey("user")
 func init() {
 	gob.Register(map[interface{}]interface{}{})
 	gob.Register(int(0))
+	gob.Register(int64(0))
+	gob.Register("")
 }
 
 func Connect_db() *gorm.DB {
