@@ -13,7 +13,7 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 3
+      replicas: 6
       restart_policy:
         condition: on-failure
       update_config:
@@ -35,7 +35,7 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 2
+      replicas: 3
       restart_policy:
         condition: on-failure
       update_config:
