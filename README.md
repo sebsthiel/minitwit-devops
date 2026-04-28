@@ -34,6 +34,11 @@ cp minitwit.db /tmp/
 ```
 
 # Run application using docker Swarm
+Load the variables from the .env file into the shell environment:
+```bash
+set -a && source .env && set +a
+```
+Then run:
 ```bash
 make runlocalswarm
 ```
