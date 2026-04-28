@@ -10,8 +10,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import requests
-import subprocess
-import pytest
+import uuid
 
 
 # import schema
@@ -19,18 +18,9 @@ import pytest
 # otherwise use the database that you got previously
 BASE_URL = "http://localhost"
 
-@pytest.fixture(autouse=True)
-def cleanup_db():
-    """Clean the database before each test"""
-    subprocess.run([
-        "docker", "exec", "-i", "my_postgres", "psql", "-U", "myuser", "-d", "mydb",
-        "-c", "DELETE FROM http_sessions"
-    ], capture_output=True, check=False)
-    subprocess.run([
-        "docker", "exec", "-i", "my_postgres", "psql", "-U", "myuser", "-d", "mydb",
-        "-c", "DELETE FROM message; DELETE FROM follower; DELETE FROM \"user\";"
-    ], capture_output=True, check=False)
-    yield
+def get_unique_username(base_name):
+    """Generate a unique username to avoid conflicts in shared databases"""
+    return f"{base_name}_{uuid.uuid4().hex[:8]}"
 
 def register(username, password, password2=None, email=None, session=None):
     """Helper function to register a user"""
@@ -87,9 +77,10 @@ def add_message(http_session, text):
 
 def test_register():
     """Make sure registering works"""
-    r, _ = register('user1', 'default')
+    unique_user = get_unique_username('testuser')
+    r, _ = register(unique_user, 'default')
     assert 'You were successfully registered and can login now' in r.text
-    r, _ = register('user1', 'default')
+    r, _ = register(unique_user, 'default')
     assert 'The username is already taken' in r.text
     r, _    = register('', 'default')
     assert 'You have to enter a username' in r.text
@@ -102,19 +93,21 @@ def test_register():
 
 def test_login_logout():
     """Make sure logging in and logging out works"""
-    r, http_session = register_and_login('user1', 'default')
+    unique_user = get_unique_username('loginuser')
+    r, http_session = register_and_login(unique_user, 'default')
     
     assert 'You were logged in' in r.text
     r = logout(http_session)
     assert 'You were logged out' in r.text
-    r, _ = login('user1', 'wrongpassword')
+    r, _ = login(unique_user, 'wrongpassword')
     assert 'Invalid password' in r.text
-    r, _ = login('user2', 'wrongpassword')
+    r, _ = login('nonexistent_user', 'wrongpassword')
     assert 'Invalid username' in r.text
 
 def test_message_recording():
     """Check if adding messages works"""
-    _, http_session = register_and_login('foo', 'default')
+    unique_user = get_unique_username('msguser')
+    _, http_session = register_and_login(unique_user, 'default')
     add_message(http_session, 'test message 1')
     add_message(http_session, '<test message 2>')
     r = requests.get(f'{BASE_URL}/')
@@ -123,10 +116,13 @@ def test_message_recording():
 
 def test_timelines():
     """Make sure that timelines work"""
-    _, http_session = register_and_login('foo', 'default')
+    foo_user = get_unique_username('foo')
+    bar_user = get_unique_username('bar')
+    
+    _, http_session = register_and_login(foo_user, 'default')
     add_message(http_session, 'the message by foo')
     logout(http_session)
-    _, http_session = register_and_login('bar', 'default')
+    _, http_session = register_and_login(bar_user, 'default')
     add_message(http_session, 'the message by bar')
     r = http_session.get(f'{BASE_URL}/public')
     assert 'the message by foo' in r.text
@@ -138,8 +134,8 @@ def test_timelines():
     assert 'the message by bar' in r.text
 
     # now let's follow foo
-    r = http_session.get(f'{BASE_URL}/foo/follow', allow_redirects=True)
-    assert 'You are now following &#34;foo&#34;' in r.text
+    r = http_session.get(f'{BASE_URL}/{foo_user}/follow', allow_redirects=True)
+    assert 'You are now following &#34;' in r.text and foo_user in r.text
 
     # we should now see foo's message
     r = http_session.get(f'{BASE_URL}/')
@@ -147,16 +143,16 @@ def test_timelines():
     assert 'the message by bar' in r.text
 
     # but on the user's page we only want the user's message
-    r = http_session.get(f'{BASE_URL}/bar')
+    r = http_session.get(f'{BASE_URL}/{bar_user}')
     assert 'the message by foo' not in r.text
     assert 'the message by bar' in r.text
-    r = http_session.get(f'{BASE_URL}/foo')
+    r = http_session.get(f'{BASE_URL}/{foo_user}')
     assert 'the message by foo' in r.text
     assert 'the message by bar' not in r.text
 
     # now unfollow and check if that worked
-    r = http_session.get(f'{BASE_URL}/foo/unfollow', allow_redirects=True)
-    assert 'You are no longer following &#34;foo&#34;' in r.text
+    r = http_session.get(f'{BASE_URL}/{foo_user}/unfollow', allow_redirects=True)
+    assert 'You are no longer following &#34;' in r.text and foo_user in r.text
     r = http_session.get(f'{BASE_URL}/')
     assert 'the message by foo' not in r.text
     assert 'the message by bar' in r.text
