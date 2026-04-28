@@ -34,9 +34,26 @@ cp minitwit.db /tmp/
 ```
 
 # Run application using docker Swarm
+Load the variables from the .env file into the shell environment:
+```bash
+set -a && source .env && set +a
+```
+Then run:
+```bash
+make runlocalswarm
+```
+This command is idempotent.
+The result should be a swarm of the application that uses a postgresql database. 
+If you want to spin up the monitoring stack you can run:
+```bash
+make deploymonitoring
+```
+To remove the solution and/or monitoring do:
+```bash
+make clean
+```
 
-NOTE !
-So far the there is only one replica for API and Web. We want probably 3 replicas for each. However if we have more replicas we need to remove the line "mode: host" from the "ports" section of each service. I Can't seem to get that to work. So it works for 1 replica per service, but we want more. 
+You can also do the steps manually if you desire:
 
 ## 0. Built local images (for running locally)
 Docker swarm does not support building the images using "build" in the compose file. Therefore the local images must be built before deploying the stack:

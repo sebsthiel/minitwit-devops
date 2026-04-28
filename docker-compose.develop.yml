@@ -2,11 +2,8 @@ services:
   api:
     # Locally built image:
     image: minitwit-api:dev
-    ports:
-      - target: 5001
-        published: 5001
     environment:
-      - DATABASE_PATH=${DATABASE_PATH}
+      - DATABASE_PATH=${DATABASE_PATH:-postgresql://myuser:mypassword@db:5432/mydb}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:
@@ -17,18 +14,15 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
 
   web:
     # Locally built image:
     image: minitwit-web:dev
-    ports:
-      - target: 5000
-        published: 5000
     environment:
-      - DATABASE_PATH=${DATABASE_PATH}
+      - DATABASE_PATH=${DATABASE_PATH:-postgresql://myuser:mypassword@db:5432/mydb}
       - LOG_LEVEL=${LOG_LEVEL}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
     networks:
@@ -42,6 +36,19 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+  nginx:
+    image: nginx:latest
+    ports:
+      - target: 80
+        published: 80
+    volumes:
+      - ./nginx.develop.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - minitwit-network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
 networks:  # Network shared between services so we can refer to them by name
   minitwit-network:
