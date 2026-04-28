@@ -3,6 +3,7 @@ module devops/minitwit
 go 1.25.6
 
 require (
+	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.34
@@ -10,7 +11,6 @@ require (
 	github.com/rs/zerolog v1.34.0
 	golang.org/x/crypto v0.48.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 )
 
@@ -25,6 +25,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/lib/pq v1.10.5 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect

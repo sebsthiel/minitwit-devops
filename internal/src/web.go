@@ -57,6 +57,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Redirect the user if they are already logged in.
 	_, ok := TryGetUserFromRequest(r)
 	if ok {
+		log.Debug().Msg("WAIT WHAAAAAT")
 		http.Redirect(w, r, "/public", http.StatusFound)
 	}
 
@@ -86,18 +87,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 		session, err := store.Get(r, "session")
 		if err != nil {
+			log.Err(err).Msg("Could not get session")
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
 
 		session.Values["user_id"] = userUser.User_id
-
-		err = session.Save(r, w)
-		if err != nil {
-			http.Error(w, "Could not save session", http.StatusInternalServerError)
-			return
-		}
-		AddFlash(w, r, "You were logged in")
+		AddFlash(w, r, session, "You were logged in")
+		log.Debug().Msgf("User %s logged in successfully", username)
 		http.Redirect(w, r, "/public", http.StatusSeeOther)
 		return
 	}
@@ -138,7 +135,8 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Add the flash message to the session:
-	AddFlash(w, r, "You are now following \""+usernameToFollow+"\"")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You are now following \""+usernameToFollow+"\"")
 	http.Redirect(w, r, "/"+usernameToFollow, http.StatusSeeOther)
 }
 
@@ -164,7 +162,8 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to unfollow user: "+res.Error.Error(), http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You are no longer following \""+usernameToUnfollow+"\"")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You are no longer following \""+usernameToUnfollow+"\"")
 	http.Redirect(w, r, "/"+usernameToUnfollow, http.StatusSeeOther)
 }
 
@@ -173,18 +172,19 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	session, err := store.Get(r, "session")
 	if err != nil {
+		log.Err(err).Msg("Could not get session")
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}
 
 	delete(session.Values, "user_id")
-
+	AddFlash(w, r, session, "You were logged out")
 	err = session.Save(r, w)
 	if err != nil {
+		log.Err(err).Msg("Could not save session")
 		http.Error(w, "could not save session", http.StatusInternalServerError)
 		return
 	}
-	AddFlash(w, r, "You were logged out")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -384,7 +384,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		registerTpl.ExecuteTemplate(w, "layout", data)
 		return
 	}
-	AddFlash(w, r, "You were successfully registered and can login now")
+
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "You were successfully registered and can login now")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
