@@ -206,7 +206,6 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 	if err := session.Save(r, w); err != nil {
 		return nil // or we could handle error properly
 	}
-	store.Save(r, w, session)
 	// Extract the messages
 	log.Debug().Msgf("Raw flashes: %v", raw)
 	var flashes []string
@@ -226,7 +225,6 @@ func AddFlash(w http.ResponseWriter, r *http.Request, session *sessions.Session,
 		http.Error(w, "Could not save session", http.StatusInternalServerError)
 		return
 	}
-	store.Save(r, w, session)
 }
 
 func loadUserFromDB(uid int) (User, bool) {

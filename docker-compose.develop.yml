@@ -14,7 +14,7 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
 
@@ -33,7 +33,7 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
   nginx:

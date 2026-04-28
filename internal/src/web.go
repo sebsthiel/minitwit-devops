@@ -180,7 +180,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	delete(session.Values, "user_id")
 	AddFlash(w, r, session, "You were logged out")
 	err = session.Save(r, w)
-	store.Save(r, w, session)
 	if err != nil {
 		log.Err(err).Msg("Could not save session")
 		http.Error(w, "could not save session", http.StatusInternalServerError)
