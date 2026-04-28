@@ -19,10 +19,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+
+	"github.com/antonlindstrom/pgstore"
+
+	"encoding/gob"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -67,27 +70,49 @@ type Latest struct {
 
 // configurations
 const PORT = "5001"
-const DATABASE_DEFAULT = "/tmp/minitwit.db"
 const PER_PAGE = 30
 
 var database *gorm.DB
 
-var (
-	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-	key   = []byte("super-secret-key")
-	store = sessions.NewCookieStore(key)
-)
+var store *pgstore.PGStore
+
+var key = []byte("super-secret-key")
 
 type contextKey string
 
 const userContextKey = contextKey("user")
 
+func init() {
+	gob.Register(map[interface{}]interface{}{})
+	gob.Register(int(0))
+	gob.Register(int64(0))
+	gob.Register("")
+}
+
 func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {
 		dialector = postgres.Open(p)
+		dsn := p
+		if !strings.Contains(p, "sslmode=") {
+			dsn += "?sslmode=disable"
+		}
+		var newStore, err = pgstore.NewPGStore(dsn, key)
+		if err != nil {
+			log.Err(err).Msg("Could not create store for sessions")
+		}
+		store = newStore
+		store.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   86400 * 30,
+			HttpOnly: true,
+
+			// IMPORTANT for pytest/local:
+			Secure:   false,
+			SameSite: http.SameSiteLaxMode, // or DefaultMode
+		}
 	} else {
-		dialector = sqlite.Open(DATABASE_DEFAULT)
+		log.Fatal().Msg("NO DATABASE PATH GIVEN. Hence could not start application")
 	}
 
 	// Costumize logger //TODO USE zerolog?
@@ -170,7 +195,8 @@ func AddMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AddFlash(w, r, "Your message was recorded")
+	session, _ := store.Get(r, "session")
+	AddFlash(w, r, session, "Your message was recorded")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -182,22 +208,25 @@ func GetFlashes(w http.ResponseWriter, r *http.Request) []string {
 	if err := session.Save(r, w); err != nil {
 		return nil // or we could handle error properly
 	}
-
 	// Extract the messages
+	log.Debug().Msgf("Raw flashes: %v", raw)
 	var flashes []string
 	for _, f := range raw {
 		if msg, ok := f.(string); ok {
 			flashes = append(flashes, msg)
 		}
 	}
-
 	return flashes
 }
 
-func AddFlash(w http.ResponseWriter, r *http.Request, msg string) {
-	session, _ := store.Get(r, "session")
+func AddFlash(w http.ResponseWriter, r *http.Request, session *sessions.Session, msg string) {
 	session.AddFlash(msg)
-	session.Save(r, w)
+	err := session.Save(r, w)
+	if err != nil {
+		log.Err(err).Msg("Could not save session")
+		http.Error(w, "Could not save session", http.StatusInternalServerError)
+		return
+	}
 }
 
 func loadUserFromDB(uid int) (User, bool) {
@@ -230,9 +259,19 @@ func GetUserByUsername(username string) *User {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// log.Info().
+		// 	Str("method", r.Method).
+		// 	Str("path", r.URL.Path).
+		// 	Str("remote", r.RemoteAddr).
+		// 	Msg("AuthMiddleware called")
 
-		session, _ := store.Get(r, "session")
-
+		session, err := store.Get(r, "session")
+		if err != nil {
+			log.Err(err).Msg("Could not get session")
+			http.Error(w, "Session error", http.StatusInternalServerError)
+			return
+		}
+		// log.Info().Msgf("session values: %v - isNew: %v - ID: %v", session.Values, session.IsNew, session.ID)
 		if uid, ok := session.Values["user_id"].(int); ok {
 			user, ok := loadUserFromDB(uid)
 			if ok {
@@ -311,18 +350,6 @@ func ValidateLogin(username string, password string) (*User, string) {
 func TryGetUserFromRequest(r *http.Request) (User, bool) {
 	user, ok := r.Context().Value(userContextKey).(User)
 	return user, ok
-}
-
-func init() {
-	store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 30,
-		HttpOnly: true,
-
-		// IMPORTANT for pytest/local:
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode, // or DefaultMode
-	}
 }
 
 func loggingConfig() {

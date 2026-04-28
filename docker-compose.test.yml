@@ -21,8 +21,6 @@ services:
       dockerfile: Dockerfile.api
     image: minitwitapiimage:local
     container_name: minitwit-api
-    ports:
-      - "5001:5001"
     environment:
       - DATABASE_PATH=${DATABASE_PATH_DOCKER}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
@@ -45,8 +43,6 @@ services:
       dockerfile: Dockerfile.web
     image: minitwitwebimage:local
     container_name: minitwit-web
-    ports:
-      - "5000:5000"
     environment:
       - DATABASE_PATH=${DATABASE_PATH_DOCKER}
       - SIMULATOR_AUTH=${SIMULATOR_AUTH}
@@ -61,6 +57,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - target: 80
+        published: 80
+    volumes:
+      - ./nginx.develop.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - minitwit-network
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
 
 
 networks:  # Network shared between services so we can refer to them by name

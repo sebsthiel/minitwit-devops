@@ -10,12 +10,16 @@ import (
 
 type statusRecorder struct {
 	http.ResponseWriter
-	statusCode int
+	statusCode    int
+	headerWritten bool
 }
 
 func (r *statusRecorder) WriteHeader(code int) {
-	r.statusCode = code
-	r.ResponseWriter.WriteHeader(code)
+	if !r.headerWritten {
+		r.statusCode = code
+		r.headerWritten = true
+		r.ResponseWriter.WriteHeader(code)
+	}
 }
 
 func MetricsMiddleware(next http.Handler) http.Handler {
