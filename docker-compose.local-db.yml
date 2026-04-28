@@ -1,0 +1,18 @@
+services:
+  db: # This config should only be used for testing, hence no need to store in .env
+    image: postgres:15
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    networks:
+    - minitwit-network
+    ports:
+      - "5432:5432"
+      
+networks:  # Network shared between services so we can refer to them by name
+  minitwit-network:
+    external: true
+    name: minitwit-network
+
