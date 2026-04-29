@@ -26,16 +26,16 @@ jobs:
       - name: Build
         run: go build ./...
       
+      - name: Build Docker image
+        run: docker build -t minitwit-api:test -f Dockerfile.api .
+
       - name: Scan Docker image with Trivy
-        run: |
-          docker build -t minitwit-api:test -f Dockerfile.api .
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-            -v ${{ github.workspace }}:/workspace \
-            aquasec/trivy image \
-            --exit-code 1 \
-            --severity HIGH,CRITICAL \
-            --ignorefile /workspace/.trivyignore \
-            minitwit-api:test
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: minitwit-api:test
+          severity: HIGH,CRITICAL
+          ignorefile: .trivyignore
+          exit-code: '1'
 
   tests:
     needs: quality-gate
