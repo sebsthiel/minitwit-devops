@@ -68,6 +68,33 @@ type Latest struct {
 	Value int
 }
 
+const (
+	AppWeb = "web"
+	AppApi = "api"
+)
+
+const (
+	EndpointRegister       = "register"
+	EndpointLatest         = "latest"
+	EndpointAuthentication = "authentication"
+	EndpointMsg            = "msg"
+	EndpointMsgUsername    = "msg_username"
+	EndpointFllwsUsername  = "fllws_username"
+)
+
+const (
+	KeyApp              = "app"
+	KeyEndpoint         = "endpoint"
+	KeyMethod           = "method"
+	KeyStatusCode       = "statuscode"
+	KeyUsername         = "username"
+	KeyLatestValue      = "latest_value"
+	KeyAuthToken        = "authtoken"
+	KeyLimit            = "limit"
+	KeyFollowUsername   = "followusername"
+	KeyUnfollowUsername = "unfollowusername"
+)
+
 // configurations
 const PORT = "5001"
 const PER_PAGE = 30
@@ -93,24 +120,6 @@ func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {
 		dialector = postgres.Open(p)
-		dsn := p
-		if !strings.Contains(p, "sslmode=") {
-			dsn += "?sslmode=disable"
-		}
-		var newStore, err = pgstore.NewPGStore(dsn, key)
-		if err != nil {
-			log.Err(err).Msg("Could not create store for sessions")
-		}
-		store = newStore
-		store.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   86400 * 30,
-			HttpOnly: true,
-
-			// IMPORTANT for pytest/local:
-			Secure:   false,
-			SameSite: http.SameSiteLaxMode, // or DefaultMode
-		}
 	} else {
 		log.Fatal().Msg("NO DATABASE PATH GIVEN. Hence could not start application")
 	}
@@ -140,6 +149,24 @@ func Connect_db() *gorm.DB {
 
 func Migrate_database(db *gorm.DB) {
 	db.AutoMigrate(&User{}, &Message{}, &Follower{}, &Latest{})
+}
+
+func InitSessionStore(dsn string) error {
+	newStore, err := pgstore.NewPGStore(dsn, key)
+	if err != nil {
+		return err
+	}
+	store = newStore
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 30,
+		HttpOnly: true,
+
+		// IMPORTANT for pytest/local:
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode, // or DefaultMode
+	}
+	return nil
 }
 
 func GetLatestValue() int {
@@ -259,19 +286,13 @@ func GetUserByUsername(username string) *User {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// log.Info().
-		// 	Str("method", r.Method).
-		// 	Str("path", r.URL.Path).
-		// 	Str("remote", r.RemoteAddr).
-		// 	Msg("AuthMiddleware called")
-
 		session, err := store.Get(r, "session")
 		if err != nil {
 			log.Err(err).Msg("Could not get session")
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
-		// log.Info().Msgf("session values: %v - isNew: %v - ID: %v", session.Values, session.IsNew, session.ID)
+
 		if uid, ok := session.Values["user_id"].(int); ok {
 			user, ok := loadUserFromDB(uid)
 			if ok {
@@ -354,6 +375,8 @@ func TryGetUserFromRequest(r *http.Request) (User, bool) {
 
 func loggingConfig() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	log.Warn().Msgf("LOG_LEVEL is %s", os.Getenv("LOG_LEVEL"))
 
 	// If environment variable is not set then it will disable logging
 	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {

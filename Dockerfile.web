@@ -22,7 +22,9 @@ COPY schema.sql ./schema.sql
 COPY ./cmd/web/ ./cmd/web/
 
 # Build Web
-RUN CGO_ENABLED=1 GOOS=linux go build -o web ./cmd/web
+# Make container run as not root user
+RUN useradd -r -u 10001 -m appuser && CGO_ENABLED=1 GOOS=linux go build -o web ./cmd/web
+USER appuser
 
 EXPOSE 5000
 
