@@ -55,7 +55,6 @@ services:
     networks:
       - minitwit-network
     deploy:
-      mode: global
       restart_policy:
         condition: on-failure
 
