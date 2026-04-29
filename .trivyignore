@@ -1,0 +1,2 @@
+# Ignore test private key from Go dependency
+AsymmetricPrivateKey

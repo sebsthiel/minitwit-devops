@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v6.0.2
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: '1.25'
 
@@ -30,7 +30,12 @@ jobs:
         run: |
           docker build -t minitwit-api:test -f Dockerfile.api .
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-            aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL minitwit-api:test
+            -v ${{ github.workspace }}:/workspace \
+            aquasec/trivy image \
+            --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            --ignorefile /workspace/.trivyignore \
+            minitwit-api:test
 
   tests:
     needs: quality-gate
