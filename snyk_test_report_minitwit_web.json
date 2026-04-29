@@ -1,0 +1,1691 @@
+
+Testing minitwit-web:dev...
+
+✗ Low severity vulnerability found in zlib/zlib1g
+  Description: Improper Validation of Specified Quantity in Input
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-ZLIB-15307854
+  Introduced through: zlib/zlib1g@1:1.3.dfsg+really1.3.1-1+b1
+  From: zlib/zlib1g@1:1.3.dfsg+really1.3.1-1+b1
+
+✗ Low severity vulnerability found in xz-utils/liblzma5
+  Description: Heap-based Buffer Overflow
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-XZUTILS-15897593
+  Introduced through: apt@3.0.3, mercurial@7.0.1-2
+  From: apt@3.0.3 > apt/libapt-pkg7.0@3.0.3 > xz-utils/liblzma5@5.8.1-1
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2 > xz-utils/liblzma5@5.8.1-1
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > dpkg@1.22.22 > xz-utils/liblzma5@5.8.1-1
+
+✗ Low severity vulnerability found in wget
+  Description: Open Redirect
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-WGET-5698765
+  Introduced through: wget@1.25.0-2
+  From: wget@1.25.0-2
+
+✗ Low severity vulnerability found in util-linux/libuuid1
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-UTILLINUX-14200590
+  Introduced through: util-linux@2.41-5, wget@1.25.0-2, subversion@1.14.5-3, mercurial@7.0.1-2, util-linux/libblkid1@2.41-5, util-linux/libmount1@2.41-5, util-linux/mount@2.41-5, util-linux/liblastlog2-2@2.41-5, util-linux/libsmartcols1@2.41-5, util-linux/bsdutils@1:2.41-5, util-linux/login@1:4.16.0-2+really2.41-5
+  From: util-linux@2.41-5 > util-linux/libuuid1@2.41-5
+  From: wget@1.25.0-2 > util-linux/libuuid1@2.41-5
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr/libapr1t64@1.7.5-1 > util-linux/libuuid1@2.41-5
+  and 17 more...
+
+✗ Low severity vulnerability found in util-linux/libuuid1
+  Description: Authentication Bypass
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-UTILLINUX-15358019
+  Introduced through: util-linux@2.41-5, wget@1.25.0-2, subversion@1.14.5-3, mercurial@7.0.1-2, util-linux/libblkid1@2.41-5, util-linux/libmount1@2.41-5, util-linux/mount@2.41-5, util-linux/liblastlog2-2@2.41-5, util-linux/libsmartcols1@2.41-5, util-linux/bsdutils@1:2.41-5, util-linux/login@1:4.16.0-2+really2.41-5
+  From: util-linux@2.41-5 > util-linux/libuuid1@2.41-5
+  From: wget@1.25.0-2 > util-linux/libuuid1@2.41-5
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr/libapr1t64@1.7.5-1 > util-linux/libuuid1@2.41-5
+  and 17 more...
+
+✗ Low severity vulnerability found in util-linux/libuuid1
+  Description: Time-of-check Time-of-use (TOCTOU)
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-UTILLINUX-15922814
+  Introduced through: util-linux@2.41-5, wget@1.25.0-2, subversion@1.14.5-3, mercurial@7.0.1-2, util-linux/libblkid1@2.41-5, util-linux/libmount1@2.41-5, util-linux/mount@2.41-5, util-linux/liblastlog2-2@2.41-5, util-linux/libsmartcols1@2.41-5, util-linux/bsdutils@1:2.41-5, util-linux/login@1:4.16.0-2+really2.41-5
+  From: util-linux@2.41-5 > util-linux/libuuid1@2.41-5
+  From: wget@1.25.0-2 > util-linux/libuuid1@2.41-5
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr/libapr1t64@1.7.5-1 > util-linux/libuuid1@2.41-5
+  and 17 more...
+
+✗ Low severity vulnerability found in util-linux/libuuid1
+  Description: Information Exposure
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-UTILLINUX-5698535
+  Introduced through: util-linux@2.41-5, wget@1.25.0-2, subversion@1.14.5-3, mercurial@7.0.1-2, util-linux/libblkid1@2.41-5, util-linux/libmount1@2.41-5, util-linux/mount@2.41-5, util-linux/liblastlog2-2@2.41-5, util-linux/libsmartcols1@2.41-5, util-linux/bsdutils@1:2.41-5, util-linux/login@1:4.16.0-2+really2.41-5
+  From: util-linux@2.41-5 > util-linux/libuuid1@2.41-5
+  From: wget@1.25.0-2 > util-linux/libuuid1@2.41-5
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr/libapr1t64@1.7.5-1 > util-linux/libuuid1@2.41-5
+  and 17 more...
+
+✗ Low severity vulnerability found in tar
+  Description: Unrestricted Upload of File with Dangerous Type
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-TAR-15962848
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > dpkg@1.22.22 > tar@1.35+dfsg-3.1
+
+✗ Low severity vulnerability found in tar
+  Description: CVE-2005-2541
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-TAR-5696683
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > dpkg@1.22.22 > tar@1.35+dfsg-3.1
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Improper Privilege Management
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-15792489
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Incorrect Resource Transfer Between Spheres
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-16009485
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Use of Less Trusted Source
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-16009492
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Incorrect Resource Transfer Between Spheres
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-16009572
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Link Following
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-5696564
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Improper Validation of Integrity Check Value
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-5733389
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Improper Validation of Integrity Check Value
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-5733399
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in systemd/libsystemd0
+  Description: Improper Validation of Integrity Check Value
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-5733401
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Low severity vulnerability found in sqlite3/libsqlite3-0
+  Description: CVE-2025-70873
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SQLITE3-15682562
+  Introduced through: rust-sequoia-sq/sq@1.3.1-2+b2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, util-linux/liblastlog2-2@2.41-5, gnupg2/gnupg@2.4.7-21+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: rust-sequoia-sq/sq@1.3.1-2+b2 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  From: util-linux/liblastlog2-2@2.41-5 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  and 4 more...
+
+✗ Low severity vulnerability found in sqlite3/libsqlite3-0
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SQLITE3-5696112
+  Introduced through: rust-sequoia-sq/sq@1.3.1-2+b2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, util-linux/liblastlog2-2@2.41-5, gnupg2/gnupg@2.4.7-21+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: rust-sequoia-sq/sq@1.3.1-2+b2 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  From: util-linux/liblastlog2-2@2.41-5 > sqlite3/libsqlite3-0@3.46.1-7+deb13u1
+  and 4 more...
+
+✗ Low severity vulnerability found in shadow/login.defs
+  Description: Access Restriction Bypass
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SHADOW-5695385
+  Introduced through: util-linux/login@1:4.16.0-2+really2.41-5, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: util-linux/login@1:4.16.0-2+really2.41-5 > shadow/login.defs@1:4.17.4-2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > adduser@3.152 > shadow/passwd@1:4.17.4-2 > shadow/login.defs@1:4.17.4-2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2 > shadow/passwd@1:4.17.4-2
+  and 1 more...
+
+✗ Low severity vulnerability found in shadow/login.defs
+  Description: CVE-2024-56433
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SHADOW-8551157
+  Introduced through: util-linux/login@1:4.16.0-2+really2.41-5, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: util-linux/login@1:4.16.0-2+really2.41-5 > shadow/login.defs@1:4.17.4-2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > adduser@3.152 > shadow/passwd@1:4.17.4-2 > shadow/login.defs@1:4.17.4-2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2 > shadow/passwd@1:4.17.4-2
+  and 1 more...
+
+✗ Low severity vulnerability found in sed
+  Description: Time-of-check Time-of-use (TOCTOU)
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SED-16114940
+  Introduced through: sed@4.9-2
+  From: sed@4.9-2
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-6069
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-10378973
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-8194
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-11191054
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-8291
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-13505368
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-6075
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-13797002
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-13837
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-14157082
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-14157087
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-12084
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-14187316
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-0865
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15051938
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-15366
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063949
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-11468
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063951
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-0672
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063952
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-15367
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063985
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-15282
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063994
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-1299
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15074152
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-2297
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15435604
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-4224
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15685125
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-3644
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15685147
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-3479
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15750884
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-4519
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15757699
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-13462
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15762935
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-3446
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-16049533
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-1502
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-16049541
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-6100
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-16066590
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2026-6019
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-16162308
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+✗ Low severity vulnerability found in perl/perl-modules-5.40
+  Description: Link Following
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PERL-5692251
+  Introduced through: git@1:2.47.3-0+deb13u1, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > perl@5.40.1-6 > perl/perl-modules-5.40@5.40.1-6
+  From: git@1:2.47.3-0+deb13u1 > perl@5.40.1-6 > perl/libperl5.40@5.40.1-6 > perl/perl-modules-5.40@5.40.1-6
+  From: git@1:2.47.3-0+deb13u1 > perl@5.40.1-6 > perl/libperl5.40@5.40.1-6
+  and 4 more...
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Always-Incorrect Control Flow Implementation
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-15922672
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Improper Preservation of Permissions
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-15922673
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Unprotected Alternate Channel
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-15922677
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Incorrect Behavior Order
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-15922683
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Always-Incorrect Control Flow Implementation
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-15922685
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Access Restriction Bypass
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691255
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Information Exposure
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691288
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: OS Command Injection
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691525
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Inappropriate Encoding for Output Context
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691533
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: CVE-2016-20012
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691534
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Information Exposure
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691559
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Improper Authentication
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691597
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openssh/openssh-client
+  Description: Information Exposure
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENSSH-5691771
+  Introduced through: openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2
+
+✗ Low severity vulnerability found in openldap/libldap2
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENLDAP-14907866
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > openldap/libldap2@2.6.10+dfsg-1
+
+✗ Low severity vulnerability found in openldap/libldap2
+  Description: Cryptographic Issues
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENLDAP-5691401
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > openldap/libldap2@2.6.10+dfsg-1
+
+✗ Low severity vulnerability found in openldap/libldap2
+  Description: Improper Initialization
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENLDAP-5691428
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > openldap/libldap2@2.6.10+dfsg-1
+
+✗ Low severity vulnerability found in openldap/libldap2
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENLDAP-5691605
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > openldap/libldap2@2.6.10+dfsg-1
+
+✗ Low severity vulnerability found in openldap/libldap2
+  Description: Improper Certificate Validation
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-OPENLDAP-5691628
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > openldap/libldap2@2.6.10+dfsg-1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > openldap/libldap2@2.6.10+dfsg-1
+
+✗ Low severity vulnerability found in nghttp2/libnghttp2-14
+  Description: Reachable Assertion
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-NGHTTP2-15709760
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > nghttp2/libnghttp2-14@1.64.0-1.1
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > nghttp2/libnghttp2-14@1.64.0-1.1
+
+✗ Low severity vulnerability found in ncurses/libtinfo6
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-NCURSES-10378958
+  Introduced through: bash/bash@5.2.37-2+b8, ncurses/ncurses-bin@6.5+20250216-2, util-linux@2.41-5, openssh/openssh-client@1:10.0p1-7+deb13u2, gnupg2/gnupg@2.4.7-21+deb13u1, mercurial@7.0.1-2, ncurses/ncurses-base@6.5+20250216-2
+  From: bash/bash@5.2.37-2+b8 > ncurses/libtinfo6@6.5+20250216-2
+  From: ncurses/ncurses-bin@6.5+20250216-2 > ncurses/libtinfo6@6.5+20250216-2
+  From: util-linux@2.41-5 > ncurses/libtinfo6@6.5+20250216-2
+  and 11 more...
+
+✗ Low severity vulnerability found in ncurses/libtinfo6
+  Description: Stack-based Buffer Overflow
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-NCURSES-15762838
+  Introduced through: bash/bash@5.2.37-2+b8, ncurses/ncurses-bin@6.5+20250216-2, util-linux@2.41-5, openssh/openssh-client@1:10.0p1-7+deb13u2, gnupg2/gnupg@2.4.7-21+deb13u1, mercurial@7.0.1-2, ncurses/ncurses-base@6.5+20250216-2
+  From: bash/bash@5.2.37-2+b8 > ncurses/libtinfo6@6.5+20250216-2
+  From: ncurses/ncurses-bin@6.5+20250216-2 > ncurses/libtinfo6@6.5+20250216-2
+  From: util-linux@2.41-5 > ncurses/libtinfo6@6.5+20250216-2
+  and 11 more...
+
+✗ Low severity vulnerability found in libtasn1-6
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-LIBTASN16-14906052
+  Introduced through: curl@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > rtmpdump/librtmp1@2.4+20151223.gitfa8646d.1-2+b5 > gnutls28/libgnutls30t64@3.8.9-3+deb13u2 > libtasn1-6@4.20.0-2
+
+✗ Low severity vulnerability found in libgcrypt20
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-LIBGCRYPT20-16135001
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  and 2 more...
+
+✗ Low severity vulnerability found in libgcrypt20
+  Description: Use of a Broken or Risky Cryptographic Algorithm
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-LIBGCRYPT20-5684059
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  and 2 more...
+
+✗ Low severity vulnerability found in libgcrypt20
+  Description: Covert Timing Channel
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-LIBGCRYPT20-6405982
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > libgcrypt20@1.11.0-7
+  and 2 more...
+
+✗ Low severity vulnerability found in libcap2/libcap2
+  Description: Time-of-check Time-of-use (TOCTOU)
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-LIBCAP2-15960217
+  Introduced through: coreutils@9.7-3, openssh/openssh-client@1:10.0p1-7+deb13u2, gnupg2/gnupg@2.4.7-21+deb13u1
+  From: coreutils@9.7-3 > libcap2/libcap2@1:2.75-10+b8
+  From: openssh/openssh-client@1:10.0p1-7+deb13u2 > libfido2/libfido2-1@1.15.0-1+b1 > systemd/libudev1@257.9-1~deb13u1 > libcap2/libcap2@1:2.75-10+b8
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > adduser@3.152 > shadow/passwd@1:4.17.4-2 > pam/libpam-modules@1.7.0-5 > systemd/libsystemd0@257.9-1~deb13u1 > libcap2/libcap2@1:2.75-10+b8
+
+✗ Low severity vulnerability found in krb5/libk5crypto3
+  Description: Integer Overflow or Wraparound
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-KRB5-5683763
+  Introduced through: curl@8.14.1-2+deb13u2, openssh/openssh-client@1:10.0p1-7+deb13u2, git@1:2.47.3-0+deb13u1, subversion@1.14.5-3
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5-3@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5support0@1.21.3-5
+  and 7 more...
+
+✗ Low severity vulnerability found in krb5/libk5crypto3
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-KRB5-6277416
+  Introduced through: curl@8.14.1-2+deb13u2, openssh/openssh-client@1:10.0p1-7+deb13u2, git@1:2.47.3-0+deb13u1, subversion@1.14.5-3
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5-3@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5support0@1.21.3-5
+  and 7 more...
+
+✗ Low severity vulnerability found in krb5/libk5crypto3
+  Description: CVE-2024-26461
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-KRB5-6277425
+  Introduced through: curl@8.14.1-2+deb13u2, openssh/openssh-client@1:10.0p1-7+deb13u2, git@1:2.47.3-0+deb13u1, subversion@1.14.5-3
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5-3@1.21.3-5 > krb5/libk5crypto3@1.21.3-5
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2 > krb5/libgssapi-krb5-2@1.21.3-5 > krb5/libkrb5support0@1.21.3-5
+  and 7 more...
+
+✗ Low severity vulnerability found in jansson/libjansson4
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-JANSSON-5683291
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > jansson/libjansson4@2.14-2+b3
+
+✗ Low severity vulnerability found in gnutls28/libgnutls30t64
+  Description: Improper Input Validation
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GNUTLS28-5681083
+  Introduced through: wget@1.25.0-2, git@1:2.47.3-0+deb13u1, gnupg2/gnupg@2.4.7-21+deb13u1, curl@8.14.1-2+deb13u2
+  From: wget@1.25.0-2 > gnutls28/libgnutls30t64@3.8.9-3+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2 > gnutls28/libgnutls30t64@3.8.9-3+deb13u2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > gnutls28/libgnutls30t64@3.8.9-3+deb13u2
+  and 2 more...
+
+✗ Low severity vulnerability found in gnupg2/gpgconf
+  Description: Improper Verification of Cryptographic Signature
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GNUPG2-14723300
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  and 7 more...
+
+✗ Low severity vulnerability found in gnupg2/gpgconf
+  Description: Stack-based Buffer Overflow
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GNUPG2-15120849
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  and 7 more...
+
+✗ Low severity vulnerability found in gnupg2/gpgconf
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GNUPG2-5681336
+  Introduced through: gnupg2/gnupg@2.4.7-21+deb13u1
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/dirmngr@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  From: gnupg2/gnupg@2.4.7-21+deb13u1 > gnupg2/gpg-agent@2.4.7-21+deb13u1+b2 > gnupg2/gpgconf@2.4.7-21+deb13u1+b2
+  and 7 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: CVE-2026-4437
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-15754001
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: CVE-2026-4438
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-15754020
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: CVE-2026-4046
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-15878857
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: CVE-2026-5928
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-16115568
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-16115576
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Uncontrolled Recursion
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5680884
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Resource Management Errors
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681058
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Use of Insufficiently Random Values
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681145
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: CVE-2019-1010023
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681177
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Uncontrolled Recursion
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681215
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681241
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in glibc/libc-dev-bin
+  Description: Information Exposure
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GLIBC-5681256
+  Introduced through: gcc-defaults/g++@4:14.2.0-1, glibc/libc6-dev@2.41-12+deb13u2, sqlite3/libsqlite3-dev@3.46.1-7+deb13u1, glibc/libc-bin@2.41-12+deb13u2, glibc/libc6@2.41-12+deb13u2
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-14/g++-14@14.2.0-19 > gcc-14/g++-14-x86-64-linux-gnu@14.2.0-19 > gcc-14/libstdc++-14-dev@14.2.0-19 > glibc/libc6-dev@2.41-12+deb13u2 > glibc/libc-dev-bin@2.41-12+deb13u2
+  From: glibc/libc6-dev@2.41-12+deb13u2
+  From: sqlite3/libsqlite3-dev@3.46.1-7+deb13u1 > glibc/libc6-dev@2.41-12+deb13u2
+  and 3 more...
+
+✗ Low severity vulnerability found in git/git-man
+  Description: Improper Input Validation
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GIT-5680997
+  Introduced through: git@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1 > git/git-man@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1
+
+✗ Low severity vulnerability found in git/git-man
+  Description: Exposure of Resource to Wrong Sphere
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GIT-5681048
+  Introduced through: git@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1 > git/git-man@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1
+
+✗ Low severity vulnerability found in git/git-man
+  Description: Improper Encoding or Escaping of Output
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-GIT-8642824
+  Introduced through: git@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1 > git/git-man@1:2.47.3-0+deb13u1
+  From: git@1:2.47.3-0+deb13u1
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: Allocation of Resources Without Limits or Throttling
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-12673886
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: Algorithmic Complexity
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-14149137
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: NULL Pointer Dereference
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-15068000
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: Integer Overflow or Wraparound
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-15158113
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: NULL Pointer Dereference
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-15683030
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: Loop with Unreachable Exit Condition ('Infinite Loop')
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-15683046
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: NULL Pointer Dereference
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-15683048
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in expat/libexpat1
+  Description: Insufficient Entropy
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-EXPAT-16093876
+  Introduced through: git@1:2.47.3-0+deb13u1, subversion@1.14.5-3, mercurial@7.0.1-2
+  From: git@1:2.47.3-0+deb13u1 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > expat/libexpat1@2.7.1-2
+  From: subversion@1.14.5-3 > subversion/libsvn1@1.14.5-3 > apr-util/libaprutil1t64@1.6.3-3+b1 > expat/libexpat1@2.7.1-2
+  and 1 more...
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-10966
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-13842046
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-15079
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894665
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: Open Redirect
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894671
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-14819
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894678
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-14017
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894680
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-15224
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894685
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2025-13034
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-14894686
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2026-3805
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-15459681
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2026-3784
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-15459684
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2026-3783
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-15459692
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in curl/libcurl4t64
+  Description: CVE-2026-1965
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-CURL-15459698
+  Introduced through: curl@8.14.1-2+deb13u2, git@1:2.47.3-0+deb13u1
+  From: curl@8.14.1-2+deb13u2 > curl/libcurl4t64@8.14.1-2+deb13u2
+  From: curl@8.14.1-2+deb13u2
+  From: git@1:2.47.3-0+deb13u1 > curl/libcurl3t64-gnutls@8.14.1-2+deb13u2
+
+✗ Low severity vulnerability found in coreutils
+  Description: Stack-based Buffer Overflow
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-COREUTILS-10259260
+  Introduced through: coreutils@9.7-3
+  From: coreutils@9.7-3
+
+✗ Low severity vulnerability found in coreutils
+  Description: Race Condition
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-COREUTILS-5673914
+  Introduced through: coreutils@9.7-3
+  From: coreutils@9.7-3
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-10259215
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-10259219
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-10740891
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-10740892
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-11023297
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13139198
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13139205
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13139206
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13504359
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13504362
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13504372
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13530044
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13530046
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13600815
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Unchecked Return Value
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-13600821
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66866
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723748
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66861
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723749
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66862
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723752
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66863
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723756
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66865
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723760
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-66864
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-14723770
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15369588
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15369592
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69649
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438186
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69644
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438191
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69646
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438204
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69652
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438205
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69651
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438215
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69645
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438216
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Double Free
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15438221
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69648
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15444861
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: CVE-2025-69647
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15444864
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-15788469
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: NULL Pointer Dereference
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-16134291
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Resource Exhaustion
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-16134296
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Heap-based Buffer Overflow
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-16134307
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Allocation of Resources Without Limits or Throttling
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-5675676
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Uncontrolled Recursion
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-5675732
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Read
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-5675770
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-5675864
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-bounds Write
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-5803139
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707451
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707454
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707456
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707463
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707465
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707467
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8707469
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8710243
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8710247
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8710249
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8710254
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Out-of-Bounds
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-8719775
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in binutils/binutils-common
+  Description: Memory Leak
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-BINUTILS-9666595
+  Introduced through: gcc-defaults/g++@4:14.2.0-1
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > binutils@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/binutils-common@2.44-3
+  From: gcc-defaults/g++@4:14.2.0-1 > gcc-defaults/gcc@4:14.2.0-1 > gcc-14@14.2.0-19 > gcc-14/gcc-14-x86-64-linux-gnu@14.2.0-19 > binutils/binutils-x86-64-linux-gnu@2.44-3 > binutils/libbinutils@2.44-3 > binutils/binutils-common@2.44-3
+  and 12 more...
+
+✗ Low severity vulnerability found in apt/libapt-pkg7.0
+  Description: Improper Verification of Cryptographic Signature
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-APT-5675173
+  Introduced through: apt/libapt-pkg7.0@3.0.3, apt@3.0.3
+  From: apt/libapt-pkg7.0@3.0.3
+  From: apt@3.0.3 > apt/libapt-pkg7.0@3.0.3
+  From: apt@3.0.3
+
+✗ Medium severity vulnerability found in systemd/libsystemd0
+  Description: Improper Access Control
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-SYSTEMD-15656985
+  Introduced through: apt@3.0.3, coreutils@9.7-3, util-linux@2.41-5, util-linux/bsdutils@1:2.41-5, mercurial@7.0.1-2, gnupg2/gnupg@2.4.7-21+deb13u1, openssh/openssh-client@1:10.0p1-7+deb13u2
+  From: apt@3.0.3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: coreutils@9.7-3 > systemd/libsystemd0@257.9-1~deb13u1
+  From: util-linux@2.41-5 > systemd/libsystemd0@257.9-1~deb13u1
+  and 9 more...
+
+✗ Medium severity vulnerability found in python3.13/libpython3.13-stdlib
+  Description: CVE-2025-12781
+  Info: https://security.snyk.io/vuln/SNYK-DEBIAN13-PYTHON313-15063989
+  Introduced through: mercurial@7.0.1-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/libpython3-stdlib@3.13.5-1 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3.13@3.13.5-2 > python3.13/libpython3.13-stdlib@3.13.5-2
+  From: mercurial@7.0.1-2 > python3-defaults/python3@3.13.5-1 > python3-defaults/python3-minimal@3.13.5-1 > python3.13/python3.13-minimal@3.13.5-2
+  and 4 more...
+
+
+
+Organization:      jacob-sonne
+Package manager:   deb
+Project name:      docker-image|minitwit-web
+Docker image:      minitwit-web:dev
+Platform:          linux/amd64
+Target OS:         Debian GNU/Linux 13 (trixie)
+Licenses:          enabled
+
+Tested 208 dependencies for known issues, found 174 issues.
+
+Snyk wasn’t able to auto detect the base image, use `--file` option to get base image remediation advice.
+Example: $ snyk container test minitwit-web:dev --file=path/to/Dockerfile
+
+To remove this message in the future, please run `snyk config set disableSuggestions=true`
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   npm
+Target file:       /usr/local/go/src/cmd/vendor/golang.org/x/telemetry/package.json
+Project name:      package.json
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 42 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   pip
+Target file:       /usr/lib/python3/dist-packages/mercurial/helptext/internals/requirements.txt
+Project name:      /usr/lib/python3/dist-packages/mercurial/helptext/internals/requirements.txt
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+✗ Low severity vulnerability found in github.com/jackc/pgx/v5/internal/sanitize
+  Description: SQL Injection
+  Info: https://security.snyk.io/vuln/SNYK-GOLANG-GITHUBCOMJACKCPGXV5INTERNALSANITIZE-16134558
+  Introduced through: github.com/jackc/pgx/v5/internal/sanitize@v5.6.0
+  From: github.com/jackc/pgx/v5/internal/sanitize@v5.6.0
+  Fixed in: 5.9.2
+
+✗ Low severity vulnerability found in github.com/jackc/pgx/v5
+  Description: SQL Injection
+  Info: https://security.snyk.io/vuln/SNYK-GOLANG-GITHUBCOMJACKCPGXV5-16134557
+  Introduced through: github.com/jackc/pgx/v5@v5.6.0
+  From: github.com/jackc/pgx/v5@v5.6.0
+  Fixed in: 5.9.2
+
+✗ High severity vulnerability found in github.com/jackc/pgx/v5/pgproto3
+  Description: Incorrect Comparison
+  Info: https://security.snyk.io/vuln/SNYK-GOLANG-GITHUBCOMJACKCPGXV5PGPROTO3-15923570
+  Introduced through: github.com/jackc/pgx/v5/pgproto3@v5.6.0
+  From: github.com/jackc/pgx/v5/pgproto3@v5.6.0
+  Fixed in: 5.9.0
+
+✗ High severity vulnerability found in github.com/jackc/pgx/v5/pgproto3
+  Description: Improper Validation of Array Index
+  Info: https://security.snyk.io/vuln/SNYK-GOLANG-GITHUBCOMJACKCPGXV5PGPROTO3-15923580
+  Introduced through: github.com/jackc/pgx/v5/pgproto3@v5.6.0
+  From: github.com/jackc/pgx/v5/pgproto3@v5.6.0
+  Fixed in: 5.9.0
+
+
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /app/web
+Project name:      devops/minitwit
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+Tested 96 dependencies for known issues, found 4 issues.
+
+Snyk wasn’t able to auto detect the base image, use `--file` option to get base image remediation advice.
+Example: $ snyk container test minitwit-web:dev --file=path/to/Dockerfile
+
+Snyk found some vulnerabilities in your image applications (Snyk searches for these vulnerabilities by default). See https://snyk.co/app-vulns for more information.
+
+To remove these messages in the future, please run `snyk config set disableSuggestions=true`
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/bin/go
+Project name:      go-distribution@cmd/go
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/bin/gofmt
+Project name:      go-distribution@cmd/gofmt
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/asm
+Project name:      go-distribution@cmd/asm
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/cgo
+Project name:      go-distribution@cmd/cgo
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/compile
+Project name:      go-distribution@cmd/compile
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/cover
+Project name:      go-distribution@cmd/cover
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/link
+Project name:      go-distribution@cmd/link
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/preprofile
+Project name:      go-distribution@cmd/preprofile
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+-------------------------------------------------------
+
+Testing minitwit-web:dev...
+
+Organization:      jacob-sonne
+Package manager:   gomodules
+Target file:       /usr/local/go/pkg/tool/linux_amd64/vet
+Project name:      go-distribution@cmd/vet
+Docker image:      minitwit-web:dev
+Licenses:          enabled
+
+✔ Tested 1 dependencies for known issues, no vulnerable paths found.
+
+
+Tested 13 projects, 2 contained vulnerable paths.
+
+
+
