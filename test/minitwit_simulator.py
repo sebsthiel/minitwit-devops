@@ -1,7 +1,7 @@
 """
 Call me for example like:
 
-$ python minitwit_simulator.py "http://localhost:5001"
+$ python minitwit_simulator.py "http://localhost/api"
 """
 
 import traceback
@@ -344,7 +344,7 @@ def main(host):
                 )
             )
 
-        sleep(delay / (1000 * 100000))
+        sleep(1000)
 
 
 if __name__ == "__main__":

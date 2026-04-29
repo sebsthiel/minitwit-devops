@@ -4,6 +4,8 @@ import (
 	"devops/minitwit/internal/monitoring"
 	minitwit "devops/minitwit/internal/src"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -15,6 +17,19 @@ func main() {
 	monitoring.Init()
 
 	minitwit.StartLogging()
+
+	dsn := os.Getenv("DATABASE_PATH")
+	if dsn == "" {
+		log.Fatal().Msg("DATABASE_PATH not set")
+	}
+	if !strings.Contains(dsn, "sslmode=") {
+		dsn += "?sslmode=disable"
+	}
+
+	// Initialize session store (web app only)
+	if err := minitwit.InitSessionStore(dsn); err != nil {
+		log.Fatal().Err(err).Msg("Failed to initialize session store")
+	}
 
 	database := minitwit.Connect_db()
 	minitwit.Migrate_database(database)

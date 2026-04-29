@@ -23,10 +23,8 @@ COPY schema.sql ./schema.sql
 COPY ./cmd/api/ ./cmd/api/
 
 # Build API
-RUN CGO_ENABLED=1 GOOS=linux go build -o api ./cmd/api
-
 # Make container run as not root user
-RUN useradd -r -u 10001 -m appuser
+RUN useradd -r -u 10001 -m appuser && CGO_ENABLED=1 GOOS=linux go build -o api ./cmd/api
 USER appuser
 
 EXPOSE 5001
