@@ -120,24 +120,6 @@ func Connect_db() *gorm.DB {
 	var dialector gorm.Dialector
 	if p := os.Getenv("DATABASE_PATH"); p != "" {
 		dialector = postgres.Open(p)
-		dsn := p
-		if !strings.Contains(p, "sslmode=") {
-			dsn += "?sslmode=disable"
-		}
-		var newStore, err = pgstore.NewPGStore(dsn, key)
-		if err != nil {
-			log.Err(err).Msg("Could not create store for sessions")
-		}
-		store = newStore
-		store.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   86400 * 30,
-			HttpOnly: true,
-
-			// IMPORTANT for pytest/local:
-			Secure:   false,
-			SameSite: http.SameSiteLaxMode, // or DefaultMode
-		}
 	} else {
 		log.Fatal().Msg("NO DATABASE PATH GIVEN. Hence could not start application")
 	}
@@ -167,6 +149,24 @@ func Connect_db() *gorm.DB {
 
 func Migrate_database(db *gorm.DB) {
 	db.AutoMigrate(&User{}, &Message{}, &Follower{}, &Latest{})
+}
+
+func InitSessionStore(dsn string) error {
+	newStore, err := pgstore.NewPGStore(dsn, key)
+	if err != nil {
+		return err
+	}
+	store = newStore
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 30,
+		HttpOnly: true,
+
+		// IMPORTANT for pytest/local:
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode, // or DefaultMode
+	}
+	return nil
 }
 
 func GetLatestValue() int {

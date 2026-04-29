@@ -1,9 +1,6 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    ports:
-      - target: 9090 # Remove when using TLS?
-        published: 9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
@@ -15,9 +12,6 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    ports:
-      - target: 3000
-        published: 3000
     environment:
       - GF_SERVER_ROOT_URL=https://minitwit-devops.tech/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
@@ -39,11 +33,6 @@ services:
       - loki-storage:/loki
       - ./loki/loki-config.yml:/mnt/config/loki-config.yml  # Mount the loki config file
     command: -config.file=/mnt/config/loki-config.yml -target=all
-    ports:
-      - target: 3100
-        published: 3100
-      - target: 9096      # Add this
-        published: 9096
     networks:
       - minitwit-network
     deploy:
