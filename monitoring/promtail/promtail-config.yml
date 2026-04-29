@@ -8,16 +8,31 @@ positions:
   filename: /tmp/positions.yaml                                   # Keeps track of how far it has made it through the logs. atm it is in tmp so a restart would have it go through the logs from the start.
 
 clients:
-  - url: http://loki:3100/loki/api/v1/push                        # The endpoint where Promtail sends collected logs. Since Loki and Promtail are on the same Docker network, Promtail can refer to Loki by its container name ('loki') instead of using a fixed IP address.
-
+  - url: http://monitoring_loki:3100/loki/api/v1/push                        # The endpoint where Promtail sends collected logs. Since Loki and Promtail are on the same Docker network, Promtail can refer to Loki by its container name ('loki') instead of using a fixed IP address.
+    #backoff_config:
+    #  min_period: 500ms
+    #  max_period: 5s
+    #  max_retries: 0
 scrape_configs:                                                   # 
   - job_name: docker
     docker_sd_configs:                                            # Describes how to use the Docker daemon API to discover containers running on the same host as Promtail.
       - host: unix:///var/run/docker.sock                         # Connect to the Docker daemon via its Unix socket to discover containers.
         refresh_interval: 5s                                      # Check for new/removed containers every 5 seconds.
     relabel_configs:
-      - source_labels: ['__meta_docker_container_name']           # Get the containers name
-        regex: '/(.*)'                                            # Strip leading / from container name: /minitwit-app -> minitwit-app.
-        target_label: 'container'                                 # Create a new label called container. This way we can query specific containers.
+      - source_labels: ['__meta_docker_swarm_service_name']
+        target_label: service
       - source_labels: ['__meta_docker_container_log_stream']     # Save the docker containers log stream to the label.
         target_label: 'stream'                                    # Create a new label called stream.
+    pipeline_stages:
+      - json:
+          expressions:
+            endpoint: endpoint            # API endpoint called (/login or /register)
+            method: method                # GET / POST
+            statusCode: statusCode        # HTTP response code.
+            level: level                  # INFO, WARN, ERROR, CRITICAL
+
+      - labels:
+          endpoint:
+          method:
+          statusCode:
+          level:
