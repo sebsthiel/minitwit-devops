@@ -23,8 +23,11 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     depends_on:
       - prometheus
+      - loki
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
       - grafana-storage:/var/lib/grafana
     networks:
       - minitwit-network
