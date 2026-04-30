@@ -44,9 +44,6 @@ createnetwork:
 		echo "Creating overlay network..."; docker network create --driver overlay --attachable $(NETWORK); \
 	else echo "Network already exists"; fi
 
-runlocalmonitoringlocal:
-	docker compose -f docker-compose.monitoring.yml up -d
-
 setenv:
 	@set -a && [ -f .env ] && . ./.env || true && set +a
 
