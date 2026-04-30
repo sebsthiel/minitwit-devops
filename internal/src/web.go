@@ -239,7 +239,7 @@ func UserTimeline(w http.ResponseWriter, r *http.Request) {
 
 	res := database.
 		Table("message").
-		Select(`message.message_id, message.text, message.pub_date, "user".username`).
+		Select(`message.message_id, message.text, message.pub_date, "user".username, u.email`).
 		Joins(`JOIN "user" ON "user".user_id = message.author_id`).
 		Where(`"user".username = ?`, username).
 		Order("message.pub_date DESC").
@@ -313,7 +313,7 @@ func Timeline(w http.ResponseWriter, r *http.Request) {
 
 	res := database.
 		Table("message").
-		Select(`message.message_id, message.text, message.pub_date, u.username`).
+		Select(`message.message_id, message.text, message.pub_date, u.username, u.email`).
 		Joins(`JOIN "user" u ON u.user_id = message.author_id`).
 		Order("message.pub_date DESC").
 		Limit(PER_PAGE).
