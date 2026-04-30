@@ -1,3 +1,0 @@
-AsymmetricPrivateKey
-/go/pkg/mod/github.com/lib/pq@v1.10.5/certs/postgresql.key
-/go/pkg/mod/github.com/lib/pq@v1.10.5/certs/server.key
