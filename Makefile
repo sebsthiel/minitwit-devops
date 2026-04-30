@@ -2,6 +2,9 @@
 
 all: staticcheck gofmt hadolint checkmake semgrep
 
+semgrep:
+	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep --config=auto /src
+
 staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	staticcheck ./...
@@ -41,11 +44,9 @@ createnetwork:
 		echo "Creating overlay network..."; docker network create --driver overlay --attachable $(NETWORK); \
 	else echo "Network already exists"; fi
 
-runlocalmonitoring:
+runlocalmonitoringlocal:
 	docker compose -f docker-compose.monitoring.yml up -d
 
-semgrep:
-	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep --config=auto /src
 setenv:
 	@set -a && [ -f .env ] && . ./.env || true && set +a
 
