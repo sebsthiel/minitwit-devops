@@ -27,9 +27,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest requests selenium psycopg2-binary psycopg2
 
+      - name: Build Docker images for tests
+        run: |
+          docker build -t minitwit-api:test -f Dockerfile.api .
+          docker build -t minitwit-web:test -f Dockerfile.web .
+
       - name: Start containers
         run: |
-          docker compose -f docker-compose.test.yml up -d --build
+          docker compose -f docker-compose.test.yml up -d
 
       - name: Wait for postgres
         run: |
