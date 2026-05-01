@@ -42,6 +42,17 @@ jobs:
       - name: Set up Snyk
         uses: snyk/actions/setup@master
 
+      - name: Check Snyk token exists
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          if [ -z "$SNYK_TOKEN" ]; then
+            echo "SNYK_TOKEN is missing"
+            exit 1
+          else
+            echo "SNYK_TOKEN is set"
+          fi
+
       - name: Build API image for scan
         run: docker build -f Dockerfile.api -t minitwit-api:snyk-scan .
 
