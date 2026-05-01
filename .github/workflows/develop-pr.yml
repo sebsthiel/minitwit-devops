@@ -26,6 +26,26 @@ jobs:
       - name: Build
         run: go build ./...
       
+      - name: Build Docker images
+        run: |
+          docker build -t minitwit-api:test -f Dockerfile.api .
+          docker build -t minitwit-web:test -f Dockerfile.web .
+
+      - name: Scan API image
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: minitwit-api:test
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
+
+      - name: Scan Web image
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: minitwit-web:test
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
 
   tests:
     needs: quality-gate
