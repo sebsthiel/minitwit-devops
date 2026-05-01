@@ -42,11 +42,6 @@ jobs:
       - name: Set up Snyk
         uses: snyk/actions/setup@master
 
-      - name: Authenticate Snyk
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk auth $SNYK_TOKEN
-
       - name: Build API image for scan
         run: docker build -f Dockerfile.api -t minitwit-api:snyk-scan .
 
