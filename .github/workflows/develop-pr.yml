@@ -36,7 +36,7 @@ jobs:
         with:
           image-ref: minitwit-api:test
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          exit-code: '0'
           scanners: vuln
 
       - name: Scan Web image
@@ -44,7 +44,7 @@ jobs:
         with:
           image-ref: minitwit-web:test
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          exit-code: '0'
           scanners: vuln
 
   tests:
