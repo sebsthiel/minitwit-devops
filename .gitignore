@@ -204,6 +204,7 @@ go.work.sum
 
 minitwit
 
+# Allow final built report PDF
 !report/build/
 !report/build/MSc_group_e.pdf
 
