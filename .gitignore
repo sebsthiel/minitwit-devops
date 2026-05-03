@@ -204,3 +204,6 @@ go.work.sum
 
 minitwit
 
+!report/build/
+!report/build/MSc_group_e.pdf
+
