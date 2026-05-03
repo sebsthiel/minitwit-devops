@@ -1,0 +1,51 @@
+
+%Process' perspective
+%This perspective should clarify how code or other artifacts come from idea into the running system and everything that happens on the way.
+%
+%In particular, the following descriptions should be included:
+%
+%A complete description and illustration of stages and tools included in the CI/CD pipelines, including deployment and release of your systems.
+%How do you monitor your systems and what precisely do you monitor?
+%What do you log in your systems and how do you aggregate logs?
+%Brief description of how you security hardened your systems.
+%How do you handle availability and scaling in your systems?
+
+\section{Process' perspective}
+\subsection{CI/CD pipelines}
+Our project mainly use two separate pipelines called "PR Quality Gate" and "CI/CD Pipeline Production Server" \textcolor{red}{LINK}
+
+\subsubsection{PR Quality Gate pipeline}
+This pipeline functions as a quality gate whenever we create a Pull Request (PR) into our development branch called "develop". Each time a PR is created or updated, the pipeline would run some static analysis checks, build the solution, and test if our testsuite passes.  \textcolor{red}{CREATE DIAGRAM}. \\\\\
+
+\subsubsection{CI/CD Pipeline Production Server pipeline}
+This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, however after that it also pushes our docker images to a docker registry and deploys our application in our production environment. The pipeline is triggered each time an update is triggered on the main branch.
+\textcolor{red}{CREATE DIAGRAM}. \\\\\
+
+
+
+
+\subsection{Monitoring}
+% Mention prometheus & grafana? yes those are the two main tools used. Also why we decided to use Grafan in logging since we already used it. Prometheus was used to gather information about the running containers while Grafana was used as a data visualization tool.
+
+
+\subsection{Logging}
+The solution makes use of a go-library called \href{https://github.com/rs/zerolog}{"zerolog"}. We chose zerolog as this framework enable us to handle logs at different log-levels easily, it is fast as well as used widely by other go-users.
+
+Promtail was used to ...
+
+Loki was used to ...
+
+As grafana already was used to show monitoring information, we also chose to use it for seeing the aggregated logs. 
+% Dashboard with the following data: Total requests, successful requests, error requests and error rate as stats.
+
+
+
+\subsection{Security}
+% TLS, reverse proxy, Docker scout/snyk test.
+
+
+\subsection{Availability and scaling}
+
+To achieve high Availability we use Docker Swarm with an on-failure restart policy and a rolling update strategy. Docker Swarm allows us to have multiple replicas of our services. If one replica goes down, other replicas will still be up and running, meaning that we don't suffer downtime. The on-failure restart policy means that any replica which goes down, is rebooted automatically. The rolling update policy means that when we ship new features, the replicas are updated one at a time, which means we can achieve zero down time when making new releases. \newline
+
+Docker Swarm is also the answer to the question of scaling. By replicating our services we employ horizontal scaling, and with Swarm Mode also comes load balancing. This means that requests to our services are distributed among the replicas to not overburden any single replicas. The application is running on three nodes (Digital Ocean Droplets). One node for the Postgres database, one swarm-manager node and one worker node. This once again means high availability since, if the worker dies the manager is still controlling the swarm and running containers, and if the manager dies, the worker node can still run existing services. Ideally we would have more nodes, and more managers to ensure that even if a manager dies, another manager can still remain in control of the swarm.
