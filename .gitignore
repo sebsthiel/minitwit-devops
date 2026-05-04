@@ -204,3 +204,6 @@ go.work.sum
 
 minitwit
 
+.vagrant/
+minitwit_backup.sql
+
