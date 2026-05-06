@@ -81,8 +81,9 @@ services:
     image: quay.io/prometheus/node-exporter:latest
     command:
       - "--path.rootfs=/host"
-    network_mode: host
-    pid: host
+    networks:
+      - minitwit-network
+    # pid: host
     volumes:
       - "/:/host:ro,rslave"
     deploy:
