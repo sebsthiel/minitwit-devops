@@ -16,7 +16,7 @@ ssh @SSH_OPTS "root@$MANAGER_IP" "mkdir -p /opt/minitwit"
 
 Write-Host "Copying files to manager..."
 scp @SSH_OPTS .\docker-compose.yml "root@${MANAGER_IP}:/opt/minitwit/docker-compose.yml"
-scp @SSH_OPTS .\nginx-http.conf "root@${MANAGER_IP}:/opt/minitwit/nginx.conf"
+scp @SSH_OPTS .\nginx.conf "root@${MANAGER_IP}:/opt/minitwit/nginx.conf"
 
 Write-Host "Setting up swarm network..."
 ssh @SSH_OPTS "root@$MANAGER_IP" "docker swarm init --advertise-addr $MANAGER_IP 2>/dev/null || true"
