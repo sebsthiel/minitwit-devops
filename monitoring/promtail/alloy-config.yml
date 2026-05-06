@@ -1,0 +1,55 @@
+discovery.docker "docker" {
+	host             = "unix:///var/run/docker.sock"
+	refresh_interval = "5s"
+}
+
+loki.process "docker" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			endpoint   = "endpoint",
+			level      = "level",
+			method     = "method",
+			statusCode = "statusCode",
+		}
+	}
+
+	stage.labels {
+		values = {
+			endpoint   = null,
+			level      = null,
+			method     = null,
+			statusCode = null,
+		}
+	}
+}
+
+discovery.relabel "docker" {
+	targets = []
+
+	rule {
+		source_labels = ["__meta_docker_swarm_service_name"]
+		target_label  = "service"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_log_stream"]
+		target_label  = "stream"
+	}
+}
+
+loki.source.docker "docker" {
+	host             = "unix:///var/run/docker.sock"
+	targets          = discovery.docker.docker.targets
+	forward_to       = [loki.process.docker.receiver]
+	relabel_rules    = discovery.relabel.docker.rules
+	refresh_interval = "5s"
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://monitoring_loki:3100/loki/api/v1/push"
+	}
+	external_labels = {}
+}
