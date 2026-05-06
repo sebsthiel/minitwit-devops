@@ -16,7 +16,9 @@ ssh @SSH_OPTS "root@$MANAGER_IP" "mkdir -p /opt/minitwit"
 
 Write-Host "Copying files to manager..."
 scp @SSH_OPTS .\docker-compose.yml "root@${MANAGER_IP}:/opt/minitwit/docker-compose.yml"
+scp @SSH_OPTS .\docker-compose.monitoring.yml "root@${MANAGER_IP}:/opt/minitwit/docker-compose.monitoring.yml"
 scp @SSH_OPTS .\nginx.conf "root@${MANAGER_IP}:/opt/minitwit/nginx.conf"
+scp @SSH_OPTS -r .\monitoring "root@${MANAGER_IP}:/opt/minitwit/monitoring"
 
 Write-Host "Setting up swarm network..."
 ssh @SSH_OPTS "root@$MANAGER_IP" "docker swarm init --advertise-addr $MANAGER_IP 2>/dev/null || true"
@@ -25,8 +27,11 @@ ssh @SSH_OPTS "root@$MANAGER_IP" "docker network create --driver overlay --attac
 Write-Host "Writing environment file..."
 ssh @SSH_OPTS "root@$MANAGER_IP" "printf '%s\n' 'DATABASE_PATH=postgresql://minitwit_user:$DB_PASS@$DB_IP/minitwit' `"SIMULATOR_AUTH='$SIMULATOR_AUTH'`" > /opt/minitwit/.env"
 
-Write-Host "Deploying stack..."
+Write-Host "Deploying MiniTwit stack..."
 ssh @SSH_OPTS "root@$MANAGER_IP" "cd /opt/minitwit && set -a && . ./.env && docker stack deploy -c docker-compose.yml minitwit"
+
+Write-Host "Deploying monitoring stack..."
+ssh @SSH_OPTS "root@$MANAGER_IP" "cd /opt/minitwit && docker stack deploy -c docker-compose.monitoring.yml monitoring"
 
 Write-Host "Services:"
 ssh @SSH_OPTS "root@$MANAGER_IP" "docker service ls"
