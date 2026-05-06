@@ -7,4 +7,33 @@ scrape_configs:
     metrics_path: /metrics
 
     static_configs:
-      - targets: ["minitwit-app:5001"]  
+      - targets: [ "minitwit-app:5001" ]
+
+  - job_name: "dockerswarm"
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: tasks
+
+    relabel_configs:
+      - source_labels: [ __meta_dockerswarm_task_desired_state ]
+        regex: running
+        action: keep
+
+      # Only scrape services that opt-in with a label
+      - source_labels: [ __meta_dockerswarm_service_label_prometheus_job ]
+        regex: .+
+        action: keep
+
+      # Use label as job name
+      - source_labels: [ __meta_dockerswarm_service_label_prometheus_job ]
+        target_label: job
+
+      # Allow per-service port overrides (prometheus_port label)
+      - source_labels: [ __meta_dockerswarm_service_label_prometheus_port ]
+        target_label: __meta_prometheus_port
+
+      # Replace port in target with label value
+      - source_labels: [ __address__, __meta_prometheus_port ]
+        regex: (.+):\d+;(\d+)
+        target_label: __address__
+        replacement: $1:$2
