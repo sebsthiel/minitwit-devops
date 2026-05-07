@@ -5,8 +5,8 @@ services:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-storage:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock
-    # ports:
-    #   - "9090:9090"
+    #  ports:
+    #    - "9090:9090"
     # user: "0:0" Used for local testing
     networks:
       - minitwit-network
