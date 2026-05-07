@@ -3,7 +3,11 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-storage:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "9090:9090"
+    # user: "0:0" Used for local testing
     networks:
       - minitwit-network
     deploy:
@@ -83,8 +87,9 @@ services:
       - "--path.rootfs=/host"
     networks:
       - minitwit-network
-    # pid: host
+    # pid: host Maybe needed for prod
     volumes:
+      #  - "/:/host:ro"  Only for local testing
       - "/:/host:ro,rslave"
     deploy:
       mode: global
@@ -101,3 +106,4 @@ networks:
 volumes:
   grafana-storage:
   loki-storage:
+  prometheus-storage:

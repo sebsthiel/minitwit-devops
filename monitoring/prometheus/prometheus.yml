@@ -7,8 +7,14 @@ scrape_configs:
     metrics_path: /metrics
 
     static_configs:
-      - targets: [ "minitwit-app:5001" ]
+      - targets: [ "minitwit_api:5001" ]
 
+  - job_name: "minitwit_web"
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ "minitwit_web:5000" ]
+
+  # Swarm discovery (recommended on real Swarm nodes with Docker socket access).
   - job_name: "dockerswarm"
     dockerswarm_sd_configs:
       - host: unix:///var/run/docker.sock
@@ -37,3 +43,12 @@ scrape_configs:
         regex: (.+):\d+;(\d+)
         target_label: __address__
         replacement: $1:$2
+  # # Local Docker Desktop testing (static targets).
+  # - job_name: "cadvisor"
+  #   static_configs:
+  #     - targets: [ "monitoring_cadvisor:8080" ]
+
+  # # Local Docker Desktop testing (static targets).
+  # - job_name: "node_exporter"
+  #   static_configs:
+  #     - targets: [ "monitoring_node_exporter:9100" ]
