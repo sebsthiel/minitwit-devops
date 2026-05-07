@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
 
       # Docker Engine + Compose plugin
       apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
+      
       # Clone/update app
       if [ ! -d /home/vagrant/app/.git ]; then
         git clone https://github.com/sebsthiel/minitwit-devops.git /home/vagrant/app
