@@ -1,6 +1,9 @@
 .PHONY: staticcheck gofmt hadolint analysis checkmake all runlocalswarm buildlocal swarm createnetwork env deploy clean test 
 
-all: staticcheck gofmt hadolint checkmake
+all: staticcheck gofmt hadolint checkmake semgrep
+
+semgrep:
+	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep --config=auto /src
 
 staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
