@@ -5,8 +5,8 @@ services:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-storage:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock
-  #  ports:
-  #    - "9090:9090"
+    # ports:
+    #   - "9090:9090"
     # user: "0:0" Used for local testing
     networks:
       - minitwit-network
@@ -35,6 +35,9 @@ services:
       - minitwit-network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -48,6 +51,9 @@ services:
       - minitwit-network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -63,6 +69,7 @@ services:
     networks:
       - minitwit-network
     deploy:
+      mode: global
       restart_policy:
         condition: on-failure
 
