@@ -128,7 +128,7 @@ def main(host):
                     data=json.dumps(data),
                     params=params,
                     headers=HEADERS,
-                    timeout=0.3,
+                    timeout=1.0,
                 )
 
                 # error handling (204 success, 400 user exists)
@@ -344,7 +344,7 @@ def main(host):
                 )
             )
 
-        sleep(1000)
+        sleep(1)
 
 
 if __name__ == "__main__":

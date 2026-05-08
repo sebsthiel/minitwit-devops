@@ -3,8 +3,10 @@ global:
 
 scrape_configs:
   - job_name: "minitwit"
-
     metrics_path: /metrics
-
-    static_configs:
-      - targets: ["minitwit-app:5001"]  
+    dns_sd_configs:
+      - names:
+          - tasks.api
+        type: A
+        port: 5001
+      

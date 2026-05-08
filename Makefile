@@ -45,6 +45,7 @@ setenv:
 	@set -a && [ -f .env ] && . ./.env || true && set +a
 
 deploywebapi:
+	@set -a && . ./.env && set +a && \
 	docker compose -f docker-compose.local-db.yml up -d
 	docker stack deploy -c docker-compose.develop.yml $(STACK_NAME)
 
@@ -56,3 +57,6 @@ clean:
 	docker stack rm $(MONITORING_STACK) || true
 	docker compose -f docker-compose.local-db.yml down || true
 	docker network rm $(NETWORK);
+
+deployall: clean buildlocal initswarm createnetwork deploywebapi deploymonitoring
+	watch -n 2 docker service ls
