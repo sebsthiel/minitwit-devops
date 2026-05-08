@@ -50,22 +50,6 @@ createnetwork:
 		echo "Creating overlay network..."; docker network create --driver overlay --attachable $(NETWORK); \
 	else echo "Network already exists"; fi
 
-createnetwork2:
-	@echo "Ensuring overlay network exists..."
-	@docker network inspect $(NETWORK) >/dev/null 2>&1 || \
-		docker network create --driver overlay --attachable $(NETWORK)
-
-	@echo "Waiting for Swarm network propagation..."
-	@i=0; \
-	until docker network inspect $(NETWORK) >/dev/null 2>&1; do \
-		i=$$((i+1)); \
-		if [ $$i -gt 10 ]; then \
-			echo "Network did not become ready in time"; exit 1; \
-		fi; \
-		sleep 1; \
-	done
-	@echo "Network ready"
-
 deploywebapi:
 	docker compose -f docker-compose.local-db.yml up -d
 	docker stack deploy -c docker-compose.develop.yml $(STACK_NAME)
@@ -77,10 +61,14 @@ clean:
 	docker stack rm $(STACK_NAME) || true
 	docker stack rm $(MONITORING_STACK) || true
 	docker compose -f docker-compose.local-db.yml down || true
-	docker network rm $(NETWORK);
+	docker network rm $(NETWORK) || true;
 
-deployall: clean buildlocal initswarm createnetwork2 deploywebapi deploymonitoring
+deployall: createnetwork buildlocal initswarm  deploywebapi deploymonitoring
 	watch -n 2 docker service ls
+
+deploy_local_simulator:
+	cd ./test
+	python3 minitwit_simulator.py http://127.0.0.1/api
 
 service_watch:
 	watch -n 2 docker service ls
@@ -105,3 +93,12 @@ log_prometheus:
 
 log_promtail:
 	docker service logs monitoring_promtail -f --tail 20
+
+# Used to cleanup VM by removing: unused images, stopped containers, unused volumes, build cache
+# and other temporary files.
+aggressive_docker_clean:
+	docker system df
+	docker system prune -a --volumes
+	sudo journalctl --vacuum-size=100M
+	sudo apt-get clean
+	sudo apt-get autoremove -y
