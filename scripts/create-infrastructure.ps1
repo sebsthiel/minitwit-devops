@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 # ── SSH key ──
 $SSH_KEY     = "$env:USERPROFILE\.ssh\minitwit_do"
-$SSH_KEY_PUB = "$env:USERPROFILE\.ssh\minitwit_do.pub"
+$SSH_KEY_PUB = "56072776"
 $SSH_OPTS    = @("-o", "StrictHostKeyChecking=no", "-o", "BatchMode=yes", "-i", $SSH_KEY)
 
 # ── Droplet names (must match exactly what is on DigitalOcean) ──
