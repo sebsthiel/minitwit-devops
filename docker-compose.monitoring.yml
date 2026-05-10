@@ -3,10 +3,18 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-storage:/prometheus
+      - /var/run/docker.sock:/var/run/docker.sock
+    #  ports:
+    #    - "9090:9090"
+    user: "0:0" # Run Prometheus as root to access docker socket and host metrics from cadvisor and node_exporter
     networks:
       - minitwit-network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -27,6 +35,9 @@ services:
       - minitwit-network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -34,21 +45,24 @@ services:
     image: grafana/loki:latest
     volumes:
       - loki-storage:/loki
-      - ./monitoring/loki/loki-config.yml:/mnt/config/loki-config.yml  # Mount the loki config file
+      - ./monitoring/loki/loki-config.yml:/mnt/config/loki-config.yml # Mount the loki config file
     command: -config.file=/mnt/config/loki-config.yml -target=all
     networks:
       - minitwit-network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
   promtail:
     image: grafana/promtail:latest
     volumes:
-      - ./monitoring/promtail/promtail-config.yml:/mnt/config/promtail-config.yml  # Mount the promtail config file
-      - /var/run/docker.sock:/var/run/docker.sock                        # Mounting the docker socket
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro         # Mounting the log directory from host
+      - ./monitoring/promtail/promtail-config.yml:/mnt/config/promtail-config.yml # Mount the promtail config file
+      - /var/run/docker.sock:/var/run/docker.sock # Mounting the docker socket
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro # Mounting the log directory from host
     command: -config.file=/mnt/config/promtail-config.yml
     depends_on:
       - loki
@@ -58,12 +72,44 @@ services:
       restart_policy:
         condition: on-failure
 
-networks:  # Network shared between services so we can refer to them by name
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - minitwit-network
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      labels:
+        - "prometheus_job=cadvisor"
+        - "prometheus_port=8080"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    command:
+      - "--path.rootfs=/host"
+    networks:
+      - minitwit-network
+    # pid: host Maybe needed for prod
+    volumes:
+      #  - "/:/host:ro"  Only for local testing
+      - "/:/host:ro,rslave"
+    deploy:
+      mode: global
+      labels:
+        - "prometheus_job=node_exporter"
+        - "prometheus_port=9100"
+
+networks:
+  # Network shared between services so we can refer to them by name
   minitwit-network:
     external: true
     name: minitwit-network
 
-
 volumes:
   grafana-storage:
   loki-storage:
+  prometheus-storage:
