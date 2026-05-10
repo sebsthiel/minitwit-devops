@@ -19,6 +19,8 @@ from contextlib import closing
 import sqlite3
 
 
+REQUESTS_PER_SECOND = 10
+DELAY = 1/REQUESTS_PER_SECOND
 CSV_FILENAME = "./minitwit_scenario.csv"
 USERNAME = "simulator"
 PWD = "super_safe!"
@@ -128,7 +130,7 @@ def main(host):
                     data=json.dumps(data),
                     params=params,
                     headers=HEADERS,
-                    timeout=0.3,
+                    timeout=1.0,
                 )
 
                 # error handling (204 success, 400 user exists)
@@ -164,7 +166,7 @@ def main(host):
                 params = {"latest": action["latest"], "no": action["no"]}
 
                 response = requests.post(
-                    url, params=params, headers=HEADERS, timeout=0.3
+                    url, params=params, headers=HEADERS, timeout=5
                 )
 
                 # error handling (200 success, 403 failure (no headers))
@@ -344,7 +346,7 @@ def main(host):
                 )
             )
 
-        sleep(0.5)
+        sleep(DELAY)
 
 
 if __name__ == "__main__":
