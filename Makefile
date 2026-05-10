@@ -1,5 +1,6 @@
 .PHONY: staticcheck gofmt hadolint analysis checkmake all runlocalswarm buildlocal swarm createnetwork env deploy clean test 
-
+.ONESHELL:
+SHELL := /bin/bash
 all: staticcheck gofmt hadolint checkmake
 
 staticcheck:
@@ -25,7 +26,7 @@ STACK_NAME=minitwit
 MONITORING_STACK=monitoring
 NETWORK=minitwit-network
 
-runlocalswarm: buildlocal initswarm createnetwork setenv deploywebapi
+runlocalswarm: buildlocal initswarm createnetwork setenv deploywebapi deploymonitoring
 
 buildlocal:
 	docker build -t minitwit-api:dev -f Dockerfile.api .

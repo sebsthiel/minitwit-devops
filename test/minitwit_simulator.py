@@ -344,7 +344,7 @@ def main(host):
                 )
             )
 
-        sleep(1000)
+        sleep(0.5)
 
 
 if __name__ == "__main__":

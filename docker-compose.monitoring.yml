@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     #  ports:
     #    - "9090:9090"
-    # user: "0:0" Used for local testing
+    user: "0:0" # Run Prometheus as root to access docker socket and host metrics from cadvisor and node_exporter
     networks:
       - minitwit-network
     deploy:
@@ -85,8 +85,8 @@ services:
     deploy:
       mode: global
       labels:
-        - "prometheus-job=cadvisor"
-        - "prometheus-port=8080"
+        - "prometheus_job=cadvisor"
+        - "prometheus_port=8080"
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
@@ -101,8 +101,8 @@ services:
     deploy:
       mode: global
       labels:
-        - "prometheus-job=node_exporter"
-        - "prometheus-port=9100"
+        - "prometheus_job=node_exporter"
+        - "prometheus_port=9100"
 
 networks:
   # Network shared between services so we can refer to them by name
