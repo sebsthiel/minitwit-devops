@@ -1,0 +1,237 @@
+\ProvidesPackage{mystyle}
+
+
+\usepackage[english]{isodate}
+
+\usepackage[a4paper,left=3cm,right=3cm]{geometry}
+\usepackage{color}
+\usepackage{mathtools}
+\usepackage{siunitx}        %SI-enheder
+\usepackage{amssymb}        %Math-symboler
+\usepackage{graphicx}       %Various graphics
+\usepackage{fancybox}
+\usepackage{float}          %Tilføjer tynd kant rundt om figurer
+
+    \restylefloat{figure}
+\usepackage[nobiblatex]{xurl}
+\usepackage[many]{tcolorbox}
+
+%Dansk navngivning
+\renewcommand{\contentsname}{Table of contents}
+\usepackage{caption}
+    \captionsetup[figure]{name=\textbf{Figure}}
+    \captionsetup[table]{name=\textbf{Table}}
+\usepackage[section]{placeins}
+
+\usepackage{tikz}                   %Karnaugh-kort
+    \usetikzlibrary{calc}
+    \usetikzlibrary{positioning}
+    \usetikzlibrary{matrix}
+
+        \pgfdeclarelayer{background}
+        \pgfsetlayers{background,main}
+
+\usepackage{karnaugh-map}
+%\usepackage{framed}
+\usepackage{hyperref}
+\usepackage{textcomp}
+\usepackage{mathcomp}
+\usepackage{outlines}
+\usepackage{biblatex}
+\usepackage{emoji}
+\addbibresource{main.bib}
+
+\usepackage{comment}
+
+\usepackage{stmaryrd}
+\usepackage{dirtytalk} % For quotes
+
+\allowdisplaybreaks[1]
+
+\newcommand\HUGE{\@setfontsize\Huge{38}{47}} 
+
+\setcounter{tocdepth}{2}
+
+\setcounter{secnumdepth}{2}
+
+\renewcommand{\thesection}{\arabic{section}}
+
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}    % subsections 1.1
+%\renewcommand\thesubsection{\thesection.\alph{subsection}}     % subsections 1.a
+
+\numberwithin{equation}{section}     %Lad formelnummer følge sektionsnummer
+    
+\linespread{1.2}%Linjeafstand - 1.3 er lig afstand halvanden, 1.6 er dobbelt afstand (MSWord)
+\setlength{\parskip}{1.5ex plus 0.5ex minus 0.2ex}
+\setlength\parindent{0pt}   %Indrykningen ved første linje i nyt afsnit (\par)
+
+\def\doubleunderline#1{\underline{\underline{#1}}}
+
+
+
+%Brugt til at fremhæve tekst
+\newenvironment{itquote}
+  {\begin{quote}\itshape}
+  {\end{quote}\ignorespacesafterend}
+
+%%  
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{RGB}{0,128,64}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{RGB}{255,255,255}
+
+  \lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{orange},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=shadowbox,
+     escapeinside={\%*}{*)}, 
+}
+
+\lstset{style=mystyle}
+
+%For at læse æ, ø og å i kode kommentarer
+\lstset{literate=
+ {æ}{{\ae}}1 {Æ}{{\AE}}1
+ {ø}{{\o}}1  {Ø}{{\O}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, const, let},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+\lstdefinelanguage{enbf}{
+  keywords={::=,|,*},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={type, id,number,string,function,stmt,end,program,participants,knowledge_list,keyRelations,functions_def,equations,formats,iconSet,message_send_stmt,match_stmt, clear_stmt, participant_stmt, match_case, set_stmt, new_stmt, expression, encrypt_expr,sign_expr},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+}
+\lstdefinelanguage{sepo}{
+  keywords={Participants, Knowledge, KeyRelations, Functions, Equations, Format, Icons, Protocol},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={g,Y,X,exp,Alice,Bob,Shared,msgA,msgB},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\newtheorem{definition}{Definition}
+
+\lstset{ %
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   numbers=left,
+   numberstyle=\footnotesize,
+   numbersep=9pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
+
+%For at kunne indsætte PDF'er
+\usepackage{pdfpages}
+
+\usepackage{tocloft}
+
+% tables
+\usepackage{tabularx, colortbl}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+%Invisible section
+\newcommand\invisiblesection[1]{%
+  \refstepcounter{section}%
+  \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}%
+  \sectionmark{#1}}
+
+%Invisible subsection  
+\newcommand\invisiblesubsection[1]{%
+  \refstepcounter{subsection}%
+  \addcontentsline{toc}{subsection}{\protect\numberline{\thesubsection}#1}%
+  \subsectionmark{#1}} 
+  
+  %For at bruge subfiles, skal helst stå lige inden \begin{document}
+\usepackage{subfiles}
+
+\usepackage{amsmath}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\lstdefinestyle{sharpc}{language=[Sharp]C, frame=lr, rulecolor=\color{blue!80!black}}
+
+
+\usepackage{titlesec}
+\titleformat{\section}
+  {\large\fontsize{20}{15}\bfseries}{\thesection}{1em}{}
+
+\titlespacing\section{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+
+\newcommand{\skyggebox}[2][0.8]{
+        \centering
+    \begin{tcolorbox}[beamer,
+                  width=#1\textwidth,
+                  arc=0pt,
+                  boxsep=0pt,
+                  left=0.1pt,right=1pt,top=0.1pt,bottom=1pt,
+                  ]
+        #2
+    \end{tcolorbox}
+}
+
+\usepackage{array}
+\usepackage{proof}
+\usepackage{bussproofs}
+\newenvironment{scprooftree}[1]%
+  {\gdef\scalefactor{#1}\begin{center}\proofSkipAmount \leavevmode}%
+  {\scalebox{\scalefactor}{\DisplayProof}\proofSkipAmount \end{center} }
+
+% Til algo-design:
+\usepackage{booktabs}
+
+\usepackage{longtable}
