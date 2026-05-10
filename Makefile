@@ -1,4 +1,4 @@
-.PHONY: staticcheck gofmt hadolint analysis checkmake all runlocalswarm buildlocal swarm createnetwork env deploy clean test 
+.PHONY: staticcheck gofmt hadolint analysis checkmake all runlocalswarm buildlocal swarm createnetwork env deploy clean test delete_all_volumes
 
 # Use ONE shell per recipe. Does not work across recipes.
 .ONESHELL:
@@ -51,6 +51,7 @@ createnetwork:
 	else echo "Network already exists"; fi
 
 deploywebapi:
+	@set -a; source .env; set +a;
 	docker compose -f docker-compose.local-db.yml up -d
 	docker stack deploy -c docker-compose.develop.yml $(STACK_NAME)
 
@@ -62,6 +63,17 @@ clean:
 	docker stack rm $(MONITORING_STACK) || true
 	docker compose -f docker-compose.local-db.yml down || true
 	docker network rm $(NETWORK) || true;
+
+delete_grafana_volume:
+	docker volume rm monitoring_grafana-storage
+
+delete_loki_volume:
+	docker volume rm monitoring_loki-storage
+
+delete_prometheus_volume:
+	docker volume rm monitoring_prometheus-storage
+
+delete_all_volumes: delete_grafana_volume delete_loki_volume delete_prometheus_volume
 
 deployall: createnetwork buildlocal initswarm  deploywebapi deploymonitoring
 	watch -n 2 docker service ls

@@ -19,7 +19,7 @@ from contextlib import closing
 import sqlite3
 
 
-REQUESTS_PER_SECOND = 10
+REQUESTS_PER_SECOND = 1000
 DELAY = 1/REQUESTS_PER_SECOND
 CSV_FILENAME = "./minitwit_scenario.csv"
 USERNAME = "simulator"
