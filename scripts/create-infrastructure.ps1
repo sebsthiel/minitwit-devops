@@ -23,7 +23,7 @@ $IMAGE  = "ubuntu-22-04-x64"
 $DB_PASS        = "minitwitpw123"
 $DB_USER        = "minitwit_user"
 $DB_NAME_PG     = "minitwit"
-//$SIMULATOR_AUTH = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
+# $SIMULATOR_AUTH = "Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh"
 
 Write-Host ""
 Write-Host "MiniTwit Infrastructure Provisioning"

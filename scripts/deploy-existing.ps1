@@ -40,7 +40,9 @@ Write-Host "Writing environment file..."
 ssh @SSH_OPTS "root@$MANAGER_IP" @"
 cat > /opt/minitwit/.env << 'EOF'
 DATABASE_PATH=postgresql://minitwit_user:$DB_PASS@$DB_IP/minitwit
+SIMULATOR_ADATABASE_PATH=postgresql://minitwit_user:$DB_PASS@$DB_IP/minitwit
 SIMULATOR_AUTH=$SIMULATOR_AUTH
+LOG_LEVEL=infoUTH=$SIMULATOR_AUTH
 EOF
 "@
 
