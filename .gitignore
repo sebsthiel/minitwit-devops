@@ -204,6 +204,12 @@ go.work.sum
 
 minitwit
 
+.vagrant/
+minitwit_backup.sql
+
+.vagrant/
+minitwit_backup.sql
+
 # Allow final built report PDF
 !report/build/
 !report/build/MSc_group_e.pdf
