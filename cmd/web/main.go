@@ -36,9 +36,9 @@ func main() {
 
 	router := mux.NewRouter()
 	router.Use(minitwit.AuthMiddleware)
+	router.Handle("/metrics", promhttp.Handler())
 	minitwit.RegisterRoutes(router, database)
 	minitwit.RegisterAPIRoutes(router, database)
-	router.Handle("/metrics", promhttp.Handler())
 	router.Use(monitoring.MetricsMiddleware)
 
 	router.PathPrefix("/static/").Handler(
