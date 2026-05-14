@@ -8,7 +8,7 @@ contactPoints:
           settings:
             message: '@everyone Api Service is down!'
             title: Api
-            url: https://discord.com/api/webhooks/1492115087731986433/KIxRzQHCx737Lx20vJdAO1K5tNJCXyZkSzdM_dwUVzZBdwRY_nfyq479hLMX2Kjhjp4L
+            url: $__env{DISCORD_WEBHOOK_URL}
             use_discord_username: false
           disableResolveMessage: false
     - orgId: 1
@@ -19,6 +19,6 @@ contactPoints:
           settings:
             message: '@everyone Web Service is down!'
             title: Web
-            url: https://discord.com/api/webhooks/1492115087731986433/KIxRzQHCx737Lx20vJdAO1K5tNJCXyZkSzdM_dwUVzZBdwRY_nfyq479hLMX2Kjhjp4L
+            url: $__env{DISCORD_WEBHOOK_URL}
             use_discord_username: true
           disableResolveMessage: false
