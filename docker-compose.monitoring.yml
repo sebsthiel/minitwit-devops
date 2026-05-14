@@ -21,6 +21,7 @@ services:
     environment:
       - GF_SERVER_ROOT_URL=https://minitwit-devops.tech/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
     depends_on:
       - prometheus
       - loki
