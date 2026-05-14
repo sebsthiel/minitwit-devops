@@ -15,11 +15,7 @@ services:
       timeout: 3s
       retries: 30
   api:
-    # Locally built image:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    image: minitwitapiimage:local
+    image: minitwit-api:test
     container_name: minitwit-api
     environment:
       - DATABASE_PATH=${DATABASE_PATH_DOCKER}
@@ -37,11 +33,7 @@ services:
       retries: 3
 
   web:
-    # Locally built image:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    image: minitwitwebimage:local
+    image: minitwit-web:test
     container_name: minitwit-web
     environment:
       - DATABASE_PATH=${DATABASE_PATH_DOCKER}

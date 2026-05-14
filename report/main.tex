@@ -1,0 +1,21 @@
+\documentclass[12pt,a4paper,reqno]{report}
+
+\usepackage{mystyle}
+
+\begin{document}
+    \input{title}
+    \clearpage
+    \tableofcontents
+    \addtocontents{toc}{\vspace{-0.5cm}}
+
+    \setcounter{page}{0}
+    \clearpage 
+
+    \input{sections/process}
+    %\clearpage
+   \input{sections/systems_perspective}
+    
+    % \section{Bibliography}
+    \printbibliography[heading=none]
+\end{document}
+

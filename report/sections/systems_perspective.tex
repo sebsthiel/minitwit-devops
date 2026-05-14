@@ -1,0 +1,52 @@
+\section{System's Perspective}
+\subsection{Design and Architecture}
+\subsection{Dependencies}
+
+The following are the dependencies for our Minitwit system, listed in an orgainized manner in order to better provide an overview.
+
+\textbf{Runtime Dependencies}
+
+These dependencies include the environment to run the application on including the operating system, VM technologies and programming language.
+
+\begin{itemize}
+    \item Ubuntu Linux: Operating System
+    \item Docker (swarm mode): Virtual Machine
+    \item golang:1.25 (Docker image)
+\end{itemize}
+
+\textbf{Application Libraries}
+
+This list contains the libraries and what each library is for.
+
+\begin{itemize}
+    \item Go 1.25.6: Programming language.
+    \item Gorilla Mux: HTTP request routing.
+    \item Gorilla Sessions: Session management.
+    \item GORM: Object-relational mapper.
+    \item PostgreSQL Driver: Database connectivity.
+    \item go-sqlite3: SQLite support for testing/development.
+    \item Zerolog: Structured logging.
+    \item Prometheus client\_golang: Metrics instrumentation.
+\end{itemize}
+
+\textbf{Testing}
+
+\begin{itemize}
+    \item Python 3.11: Programming language
+    \item pytest: Testing framework
+    
+\end{itemize}
+
+\textbf{DevOps / Build Dependencies}
+
+This list includes tools for employing DevOps practices. 
+
+\begin{itemize}
+    \item Github: Code repository
+    \item Dockerhub: Docker image repository
+    \item Github Actions: CI/CD Pipeline
+    \item Codacy: Quality assurance
+    \item SonarQube: Quality assurance
+\end{itemize}
+
+\subsection{Current System State}
