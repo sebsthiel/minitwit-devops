@@ -27,8 +27,7 @@ cp minitwit.db /tmp/        # optional: seed with sample data
 go run ./cmd/web            # web UI on http://localhost:5000
 go run ./cmd/api            # API on  http://localhost:5001/api
 ```
- 
-To reset the database, run `rm /tmp/minitwit.db`.
+
  
 ## Run with Docker Swarm
  
