@@ -59,6 +59,7 @@ deploywebapi:
 	docker stack deploy -c docker-compose.develop.yml $(STACK_NAME)
 
 deploymonitoring:
+	@set -a; source .env; set +a;
 	docker stack deploy -c docker-compose.monitoring.yml $(MONITORING_STACK)
 
 clean:
