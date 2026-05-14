@@ -1,0 +1,42 @@
+name: Build Report
+
+on:
+  push:
+    paths:
+      - 'report/**'
+      - '.github/workflows/report.yml'
+  pull_request:
+    paths:
+      - 'report/**'
+      - '.github/workflows/report.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: report
+          latexmk_use_lualatex: true
+
+      - name: Move PDF
+        run: |
+          mkdir -p report/build
+          mv report/main.pdf report/build/MSc_group_e.pdf
+
+      - name: Commit PDF
+        if: github.event_name == 'push'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -f report/build/MSc_group_e.pdf
+          git commit -m "Update report PDF" || echo "No changes"
+          git push

@@ -10,7 +10,10 @@ include .env
 # Export all make variables to shell. Recipes can use $VARIABLE_NAME. Especially useful if we use python scripts to run stuff as we might want to expose variables instead of passing them.
 # export
 
-all: staticcheck gofmt hadolint checkmake
+all: staticcheck gofmt hadolint checkmake semgrep
+
+semgrep:
+	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep --config=auto /src
 
 staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
