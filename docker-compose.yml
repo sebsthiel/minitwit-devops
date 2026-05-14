@@ -20,6 +20,9 @@ services:
         parallelism: 1
         delay: 10s
         failure_action: rollback
+      placement:
+        preferences:
+          - spread: node.role
 
   web:
     image: ${MINITWIT_IMAGE:-marcp85/minitwitwebimage:latest}
@@ -42,6 +45,9 @@ services:
         parallelism: 1
         delay: 10s
         failure_action: rollback
+      placement:
+        preferences:
+          - spread: node.role
 
   nginx:
     image: nginx:latest
