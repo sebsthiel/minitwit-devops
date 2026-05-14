@@ -91,5 +91,5 @@ Developed by — ITU DevOps course, Autumn 2025.
 - Renate Mekere
 - Adam Nørgård Aabye
 - Marc David Paget
--  Sebastian Thiel Steensgaard
+- Sebastian Thiel Steensgaard
 - Asger Engelund Trads
