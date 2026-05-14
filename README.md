@@ -32,13 +32,10 @@ To reset the database, run `rm /tmp/minitwit.db`.
  
 ## Run with Docker Swarm
  
-Requires Docker with Swarm mode and the Compose plugin.
+Requires Docker with Swarm mode and Compose.
  
 ```bash
-set -a && source .env && set +a   # load env vars
-make runlocalswarm                # build images, init swarm, deploy
-make deploymonitoring             # optional: Prometheus + Grafana + Loki
-make clean                        # tear everything down
+make deployall
 ```
  
 The app is then available at **http://localhost** behind nginx. Grafana is on **http://localhost:3000** (default `admin`/`admin`).
@@ -50,6 +47,7 @@ The app is then available at **http://localhost** behind nginx. Grafana is on **
 | `DATABASE_PATH` | Postgres connection string |
 | `LOG_LEVEL` | `debug`, `info`, `warn`, or `error` |
 | `SIMULATOR_AUTH` | Bearer token for the simulator endpoints |
+| `DISCORD_WEBHOOK_URL` | Url link to discord webhook for availability notifications |
  
 ## Testing
  
@@ -83,7 +81,7 @@ Production runs on two DigitalOcean droplets (app + db), provisioned with Vagran
  
 We use a feature-branch workflow with mandatory PR review.
  
-1. Branch off `develop`: `git checkout -b feat/<short-description>`.
+1. Branch off `develop`: `git checkout -b feature/<short-description>`.
 2. Run `make all` and `go test ./...` before pushing.
 3. Open a PR into `develop`. CI must be green before merge.
 4. Releases to production happen via PR from `develop` → `main`, which triggers the deploy workflow in `.github/workflows/cicd-prod.server.yml`.
