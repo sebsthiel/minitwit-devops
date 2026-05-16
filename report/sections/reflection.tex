@@ -1,0 +1,52 @@
+\section{Reflection Perspective}
+
+\subsection{DevOps Style of Work}
+
+Our development process combined feature development with continuous operation of a live system under load from the MiniTwit simulator. Compared to previous projects, this required us to consider deployment, monitoring, and system reliability as part of the development process, rather than as separate activities.
+
+We organized work using GitHub Projects, where issues were tracked and progressed through stages such as \textit{To Do}, \textit{In Progress}, \textit{Ready}, and \textit{Done}. Changes were developed in small feature branches and integrated through pull requests into the \texttt{develop} branch. Automated CI checks and code reviews helped ensure that changes met quality standards before integration.
+
+In addition to our technical workflow, collaboration and communication were central to how we applied DevOps principles in practice. We coordinated work through GitHub and communicated primarily via Discord, where we shared updates, issues, and progress. Regular meetings helped align the team, while informal collaboration, including pair programming, supported knowledge sharing and problem-solving.
+
+As the semester progressed, communication became less consistent due to increasing workload from other courses. In a professional setting, we recognize that more structured communication and clearer pull request descriptions would be necessary to maintain transparency and traceability.
+
+We also observed that some team members naturally took on more responsibility, particularly in reviewing pull requests and managing integrations. While this helped maintain progress, it highlights the importance of distributing knowledge and responsibilities to avoid reliance on a few individuals.
+
+\subsection{Key Challenges and Lessons Learned}
+
+One of the main challenges was working with infrastructure and deployment. Initial plans, such as using Vagrant, had to be changed due to compatibility issues, which required us to adapt our approach and implement a simpler deployment solution based on scripting and Docker Swarm. Operating a live system also introduced challenges related to debugging and stability. When issues occurred, we relied on logs, monitoring tools, and team communication to identify and resolve problems quickly. This emphasized the importance of observability and fast feedback in maintaining system reliability.
+
+Another key lesson was the value of automation. Moving toward an automated deployment process reduced errors, made the system easier to reproduce and made deployment faster and easier. At the same time, we learned that it is often necessary to balance ideal technical solutions with practical constraints such as time, tooling limitations, and team experience.
+
+Finally, we observed that a strong team culture was essential. Open communication and a willingness to share problems made it easier to collaborate and improve the system continuously. Overall, our DevOps approach was iterative and adaptive, where both the system and the process evolved based on experience and feedback.
+
+\subsection{Evolution and Refactoring }
+
+Some of the challenges in the project was the transition from the original implementation to a refactored system. We as a group chose to work in Go. This decision was based on Go’s great compatibility with container-based environments such as Docker, as well as its performance.
+
+This however turned out to be a challenge since only one of the members in the team had prior experience with Go. This refactoring from Python to Go required a lot of adaptation to another type system with a different approach to error handling. This slowed down the refactoring process and its deployment a lot.
+
+Another issue came during the separation of services. For this refactoring we initially attempted to split the whole system into a bunch of small individual services. For the scale of the project, however and time constrains this approach quickly became too complex in between deployment and communication between services. Therefore we decided to make a simpler version that would focus on separating the web and the api services (see commit \href{https://github.com/sebsthiel/minitwit-devops/commit/a8377dab525ee6f05cba84210267da76e0edc6fe}{a8377da}).
+
+
+These issues showed a clear example of how important it is to be critical of implementations of systems. Attempting to introduce overly complex solutions too early can result in overengineering, especially in early-stage systems. Service boundaries should be introduced gradually rather than upfront. 
+
+\subsection{Operation}
+
+Operating the system introduced challenges related to orchestration and deployment, some appeared when using Docker Swarm. Configuring the swarm setup and ensuring communication between nodes proved difficult, especially when dealing with networking and port configuration issues. For example, connecting worker nodes to the manager required either exposing ports (raising security concerns) or reconfiguring the swarm to use private IP addresses (see commit \href{https://github.com/sebsthiel/minitwit-devops/commit/de9ece2321d66eeb74f87014aebf46655bbc92cb}{de9ece2}).
+
+There was also uncertainty about whether to combine Docker Swarm with Docker Compose or rely on a single orchestration approach. But sticking to Docker Swarm reduced its complexity and simplified networking decisions.
+
+We discovered that our monitoring was not sufficient. The metrics and logs did not provide a full coverage of the health of our application.  
+This made it difficult to detect and diagnose issues. Introducing more complete monitoring mechanisms later in the process improved system visibility but also revealed how critical it is to include observability early.
+
+\subsection{Maintenance}
+
+Maintaining the system was particularly challenging due to issues with the test suite and CI/CD pipeline. Tests were unstable for a significant part of the project, due to misconfigurations in the pipeline and inconsistencies in the test setup. This resulted in the test suite being only fully functional late in the project.
+
+It took a lot to stabilize the testing environment, including restructuring container setups, fixing dependencies such as geckodriver, and ensuring proper database connectivity (see commit  \href{https://github.com/sebsthiel/minitwit-devops/commit/355f28c316aa33d9a324e6a0f35a3c6d165aa6f5}{355f28c}). This included introducing health checks, improving logging on failure, and refining environment variable handling.
+
+These issues made it difficult to confidently validate changes and slowed down development, particularly during refactoring phases. Once the test suite became stable and integrated into the CI/CD pipeline, it significantly improved deployments.
+
+This showed how reliable testing infrastructure is critical for maintainability. Delaying the stabilization of tests leads to increased debugging time and reduced development speed, especially in a distributed, container-based system.
+
