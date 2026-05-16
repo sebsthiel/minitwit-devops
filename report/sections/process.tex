@@ -12,36 +12,142 @@
 
 \section{Process' perspective}
 \subsection{CI/CD pipelines}
-\textbf{TEST: pipeline is working}
-Our project mainly use two separate pipelines called "PR Quality Gate" and "CI/CD Pipeline Production Server" \textcolor{red}{LINK}
+Our project mainly use two separate pipelines called \href{https://github.com/sebsthiel/minitwit-devops/actions/workflows/develop-pr.yml}{"PR Quality Gate"} and \href{https://github.com/sebsthiel/minitwit-devops/actions/workflows/cicd-prod.server.yml}{"CI/CD Pipeline Production Server"}. Both pipelines utilizes a pipeline template called "Merged Test Suite", which will be referred to as the "test-suite".
 
 \subsubsection{PR Quality Gate pipeline}
-This pipeline functions as a quality gate whenever we create a Pull Request (PR) into our development branch called "develop". Each time a PR is created or updated, the pipeline would run some static analysis checks, build the solution, and test if our testsuite passes.  \textcolor{red}{CREATE DIAGRAM}. \\\\\
+This pipeline functions as a quality gate whenever we create a Pull Request (PR) into our development branch called "develop". Each time a PR is created or updated, the pipeline would run some static analysis checks, build the solution, and test if our test-suite passes. An overview of the pipeline can be seen in figure \ref{fig:pipeline-pr}.
+Additionally SonarQube and Codacy has been set up for the git repository such that every time a Pull Request is created it will scan the code.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/PR.drawio.png}
+    \caption{Overview of the PR Quality gate pipeline}
+    \label{fig:pipeline-pr}
+\end{figure}
 
 \subsubsection{CI/CD Pipeline Production Server pipeline}
-This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, however after that it also pushes our docker images to a docker registry and deploys our application in our production environment. The pipeline is triggered each time an update is triggered on the main branch.
-\textcolor{red}{CREATE DIAGRAM}. \\\\\
+This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, however after that it also pushes our docker images to a docker registry and deploys our application in our production environment. The pipeline is triggered each time an update is triggered on the main branch. It only deploys if every prior step succeeds.An overview of this pipeline can be seen in figure \ref{fig:pipeline-cicd}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/CICD.drawio.png}
+    \caption{Overview of the CI/CD pipeline}
+    \label{fig:pipeline-cicd}
+\end{figure}
+
+\subsubsection{Test-suite}
+The test suite is a template pipeline that is responsible for testing that the applications passes UI tests, unit tests and API tests. An overview of the pipeline template can be seen in figure \ref{fig:pipeline-testsuite}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/TestSuite.drawio.png}
+    \caption{Illustration of the test-suite's steps and tools}
+    \label{fig:pipeline-testsuite}
+\end{figure}
+
 
 
 
 
 \subsection{Monitoring}
-% Mention prometheus & grafana? yes those are the two main tools used. Also why we decided to use Grafan in logging since we already used it. Prometheus was used to gather information about the running containers while Grafana was used as a data visualization tool.
+\label{sec:monitoring}
+For monitoring, we use a combination of Prometheus, cAdvisor, Node Exporter, and Grafana. Prometheus acts as the central metrics collection and storage system and it periodically scrapes metrics from the configured exporters and make them available as a data source for Grafana. Node Exporter exposes host-level metrics from the nodes, such as CPU, memory, disk, and network usage, while cAdvisor exposes container-level metrics, such as per-service CPU core utilization broken down by Docker Swarm service name.
 
+Grafana is used as the data visualization layer and we have configured two dashboards (see here \href{https://minitwit-devops.tech/grafana}{Grafana Dashboard}):
+
+\begin{itemize}
+    \item \textbf{Availability Dashboard}: Tracks the uptime of the Minitwit API, Minitwit Web, cAdvisor, and Node Exporter using Prometheus' \texttt{up} metric. It shows each service's availability percentage over time, as well as a state timeline indicating when services were up or down (see here \href{https://minitwit-devops.tech/grafana/d/adlrfxw/availability?orgId=1&from=now-3h&to=now&timezone=browser&var-instance=.%2A&refresh=5s}{Availability Dashboard}).
+    \item \textbf{Resource Usage Dashboard}: Provides a detailed view of the infrastructure health, including CPU utilization (min, mean, max, and p95), the memory utilization (total, used, and available), disk utilization, and network throughput (bytes received and transmitted) (see here \href{https://minitwit-devops.tech/grafana/d/adkmz5r/resource-usage?orgId=1&from=now-1h&to=now&timezone=browser&refresh=5s}{Resource Usage Dashboard}).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/availability.png}
+    \caption{Dashboard of Availability}
+    \label{fig:security_risks}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/reee.JPG}
+    \caption{Dashboard of Resource Usage}
+    \label{fig:security_risks}
+\end{figure}
+
+In addition to the dashboards, Grafana is configured with alert rules based on the \texttt{up} metric for both the Minitwit API and the Minitwit Web services. If either service becomes unavailable, an alert is triggered, and a notification is sent to the team via a Discord webhook, allowing us to quickly respond to unexpected downtime.
 
 \subsection{Logging}
-The solution makes use of a go-library called \href{https://github.com/rs/zerolog}{"zerolog"}. We chose zerolog as this framework enable us to handle logs at different log-levels easily, it is fast as well as used widely by other go-users.
+We use a Go library called \href{https://github.com/rs/zerolog}{"zerolog"} for structured logging. We chose zerolog because it supports multiple log levels, is lightweight and performant, and is widely used in the Go community.
 
-Promtail was used to ...
+To collect the logs from the Docker containers running in the swarm, we use Promtail. Promtail adds metadata labels to each log entry before forwarding them, making it easier to search and filter logs later. In our case, Promtail adds the following labels:
 
-Loki was used to ...
+\begin{itemize}
+    \item \texttt{app}: Whether the log originates from the web or API service.
+    \item \texttt{endpoint}: The logical endpoint that was called, e.g. \texttt{register}, \texttt{msg}, or \texttt{fllws\_username}.
+    \item \texttt{method}: The HTTP method of the request, e.g. \texttt{GET} or \texttt{POST}.
+    \item \texttt{statusCode}: The HTTP response code returned, e.g. \texttt{200} or \texttt{404}.
+    \item \texttt{level}: The log level of the entry, e.g. \texttt{info} or \texttt{error}.
+\end{itemize}
 
-As grafana already was used to show monitoring information, we also chose to use it for seeing the aggregated logs. 
-% Dashboard with the following data: Total requests, successful requests, error requests and error rate as stats.
+The logs are then forwarded to Loki, which is our log aggregation system. Loki indexes the labels created by Promtail, enabling fast and efficient querying without indexing the full log content.
 
+Since Grafana was already used for the monitoring dashboards, we also use it to visualize the aggregated logs through an \textbf{API Dashboard} (see here \href{https://minitwit-devops.tech/grafana/d/ad5dg8t/api-dashboard?orgId=1&from=now-6h&to=now&timezone=browser&var-endpoint=\$__all&var-level=\$__all&var-method=\$__all}{API Dashboard}). The dashboard queries Loki and displays the following information:
 
+\begin{itemize}
+    \item \textbf{Summary statistics}: Total requests, successful requests (info-level), errors, and overall error rate percentage across the selected time range.
+    \item \textbf{Request time series}: A graph showing request volume per endpoint over time.
+    \item \textbf{Per-endpoint breakdown}: A table showing total, successful and failed requests along with the error rate for each individual endpoint.
+    \item \textbf{Raw log view}: A filterable view of raw log entries, supporting filtering by endpoint, HTTP method, and log level.
+\end{itemize}
 
-\subsection{Security}
+\subsection{Security Hardening}
+
+A focused security assessment was conducted on the MiniTwit system to identify risks across infrastructure, CI/CD workflows, deployment configuration, and application behavior. The assessment was based on static analysis tools, manual inspection of workflows, firewall testing, and external port scanning.
+
+The identified risks are summarized in Figure~\ref{fig:security_risks}. The most critical risks were related to exposed network ports, insecure handling of secrets, and database instability under load.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Images/security_risks.png}
+    \caption{Overview of identified security risks categorized by likelihood and impact}
+    \label{fig:security_risks}
+\end{figure}
+
+\subsubsection{Implemented Improvements}
+
+The most significant improvement was firewall hardening on all three nodes using UFW. A deny-by-default incoming policy was configured, and unnecessary public ports were removed. Previously exposed ports included Docker management ports (2375, 2376, 2377) and direct application ports (5000, 5001). After hardening, only essential services remained publicly accessible:
+
+\begin{itemize}
+   \item SSH (22)
+    \item HTTP (80)
+    \item HTTPS (443)
+    \item Docker Swarm management (2377)
+    \item Docker Swarm node communication (7946)
+    \item Docker overlay network (4789)
+\end{itemize}
+
+All application traffic is now routed through the Nginx reverse proxy, reducing the system's public attack surface. Firewall changes were validated using external port scanning, confirming that removed services were no longer reachable.
+
+To mitigate brute-force attacks, Fail2Ban was installed and configured to block repeated failed SSH login attempts. Automatic system updates were also enabled to ensure that known vulnerabilities are patched regularly.
+
+Security scanning was integrated into the CI/CD pipeline using tools such as Semgrep and Trivy as well as having SonarQube and Codacy enabled for the repository. These tools help detect insecure code patterns and misconfigurations before deployment.
+
+ HTTPS is enabled using Let's Encrypt certificates managed via Certbot with Nginx configured to terminate TLS on port 443.
+
+\subsubsection{Remaining Risks and Improvements}
+
+Despite these improvements, some risks remain:
+
+\begin{itemize}
+    \item Secrets are stored in environment variables and should be moved to a secure secret management solution
+    \item Prometheus and Promtail run with elevated privileges 
+(root user) in order to access the Docker socket and 
+container logs respectively
+    \item Docker images use mutable tags, reducing deployment reproducibility
+    \item Monitoring tools may be publicly accessible
+    \item Database connection limits caused instability under load
+\end{itemize}
+
+Future improvements include restricting monitoring access, using Docker Secrets, running containers as non-root users, introducing database connection pooling, and improving backup strategies.
+
+Overall, the implemented measures significantly improved the security posture of the system, while highlighting areas for further hardening.
 % TLS, reverse proxy, Docker scout/snyk test.
 
 
@@ -49,4 +155,6 @@ As grafana already was used to show monitoring information, we also chose to use
 
 To achieve high Availability we use Docker Swarm with an on-failure restart policy and a rolling update strategy. Docker Swarm allows us to have multiple replicas of our services. If one replica goes down, other replicas will still be up and running, meaning that we don't suffer downtime. The on-failure restart policy means that any replica which goes down, is rebooted automatically. The rolling update policy means that when we ship new features, the replicas are updated one at a time, which means we can achieve zero down time when making new releases. \newline
 
-Docker Swarm is also the answer to the question of scaling. By replicating our services we employ horizontal scaling, and with Swarm Mode also comes load balancing. This means that requests to our services are distributed among the replicas to not overburden any single replicas. The application is running on three nodes (Digital Ocean Droplets). One node for the Postgres database, one swarm-manager node and one worker node. This once again means high availability since, if the worker dies the manager is still controlling the swarm and running containers, and if the manager dies, the worker node can still run existing services. Ideally we would have more nodes, and more managers to ensure that even if a manager dies, another manager can still remain in control of the swarm.
+Docker Swarm is also the answer to the question of scaling. By replicating our services we employ horizontal scaling, and with Swarm Mode also comes load balancing. This means that requests to our services are distributed among the replicas to not overburden any single replica. The application is running on three nodes (Digital Ocean Droplets). One node for the Postgres database, one swarm-manager node and one worker node. This once again means high availability since, if the worker dies the manager is still controlling the swarm and running containers, and if the manager dies, the worker node can still run existing containers 
+though new deployments will be unavailable until the manager recovers 
+The application infrastructure is described in detail in Section~\ref{sec:design}.

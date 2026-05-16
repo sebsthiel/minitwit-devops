@@ -1,8 +1,56 @@
 \section{System's Perspective}
 \subsection{Design and Architecture}
+\label{sec:design}
+
+The Minitwit system is deployed on DigitalOcean using three droplets: one PostgreSQL database node, one Docker Swarm manager node, and one Docker Swarm worker node. The application is containerized and deployed through Docker Swarm, which runs and manages the application services across the swarm.
+
+The original plan was to use Vagrant with DigitalOcean, but this caused compatibility issues, especially on Windows machines. Instead, we implemented a PowerShell-based deployment script, \texttt{scripts/deploy-existing.ps1}. The script deploys to already existing droplets by connecting to the server with SSH, copying configuration files with SCP, setting the required environment variables, and deploying the services using Docker Swarm.
+
+The public entry point to the system is Nginx. Incoming traffic is routed through Nginx, which forwards requests 
+to the web service, the API service, or Grafana based on the URL path. The API and web services communicate with the PostgreSQL database for persistent storage. The simplified request flow is:
+
+\begin{center}
+    \texttt{Browser / Simulator $\rightarrow$ Nginx $\rightarrow$ Web / API $\rightarrow$ PostgreSQL}
+\end{center}
+
+The system also includes a full monitoring stack comprising Prometheus, 
+Grafana, Loki, Promtail, cAdvisor, and node-exporter, which is described 
+in detail in Section~\ref{sec:monitoring}.
+
+The deployment architecture is illustrated in Figure~\ref{fig:deployment-diagram}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{Images/deployment-diagram.png}
+    \caption{Deployment diagram of the MiniTwit system}
+    \label{fig:deployment-diagram}
+\end{figure}
+
+A \texttt{scripts/create-infrastructure.ps1} script was also implemented to automate full infrastructure creation from scratch. It creates the three droplets, installs PostgreSQL and Docker, configures Docker Swarm, joins the worker node, and restores the database from a backup. A companion script \texttt{scripts/backup-database.ps1} backs up the live PostgreSQL database before any redeployment. Testing of the full infrastructure creation was limited because the DigitalOcean account reached the three-droplet limit, preventing creation of new droplets while the existing ones were running.
+
+% HERE WE REFER TO SEQUENCE DIAGRAM?
+% 
+Additionally two sequence diagrams were created to visualize the sequential flow of logging in and posting a message in the solution. The interaction can be seen in figure~\ref{fig:post-sequence} and ~\ref{fig:login-sequence}.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/SeqDiaPostMsg.JPG}
+    \caption{Post creation and timeline rendering sequence diagram}
+    \label{fig:post-sequence}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/SeqDiaLogin.JPG}
+    \caption{Login sequence diagram of the MiniTwit system}
+    \label{fig:login-sequence}
+\end{figure}
+
 \subsection{Dependencies}
 
-The following are the dependencies for our Minitwit system, listed in an orgainized manner in order to better provide an overview.
+The following are the dependencies for our Minitwit system, listed in an organized manner in order to better provide an overview.
 
 \textbf{Runtime Dependencies}
 
@@ -24,7 +72,6 @@ This list contains the libraries and what each library is for.
     \item Gorilla Sessions: Session management.
     \item GORM: Object-relational mapper.
     \item PostgreSQL Driver: Database connectivity.
-    \item go-sqlite3: SQLite support for testing/development.
     \item Zerolog: Structured logging.
     \item Prometheus client\_golang: Metrics instrumentation.
 \end{itemize}
@@ -47,6 +94,20 @@ This list includes tools for employing DevOps practices.
     \item Github Actions: CI/CD Pipeline
     \item Codacy: Quality assurance
     \item SonarQube: Quality assurance
+    \item Trivy: Pipeline hardening
+    \item Fail2Ban: Intrusion-prevention framework
 \end{itemize}
 
 \subsection{Current System State}
+
+The application has certain issues, which have not been resolved due to lack of time. These issues are mentioned below.
+
+\begin{itemize}
+    \item Ideally we would have more nodes, and more managers to ensure that even if a manager dies, another manager can still remain in control of the swarm.
+    \item There is a bug where it is possible to create multiple instances of the same user.
+    \item There are currently no logging for the WEB part of the application. This has been neglected as almost all traffic has come from the simulator, which only talks with the API.
+    \item Our entire monitoring stack as well as nginx don't have a health check configured, meaning we cannot monitor the uptime of these services
+    \item We have used Trivy for analysing dependencies in in the docker images, but have not acted on the information.
+\end{itemize}
+
+% Log in is buggy (think it is because database is overloaded)
