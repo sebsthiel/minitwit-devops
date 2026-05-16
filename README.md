@@ -1,219 +1,98 @@
-# Run the application
+# MiniTwit DevOps
 
-To synchronize dependencies run:
+A Go reimplementation of the *MiniTwit* application, built for the **DevOps** course at ITU. The app is split into a web service and a REST API, runs on Docker Swarm with a PostgreSQL backend, and is deployed on DigitalOcean via GitHub Actions.
 
-```bash
-go mod tidy
+## Tech Stack
+
+Go 1.25 · PostgreSQL · Docker Swarm · nginx · Prometheus + Grafana + Loki · GitHub Actions
+
+## Repository Layout
+
+```
+cmd/api, cmd/web        # Service entry points
+internal/               # Handlers, DB access, monitoring
+templates/, static/     # Web UI
+test/                   # Simulator + API tests
+monitoring/             # Prometheus, Grafana, Loki configs
+python_implementation/  # Original Python version (reference only)
 ```
 
-You can run it by writing:
+## Run with Docker Swarm
+
+Requires Docker with Swarm mode.
 
 ```bash
-go run .
+set -a && source .env && set +a   # load env vars
+make runlocalswarm                # build images, init swarm, deploy
+make deploymonitoring             # optional: Prometheus + Grafana + Loki
+make clean                        # tear everything down
 ```
 
-When running you can find it on:
-[http://localhost:5001](http://localhost:5001)
+The app is then available at **http://localhost** behind nginx. Grafana is on **http://localhost:3000** (default `admin`/`admin`).
 
-## Use an empty database:
+### Environment variables
 
-To use an empty database you need to simply delete the database folder in the tmp folder.
-This can be done like:
+| Variable | Description |
+| --- | --- |
+| `DATABASE_PATH` | Postgres connection string |
+| `LOG_LEVEL` | `debug`, `info`, `warn`, or `error` |
+| `SIMULATOR_AUTH` | Bearer token for the simulator endpoints |
+| `DISCORD_WEBHOOK_URL` | Url link to discord webhook for availability notifications |
+
+## Testing
 
 ```bash
-rm /tmp/minitwit.db
+python3 minitwit_simulator.py http://localhost:5001/api   # run the simulator
+cd test && pytest minitwit_sim_api_test.py                # API integration tests
+make all                                                  # lint + static analysis
 ```
 
-## Use a database with data
+## Deploy to Production
 
-The repository contains a small database file contained with some messages and users.
-To make the application use this database you need to copy the minitwit.db from the root folder to the "/tmp" folder on your machine.
+Production is deployed **automatically via GitHub Actions** — there is no manual deploy step.
 
-```bash
-cp minitwit.db /tmp/
-```
+Merging a PR from `develop` into `main` triggers the CI/CD pipeline (`.github/workflows/cicd-prod.server.yml`), which:
 
-# Run application using docker Swarm
-Load the variables from the .env file into the shell environment:
-```bash
-set -a && source .env && set +a
-```
-Then run:
-```bash
-make runlocalswarm
-```
-This command is idempotent.
-The result should be a swarm of the application that uses a postgresql database. 
-If you want to spin up the monitoring stack you can run:
-```bash
-make deploymonitoring
-```
-To remove the solution and/or monitoring do:
-```bash
-make clean
-```
+1. Runs static analysis and tests
+2. Builds and pushes the API and web Docker images to Docker Hub
+3. SSHs into the swarm manager droplet and runs `docker stack deploy`
 
-You can also do the steps manually if you desire:
+Production runs on two DigitalOcean droplets (swarm manager + db) that are already provisioned. The pipeline requires the following GitHub secrets to be set:
 
-## 0. Built local images (for running locally)
-Docker swarm does not support building the images using "build" in the compose file. Therefore the local images must be built before deploying the stack:
-```bash
-# API
-docker build -t minitwit-api:dev -f Dockerfile.api .
-# Web
-docker build -t minitwit-web:dev -f Dockerfile.web .
-# both
-make buildlocal
-```
+| Secret | Description |
+| --- | --- |
+| `DOCKER_USERNAME` | Docker Hub username |
+| `DOCKER_PASSWORD` | Docker Hub password |
+| `SSH_HOST_SWARM` | IP address of the swarm manager droplet |
+| `SSH_USER_SWARM` | SSH username (e.g. `root`) |
+| `SSH_KEY_SWARM` | Private SSH key for the swarm manager |
 
-## 1. Initialize the swarm (first time only)
-```bash
-docker swarm init
-```
-## 2. Create the shared overlay network (first time only)
-```bash
-docker network create --driver overlay minitwit-network
-```
-## 3. Load environment variables
-Load the variables from the .env file into the shell environment:
-```bash
-set -a && source .env && set +a
-```
-## 4. Deploy the stack (Using local images)
-```bash
-# API And Web services
-docker stack deploy -c docker-compose.develop.yml minitwit
-# Monitoring services 
-docker stack deploy -c docker-compose.monitoring.yml monitoring
-```
-## 5. Verify services
-```bash
-docker service ls
-```
-## 6. View logs
-```bash
-## For API
-docker service logs minitwit_api
-## For Web
-docker service logs minitwit_web
-```
-## 7. Remove the stack
-```bash
-docker stack rm minitwit
-docker stack rm monitoring
-```
+## Infrastructure
 
-# Run application using docker Compose (Depricated, probably doens't work anymore):
+Production runs on two DigitalOcean droplets:
 
-The docker commands have been inserted into a Makefile.
-To build and run the application with docker:
+| Droplet | IP | Role |
+| --- | --- | --- |
+| swarm-manager | 157.230.121.187 | Runs Docker Swarm, nginx, app services, monitoring |
+| db | 104.248.247.141 | Runs PostgreSQL 14 |
 
-```bash
-make runlocal
-```
+Access is via SSH key only. The swarm manager can also be reached via the DigitalOcean web console.
 
-Stop minitwit (using docker):
+## Contributing
 
-```bash
-docker compose down
-```
+We use a feature-branch workflow with mandatory PR review.
 
-# Test application
+1. Branch off `develop`: `git checkout -b <short-description>`.
+2. Run `make all` and `go test ./...` before pushing.
+3. Open a PR into `develop`. CI must be green before merge.
+4. Releases to production happen via PR from `develop` → `main`, which triggers the deploy workflow in `.github/workflows/cicd-prod.server.yml`.
 
-## Run a minitwit simulator against our API:
+## Authors
 
-```bash
-python3 minitwit_simulator.py http://localhost:5001/api
-```
-
-## Run
-
-# Simulation API
-
-The API is part of the application. It is accessible on the same host but with the route /api.
-See api.go
-
-## Testing the api
-
-This requires two console windows.
-
-```bash
-1) Run minitwit
-cd /minitwit-devops
-run go .
-
-2) Run the minitwit_sim_api_test.py inside the test folder.
-cd /minitwit-devops/test
-pytest minitwit_sim_api_test.py
-```
-
-# Create environment - RUN Vagrant
-
-## Setting Required Environment Variables for Vagrant + DigitalOcean
-
-### 1. DIGITAL_OCEAN_TOKEN (Required)
-
-Create a **Personal Access Token (Write scope)** in:
-
-DigitalOcean → API → Tokens/Keys → Generate New Token
-
-Copy the token (looks like `dop_v1_...`).
-
-#### macOS / Linux (bash/zsh)
-
-Temporary (current terminal only):
-
-```bash
-export DIGITAL_OCEAN_TOKEN="dop_v1_..."
-```
-
-Persistent (add to ~/.zshrc or ~/.bashrc):
-
-```bash
-echo 'export DIGITAL_OCEAN_TOKEN="dop_v1_..."' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### 2. DIGITAL_OCEAN_SSH_KEY_PATH
-
-If you don’t set it, your Vagrantfile uses ~/.ssh/do_vagrant.
-
-You must have these files on your host:
-
-~/.ssh/do_vagrant (private key)
-
-~/.ssh/do_vagrant.pub (public key)
-
-Create them (recommended):
-
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/do_vagrant -C "do-vagrant"
-```
-
-#### If you used a different path, set it:
-
-```bash
-export DIGITAL_OCEAN_SSH_KEY_PATH="~/.ssh/some/path"
-```
-
-### 3. DIGITAL_OCEAN_SSH_KEY_NAME
-
-This is the name of the SSH key object inside DigitalOcean. Default is do-vagrant.
-
-```bash
-export DIGITAL_OCEAN_SSH_KEY_NAME="do-vagrant-myname"
-```
-
-### 4. Verify variables are set
-
-```bash
-echo $DIGITAL_OCEAN_TOKEN
-echo $DIGITAL_OCEAN_SSH_KEY_PATH
-echo $DIGITAL_OCEAN_SSH_KEY_NAME
-```
-
-## Run vagrant
-
-```bash
-vagrant up --provider=digital_ocean
-```
+Developed by — ITU DevOps course, Autumn 2025.
+- Jacob Sonne
+- Renate Mekere
+- Adam Nørgård Aabye
+- Marc David Paget
+- Sebastian Thiel Steensgaard
+- Asger Engelund Trads
