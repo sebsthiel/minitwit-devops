@@ -19,7 +19,7 @@ This pipeline functions as a quality gate whenever we create a Pull Request (PR)
 Additionally SonarQube and Codacy has been set up for the git repository such that every time a Pull Request is created it will scan the code.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/PR.drawio.png}
+    \includegraphics[width=0.9\linewidth]{images/PR.drawio.png}
     \caption{Overview of the PR Quality gate pipeline}
     \label{fig:pipeline-pr}
 \end{figure}
@@ -28,7 +28,7 @@ Additionally SonarQube and Codacy has been set up for the git repository such th
 This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, however after that it also pushes our docker images to a docker registry and deploys our application in our production environment. The pipeline is triggered each time an update is triggered on the main branch. It only deploys if every prior step succeeds.An overview of this pipeline can be seen in figure \ref{fig:pipeline-cicd}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/CICD.drawio.png}
+    \includegraphics[width=0.9\linewidth]{images/CICD.drawio.png}
     \caption{Overview of the CI/CD pipeline}
     \label{fig:pipeline-cicd}
 \end{figure}
@@ -37,7 +37,7 @@ This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, ho
 The test suite is a template pipeline that is responsible for testing that the applications passes UI tests, unit tests and API tests. An overview of the pipeline template can be seen in figure \ref{fig:pipeline-testsuite}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/TestSuite.drawio.png}
+    \includegraphics[width=0.9\linewidth]{images/TestSuite.drawio.png}
     \caption{Illustration of the test-suite's steps and tools}
     \label{fig:pipeline-testsuite}
 \end{figure}
@@ -59,14 +59,14 @@ Grafana is used as the data visualization layer and we have configured two dashb
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/availability.png}
+    \includegraphics[width=0.9\linewidth]{images/availability.png}
     \caption{Dashboard of Availability}
     \label{fig:security_risks}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/reee.JPG}
+    \includegraphics[width=0.9\linewidth]{images/reee.JPG}
     \caption{Dashboard of Resource Usage}
     \label{fig:security_risks}
 \end{figure}
@@ -105,7 +105,7 @@ The identified risks are summarized in Figure~\ref{fig:security_risks}. The most
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{Images/security_risks.png}
+    \includegraphics[width=0.9\linewidth]{images/security_risks.png}
     \caption{Overview of identified security risks categorized by likelihood and impact}
     \label{fig:security_risks}
 \end{figure}
