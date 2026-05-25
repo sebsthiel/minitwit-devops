@@ -4,12 +4,6 @@
 .ONESHELL:
 SHELL := /bin/bash
 
-# Make .env variables accessible to all recipes with $(VARIABLE_NAME)
-# include .env
-
-# Export all make variables to shell. Recipes can use $VARIABLE_NAME. Especially useful if we use python scripts to run stuff as we might want to expose variables instead of passing them.
-# export
-
 all: staticcheck gofmt hadolint checkmake semgrep
 
 semgrep:
