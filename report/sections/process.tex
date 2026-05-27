@@ -19,7 +19,7 @@ This pipeline functions as a quality gate whenever we create a Pull Request (PR)
 Additionally SonarQube and Codacy has been set up for the git repository such that every time a Pull Request is created it will scan the code.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/PR.drawio.png}
+    \includegraphics[width=0.9\linewidth]{Images/PR.drawio.png}
     \caption{Overview of the PR Quality gate pipeline}
     \label{fig:pipeline-pr}
 \end{figure}
@@ -28,7 +28,7 @@ Additionally SonarQube and Codacy has been set up for the git repository such th
 This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, however after that it also pushes our docker images to a docker registry and deploys our application in our production environment. The pipeline is triggered each time an update is triggered on the main branch. It only deploys if every prior step succeeds.An overview of this pipeline can be seen in figure \ref{fig:pipeline-cicd}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/CICD.drawio.png}
+    \includegraphics[width=0.9\linewidth]{Images/CICD.drawio.png}
     \caption{Overview of the CI/CD pipeline}
     \label{fig:pipeline-cicd}
 \end{figure}
@@ -37,7 +37,7 @@ This pipeline also runs the quality checks as the "PR Quality Gate" pipeline, ho
 The test suite is a template pipeline that is responsible for testing that the applications passes UI tests, unit tests and API tests. An overview of the pipeline template can be seen in figure \ref{fig:pipeline-testsuite}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/TestSuite.drawio.png}
+    \includegraphics[width=0.9\linewidth]{Images/TestSuite.drawio.png}
     \caption{Illustration of the test-suite's steps and tools}
     \label{fig:pipeline-testsuite}
 \end{figure}
@@ -50,26 +50,12 @@ The test suite is a template pipeline that is responsible for testing that the a
 \label{sec:monitoring}
 For monitoring, we use a combination of Prometheus, cAdvisor, Node Exporter, and Grafana. Prometheus acts as the central metrics collection and storage system and it periodically scrapes metrics from the configured exporters and make them available as a data source for Grafana. Node Exporter exposes host-level metrics from the nodes, such as CPU, memory, disk, and network usage, while cAdvisor exposes container-level metrics, such as per-service CPU core utilization broken down by Docker Swarm service name.
 
-Grafana is used as the data visualization layer and we have configured two dashboards (see here \href{https://minitwit-devops.tech/grafana}{Grafana Dashboard}):
+Grafana is used as the data visualization layer and we have configured two dashboards which can be seen in the appendix (section \ref{sec:monitoring-dashboards}):
 
 \begin{itemize}
-    \item \textbf{Availability Dashboard}: Tracks the uptime of the Minitwit API, Minitwit Web, cAdvisor, and Node Exporter using Prometheus' \texttt{up} metric. It shows each service's availability percentage over time, as well as a state timeline indicating when services were up or down (see here \href{https://minitwit-devops.tech/grafana/d/adlrfxw/availability?orgId=1&from=now-3h&to=now&timezone=browser&var-instance=.%2A&refresh=5s}{Availability Dashboard}).
-    \item \textbf{Resource Usage Dashboard}: Provides a detailed view of the infrastructure health, including CPU utilization (min, mean, max, and p95), the memory utilization (total, used, and available), disk utilization, and network throughput (bytes received and transmitted) (see here \href{https://minitwit-devops.tech/grafana/d/adkmz5r/resource-usage?orgId=1&from=now-1h&to=now&timezone=browser&refresh=5s}{Resource Usage Dashboard}).
+    \item \textbf{Availability Dashboard}: Tracks the uptime of the Minitwit API, Minitwit Web, cAdvisor, and Node Exporter using Prometheus' \texttt{up} metric. It shows each service's availability percentage over time, as well as a state timeline indicating when services were up or down. The dashboard can be seen in the appendix or here .
+    \item \textbf{Resource Usage Dashboard}: Provides a detailed view of the infrastructure health, including CPU utilization (min, mean, max, and p95), the memory utilization (total, used, and available), disk utilization, and network throughput (bytes received and transmitted) .
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/availability.png}
-    \caption{Dashboard of Availability}
-    \label{fig:security_risks}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/reee.JPG}
-    \caption{Dashboard of Resource Usage}
-    \label{fig:security_risks}
-\end{figure}
 
 In addition to the dashboards, Grafana is configured with alert rules based on the \texttt{up} metric for both the Minitwit API and the Minitwit Web services. If either service becomes unavailable, an alert is triggered, and a notification is sent to the team via a Discord webhook, allowing us to quickly respond to unexpected downtime.
 
@@ -88,7 +74,7 @@ To collect the logs from the Docker containers running in the swarm, we use Prom
 
 The logs are then forwarded to Loki, which is our log aggregation system. Loki indexes the labels created by Promtail, enabling fast and efficient querying without indexing the full log content.
 
-Since Grafana was already used for the monitoring dashboards, we also use it to visualize the aggregated logs through an \textbf{API Dashboard} (see here \href{https://minitwit-devops.tech/grafana/d/ad5dg8t/api-dashboard?orgId=1&from=now-6h&to=now&timezone=browser&var-endpoint=\$__all&var-level=\$__all&var-method=\$__all}{API Dashboard}). The dashboard queries Loki and displays the following information:
+Since Grafana was already used for the monitoring dashboards, we also use it to visualize the aggregated logs through an \textbf{API Dashboard} (see appendix \ref{sec:logging}). The dashboard queries Loki and displays the following information:
 
 \begin{itemize}
     \item \textbf{Summary statistics}: Total requests, successful requests (info-level), errors, and overall error rate percentage across the selected time range.
@@ -105,7 +91,7 @@ The identified risks are summarized in Figure~\ref{fig:security_risks}. The most
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/security_risks.png}
+    \includegraphics[width=0.9\linewidth]{Images/security_risks.png}
     \caption{Overview of identified security risks categorized by likelihood and impact}
     \label{fig:security_risks}
 \end{figure}
@@ -155,6 +141,8 @@ Overall, the implemented measures significantly improved the security posture of
 
 To achieve high Availability we use Docker Swarm with an on-failure restart policy and a rolling update strategy. Docker Swarm allows us to have multiple replicas of our services. If one replica goes down, other replicas will still be up and running, meaning that we don't suffer downtime. The on-failure restart policy means that any replica which goes down, is rebooted automatically. The rolling update policy means that when we ship new features, the replicas are updated one at a time, which means we can achieve zero down time when making new releases. \newline
 
-Docker Swarm is also the answer to the question of scaling. By replicating our services we employ horizontal scaling, and with Swarm Mode also comes load balancing. This means that requests to our services are distributed among the replicas to not overburden any single replica. The application is running on three nodes (Digital Ocean Droplets). One node for the Postgres database, one swarm-manager node and one worker node. This once again means high availability since, if the worker dies the manager is still controlling the swarm and running containers, and if the manager dies, the worker node can still run existing containers 
+Docker Swarm is also the answer to the question of scaling. By replicating our services we employ horizontal scaling, and with Swarm Mode also comes load balancing. This means that requests to our services are distributed among the nodes and containers to not overburden any single replica. 
+
+This once again means high availability since, if the worker dies the manager is still controlling the swarm and running containers, and if the manager dies, the worker node can still run existing containers 
 though new deployments will be unavailable until the manager recovers 
 The application infrastructure is described in detail in Section~\ref{sec:design}.

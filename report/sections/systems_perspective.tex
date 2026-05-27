@@ -4,7 +4,7 @@
 
 The Minitwit system is deployed on DigitalOcean using three droplets: one PostgreSQL database node, one Docker Swarm manager node, and one Docker Swarm worker node. The application is containerized and deployed through Docker Swarm, which runs and manages the application services across the swarm.
 
-The original plan was to use Vagrant with DigitalOcean, but this caused compatibility issues, especially on Windows machines. Instead, we implemented a PowerShell-based deployment script, \texttt{scripts/deploy-existing.ps1}. The script deploys to already existing droplets by connecting to the server with SSH, copying configuration files with SCP, setting the required environment variables, and deploying the services using Docker Swarm.
+The team have implemented a PowerShell-based deployment script, \texttt{scripts/deploy-existing.ps1}. The script deploys to already existing droplets by connecting to the server with SSH, copying configuration files with SCP, setting the required environment variables, and deploying the services using Docker Swarm.
 
 The public entry point to the system is Nginx. Incoming traffic is routed through Nginx, which forwards requests 
 to the web service, the API service, or Grafana based on the URL path. The API and web services communicate with the PostgreSQL database for persistent storage. The simplified request flow is:
@@ -21,7 +21,7 @@ The deployment architecture is illustrated in Figure~\ref{fig:deployment-diagram
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{images/deployment-diagram.png}
+    \includegraphics[width=\textwidth]{Images/deployment-diagram.png}
     \caption{Deployment diagram of the MiniTwit system}
     \label{fig:deployment-diagram}
 \end{figure}
@@ -35,7 +35,7 @@ Additionally two sequence diagrams were created to visualize the sequential flow
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/SeqDiaPostMsg.JPG}
+    \includegraphics[width=\textwidth]{Images/SeqDiaPostMsg.JPG}
     \caption{Post creation and timeline rendering sequence diagram}
     \label{fig:post-sequence}
 \end{figure}
@@ -43,7 +43,7 @@ Additionally two sequence diagrams were created to visualize the sequential flow
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/SeqDiaLogin.JPG}
+    \includegraphics[width=\textwidth]{Images/SeqDiaLogin.JPG}
     \caption{Login sequence diagram of the MiniTwit system}
     \label{fig:login-sequence}
 \end{figure}
