@@ -35,6 +35,7 @@ Write-Host "- Create swarm worker"
 Write-Host "- Install PostgreSQL on DB droplet"
 Write-Host "- Restore database backup"
 Write-Host "- Install Docker on manager + worker"
+Write-Host "- Configure UFW firewall on all nodes"
 Write-Host "- Initialize Docker Swarm"
 Write-Host "- Join worker to swarm"
 Write-Host ""
@@ -154,6 +155,42 @@ foreach ($node in @($MANAGER_IP, $WORKER_IP)) {
     ssh @SSH_OPTS "root@$node" $DOCKER_INSTALL
 }
 Write-Host "Docker installed on both nodes."
+
+# ── Configure UFW firewall on all nodes ──
+Write-Host ""
+Write-Host "Configuring firewall on DB node..."
+ssh @SSH_OPTS "root@$DB_IP" @"
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22
+ufw allow 5432
+ufw --force enable
+"@
+
+Write-Host "Configuring firewall on manager..."
+ssh @SSH_OPTS "root@$MANAGER_IP" @"
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22
+ufw allow 80
+ufw allow 443
+ufw allow 2377
+ufw allow 7946
+ufw allow 4789
+ufw --force enable
+"@
+
+Write-Host "Configuring firewall on worker..."
+ssh @SSH_OPTS "root@$WORKER_IP" @"
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22
+ufw allow 2377
+ufw allow 7946
+ufw allow 4789
+ufw --force enable
+"@
+Write-Host "Firewalls configured on all nodes."
 
 # ── Init Docker Swarm ──
 Write-Host ""
