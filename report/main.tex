@@ -3,19 +3,21 @@
 \usepackage{mystyle}
 
 \begin{document}
-    \input{title}
+    \input{./title.tex} 
     \clearpage
     \tableofcontents
     \addtocontents{toc}{\vspace{-0.5cm}}
 
     \setcounter{page}{0}
     \clearpage 
+    \input{tex/sections/systems_perspective}
+    \input{tex/sections/process}
 
-    \input{sections/process}
-    %\clearpage
-   \input{sections/systems_perspective}
+    \input{tex/sections/reflection}
+
+    \input{tex/sections/use_of_ai}
     
-    % \section{Bibliography}
     \printbibliography[heading=none]
-\end{document}
 
+    \input{tex/sections/appendix}
+\end{document}
