@@ -21,7 +21,7 @@ The deployment architecture is illustrated in Figure~\ref{fig:deployment-diagram
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{images/deployment-diagram.png}
+    \includegraphics[width=\textwidth]{Images/deployment-diagram.png}
     \caption{Deployment diagram of the MiniTwit system}
     \label{fig:deployment-diagram}
 \end{figure}
@@ -35,7 +35,7 @@ Additionally two sequence diagrams were created to visualize the sequential flow
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/SeqDiaPostMsg.JPG}
+    \includegraphics[width=\textwidth]{Images/SeqDiaPostMsg.JPG}
     \caption{Post creation and timeline rendering sequence diagram}
     \label{fig:post-sequence}
 \end{figure}
@@ -43,7 +43,7 @@ Additionally two sequence diagrams were created to visualize the sequential flow
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/SeqDiaLogin.JPG}
+    \includegraphics[width=\textwidth]{Images/SeqDiaLogin.JPG}
     \caption{Login sequence diagram of the MiniTwit system}
     \label{fig:login-sequence}
 \end{figure}
@@ -107,7 +107,7 @@ The application has certain issues, which have not been resolved due to lack of 
     \item There is a bug where it is possible to create multiple instances of the same user.
     \item There are currently no logging for the WEB part of the application. This has been neglected as almost all traffic has come from the simulator, which only talks with the API.
     \item Our entire monitoring stack as well as nginx don't have a health check configured, meaning we cannot monitor the uptime of these services
-    \item We have used Trivy for analysing dependencies in in the docker images, but have not acted on the information.
+    \item We have used Trivy for analysing dependencies in in the docker Images, but have not acted on the information.
 \end{itemize}
 
 % Log in is buggy (think it is because database is overloaded)
